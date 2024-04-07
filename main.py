@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # read arguments
     if len(sys.argv) != 2:
         # print('Please specify 2 arguments: 1) the name of the task (e.g., \'find\' or \'list\'), and 2) input file path (e.g., graphs/canonical.txt).')
-        print('Please specify 1 argument: input file path (e.g., graphs/m_graph.txt).')
+        print('Please specify 1 argument: input file path (e.g., graphs/list1.txt).')
 
         sys.exit()
 
