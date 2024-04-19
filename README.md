@@ -17,10 +17,11 @@ pip install -e .
 To run some examples, try running the following commands:
 
 ```
-python3 main.py graphs/list1.txt
+python3 main.py lmp graphs/list1.txt
 ```
 
-1. First argument: `graphs/list1.txt`. the path to a file that contains all necessary information, such as graph. Please check the formatting for details.
+1. First argument: `gmp` or `lmp`. `gmp` lists all conditional independencies invoked by the global Markov property. 'lmp' lists all conditional independencies invoked by the ordered local Markov property.
+2. Second argument: `graphs/list1.txt`. the path to a file that contains all necessary information, such as graph, query, and constraints (i.e., `I` and `R`). Please check the formatting for details.
 
 ## Formatting of the input file
 

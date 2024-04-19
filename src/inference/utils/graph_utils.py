@@ -291,6 +291,41 @@ class GraphUtils():
 
         return graph
 
+    @staticmethod
+    def moralize(G):
+        graph = G.copy()
+
+        # convert all edges to undirected
+        graph.toUndirected()
+
+        for edge in graph.edges:
+            edge['type_'] = undirectedEdgeType.id_
+
+        edgesToAdd = []
+
+        for node in G.nodes:
+            Pa = GraphUtils.parents(node, G)
+
+            # generate pairs
+            names = list(map(lambda n: n['name'], Pa))
+            pairs = [(a, b) for a in names for b in names if b > a]
+
+            for (a, b) in pairs:
+                if GraphUtils.hasEdge(a, b, graph) or GraphUtils.hasEdge(b, a, graph):
+                    continue
+
+                edge = {
+                    'from_': a,
+                    'to_': b,
+                    'type_': undirectedEdgeType.id_
+                }
+
+                edgesToAdd.append(edge)
+
+        graph.addEdges(edgesToAdd)
+
+        return graph
+
     # Graph, Node[]
     # Graph
 

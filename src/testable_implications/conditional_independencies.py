@@ -1,15 +1,75 @@
 import itertools
 
-from src.inference.utils.graph_utils import GraphUtils as gu
+from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
+from src.common.object_utils import ObjectUtils as ou
 from src.inference.utils.graph_utils import compareNames
 from src.adjustment.adjustment_sets_utils import writeNodeNames
+from src.path_analysis.d_separation import DSeparation
 
+def isSymmetric(ci1, ci2):
+    isXYEqual = su.equals(ci1['X'], ci2['Y'], 'name')
+    isYXEqual = su.equals(ci1['Y'], ci2['X'], 'name')
+
+    return isXYEqual and isYXEqual
 
 class ConditionalIndependencies():
 
     @staticmethod
-    def ListCIBF(G, V):
+    def GMP(G,V):
+        if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
+            return []
+        
+        CI = []
+        
+        for i in range(1,len(V)):
+            Xcombs = list(itertools.combinations(V, i))
+
+            for X in Xcombs:
+                if len(X) == 0:
+                    continue
+
+                X = ou.makeArray(list(X))
+                VminusX = su.difference(V, X, 'name')
+
+                for j in range(1, len(VminusX)+1):
+                    Ycombs = list(itertools.combinations(VminusX, j))
+
+                    for Y in Ycombs:
+                        if len(Y) == 0:
+                            continue
+
+                        Y = ou.makeArray(list(Y))
+                        VminusXY = su.difference(VminusX, Y, 'name')
+
+                        for k in range(0, len(VminusXY)+1):
+                            Zcombs = list(itertools.combinations(VminusXY, k))
+                            
+                            for Z in Zcombs:
+                                if len(Z) == 0:
+                                    continue
+
+                                Z = ou.makeArray(list(Z))
+                                
+                                if DSeparation.test(G, X, Y, Z):
+                                    # sort to remove duplicates
+                                    CI.append({
+                                        'X': sorted(X, key=sortByName),
+                                        'Y': sorted(Y, key=sortByName),
+                                        'Z': sorted(Z, key=sortByName)
+                                    })
+
+        # remove duplicates
+        CI = su.unique(CI)
+
+        # remove symmetric CIs
+        CI = su.uniqueWith(CI, isSymmetric)
+
+        return CI
+
+
+    @staticmethod
+    def LMP(G, V, onlyMaximalAns = True):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
 
@@ -41,8 +101,7 @@ class ConditionalIndependencies():
                     # check if S is ancestral
                     if not su.equals(S, AnS, 'name'):
                         continue
-                    
-                    # check if S is maximal w.r.t. Z = mb(u,S)
+
                     GS = gu.subgraph(GVlequ, S)
 
                     # C = C(u)_GS
@@ -53,21 +112,26 @@ class ConditionalIndependencies():
                         if su.belongs(u, ccs, compareNames):
                             C = ccs
                             break
+                    
+                    if onlyMaximalAns:
+                        # check if S is maximal w.r.t. Z = mb(u,S)
+                        # S+ = V<=u \ De( Sp(C) \ (Z + {u}) )
+                        # Lemma 5, Richardson 2003
+                        PaC = gu.parentsPlus(C, GS)
+                        Sp = su.difference(gu.spouses(C, GVlequ), PaC, 'name')
+                        DeSp = gu.descendants(Sp, GVlequ)
+                        Sminus = su.union(Sp, DeSp, 'name')
+                        Splus = su.difference(Vlequ, Sminus, 'name')
 
-                    # S+ = V<=u \ De( Sp(C) \ (Z + {u}) )
-                    # Lemma 5, Richardson 2003
-                    PaC = gu.parentsPlus(C, GS)
-                    Sp = su.difference(gu.spouses(C, GVlequ), PaC, 'name')
-                    DeSp = gu.descendants(Sp, GVlequ)
-                    Sminus = su.union(Sp, DeSp, 'name')
-                    Splus = su.difference(Vlequ, Sminus, 'name')
+                        if not su.equals(S, Splus):
+                            continue
 
-                    if not su.equals(S, Splus):
-                        continue
+                        W = su.difference(Splus, PaC, 'name')
+                    else:
+                        PaC = gu.parentsPlus(C, GS)
+                        W = su.difference(S, PaC, 'name')
 
                     # check valid CI
-                    W = su.difference(Splus, PaC, 'name')
-
                     if su.isEmpty(W):
                         continue
 

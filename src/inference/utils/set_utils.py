@@ -65,3 +65,7 @@ class SetUtils():
     @staticmethod
     def unique(arr):
         return pydash.arrays.uniq(arr)
+    
+    @staticmethod
+    def uniqueWith(arr, comparator = None):
+        return pydash.arrays.uniq_with(arr, comparator)

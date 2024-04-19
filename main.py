@@ -11,8 +11,7 @@ from src.testable_implications.conditional_independencies import ConditionalInde
 from src.adjustment.adjustment_sets_utils import writeNodeNames
 from src.graph.classes.graph_defs import latentNodeType, bidirectedEdgeType
 
-
-def ListCIBF(fileContent):
+def GMP(fileContent):
     parsedData = parseInput(fileContent)
 
     if parsedData is None:
@@ -20,13 +19,38 @@ def ListCIBF(fileContent):
 
     G = parsedData['graph']
 
-    CI = ConditionalIndependencies.ListCIBF(G, G.nodes)
+    CI = ConditionalIndependencies.GMP(G, G.nodes)
 
     if CI is None or len(CI) == 0:
         print('No conditional independence is implied.')
     else:
-        print('Conditional independencies:')
+        for ci in CI:
+            X = ci['X']
+            Y = ci['Y']
+            Z = ci['Z']
 
+            Xnames = sorted(list(map(lambda n: n['name'], X)))
+            Ynames = sorted(list(map(lambda n: n['name'], Y)))
+            Znames = sorted(list(map(lambda n: n['name'], Z)))
+
+            print(writeNodeNames(Xnames) + ' \indep ' + writeNodeNames(Ynames) + ' | ' + writeNodeNames(Znames))
+
+        print('Conditional independencies (' + str(len(CI)) + ') in total):')
+
+
+def LMP(fileContent):
+    parsedData = parseInput(fileContent)
+
+    if parsedData is None:
+        return
+
+    G = parsedData['graph']
+
+    CI = ConditionalIndependencies.LMP(G, G.nodes)
+
+    if CI is None or len(CI) == 0:
+        print('No conditional independence is implied.')
+    else:
         for ci in CI:
             u = ci['u']
             W = ci['W']
@@ -36,6 +60,8 @@ def ListCIBF(fileContent):
             Znames = sorted(list(map(lambda n: n['name'], Z)))
 
             print(u['name'] + ' \indep ' + writeNodeNames(Wnames) + ' | ' + writeNodeNames(Znames))
+
+        print('Conditional independencies (' + str(len(CI)) + ') in total):')
 
 
 def parseInput(fileContent):
@@ -64,29 +90,25 @@ def getEdgesSection():
 if __name__ == '__main__':
 
     # read arguments
-    if len(sys.argv) != 2:
-        # print('Please specify 2 arguments: 1) the name of the task (e.g., \'find\' or \'list\'), and 2) input file path (e.g., graphs/canonical.txt).')
-        print('Please specify 1 argument: input file path (e.g., graphs/list1.txt).')
+    if len(sys.argv) != 3:
+        print('Please specify 2 arguments: 1) the name of the task (e.g., \'gmp\' or \'lmp\'), and 2) input file path (e.g., graphs/list1.txt).')
 
         sys.exit()
 
-    # task = sys.argv[1]
-    # filePath = sys.argv[2]
-    filePath = sys.argv[1]
+    task = sys.argv[1]
+    filePath = sys.argv[2]
 
     try:
         with open(filePath, 'r') as f:
             fileContent = f.read()
 
-            ListCIBF(fileContent)
-
-            # # decide which feature to run
-            # if task == 'find':
-            #     FindFDSet(fileContent)
-            # elif task == 'list':
-            #     ListFDSets(fileContent)
-            # else:
-            #     print('Please specify a valid task to run (e.g., \'find\' or \'list\').')
+            # decide which feature to run
+            if task == 'gmp':
+                GMP(fileContent)
+            elif task == 'lmp':
+                LMP(fileContent)
+            else:
+                print('Please specify a valid task to run (e.g., \'gmp\' or \'lmp\').')
 
             f.close()
     except IOError:
