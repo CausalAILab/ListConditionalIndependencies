@@ -46,9 +46,6 @@ class ConditionalIndependencies():
                             Zcombs = list(itertools.combinations(VminusXY, k))
                             
                             for Z in Zcombs:
-                                if len(Z) == 0:
-                                    continue
-
                                 Z = ou.makeArray(list(Z))
                                 
                                 if DSeparation.test(G, X, Y, Z):
@@ -76,10 +73,22 @@ class ConditionalIndependencies():
         CI = []
 
         V = su.intersection(gu.topoSort(G), V, 'name')
+
+        # hack to force certain topo order, making results consistent
+        # namesInOrder = ['A','B','C','D','E','F','H','J']
+        # Vordered = []
+
+        # for name in namesInOrder:
+        #     Vs = list(filter(lambda n: n['name'] == name, V))
+        #     Vordered.append(Vs[0])
+
+        # V = Vordered
         
         Vnames = list(map(lambda n: n['name'], V))
         print('Variables (topo sorted):')
         print(writeNodeNames(Vnames))
+
+        MaxAns = []
         
         for u in V:
             Vlequ = V[:V.index(u)+1]
@@ -126,6 +135,8 @@ class ConditionalIndependencies():
                         if not su.equals(S, Splus):
                             continue
 
+                        MaxAns.append(Splus)
+
                         W = su.difference(Splus, PaC, 'name')
                     else:
                         PaC = gu.parentsPlus(C, GS)
@@ -143,5 +154,5 @@ class ConditionalIndependencies():
                         'W': W,
                         'Z': Z
                     })
-
+        
         return CI
