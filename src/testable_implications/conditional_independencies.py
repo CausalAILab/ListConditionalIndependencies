@@ -15,6 +15,22 @@ def isSymmetric(ci1, ci2):
 
 class ConditionalIndependencies():
 
+    # assumes V is topo sorted
+
+    @staticmethod
+    def mbplus(G,V,X,C):
+        if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
+            return None
+        
+        if X is None or C is None or len(C) == 0:
+            return None
+
+        VleqX = V[:V.index(X)+1]
+        GVleqX = gu.subgraph(G, VleqX)
+        PaC = su.union(gu.parents(C,GVleqX), C, 'name')
+
+        return su.difference(PaC, [X], 'name')
+
     @staticmethod
     def GMP(G,V):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
