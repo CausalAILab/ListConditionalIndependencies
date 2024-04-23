@@ -51,3 +51,11 @@ def TestSep(G, X, Y, Z=[]):
 
 def writeNodeNames(nodes):
     return ', '.join(nodes) if len(nodes) > 0 else 'emptyset'
+
+def nodeNamesToString(nodes, sortByName = True):
+    names = list(map(lambda n: n['name'], nodes))
+
+    if sortByName:
+        names = sorted(names)
+
+    return writeNodeNames(names)

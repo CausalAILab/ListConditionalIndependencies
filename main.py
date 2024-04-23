@@ -11,23 +11,46 @@ from src.testable_implications.conditional_independencies import ConditionalInde
 from src.adjustment.adjustment_sets_utils import writeNodeNames
 from src.graph.classes.graph_defs import latentNodeType, bidirectedEdgeType
 
-def GMP(fileContent):
+def outputCIs(fileContent, task):
     parsedData = parseInput(fileContent)
 
     if parsedData is None:
         return
 
     G = parsedData['graph']
+    CI = []
 
-    CI = ConditionalIndependencies.GMP(G, G.nodes)
+    Vordered = None
+    namesInOrder = None
+
+    if namesInOrder is not None:
+        Vordered = []
+
+        for name in namesInOrder:
+            Vs = list(filter(lambda n: n['name'] == name, G.nodes))
+            Vordered.append(Vs[0])
+
+    if task == 'gmp':
+        CI = ConditionalIndependencies.GMP(G, G.nodes)
+    elif task == 'lmp':
+        CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
+    elif task == 'lmpp':
+        CI = ConditionalIndependencies.LMPplus(G, G.nodes)
+    elif task == 'listci':
+        CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
     if CI is None or len(CI) == 0:
         print('No conditional independence is implied.')
     else:
         for ci in CI:
-            X = ci['X']
-            Y = ci['Y']
-            Z = ci['Z']
+            if task == 'gmp':
+                X = ci['X']
+                Y = ci['Y']
+                Z = ci['Z']
+            elif task == 'lmp' or task == 'lmpp' or task == 'listci':
+                X = [ci['X']]
+                Y = ci['W']
+                Z = ci['Z']
 
             Xnames = sorted(list(map(lambda n: n['name'], X)))
             Ynames = sorted(list(map(lambda n: n['name'], Y)))
@@ -35,33 +58,7 @@ def GMP(fileContent):
 
             print(writeNodeNames(Xnames) + ' \indep ' + writeNodeNames(Ynames) + ' | ' + writeNodeNames(Znames))
 
-        print('Conditional independencies (' + str(len(CI)) + ') in total):')
-
-
-def LMP(fileContent):
-    parsedData = parseInput(fileContent)
-
-    if parsedData is None:
-        return
-
-    G = parsedData['graph']
-
-    CI = ConditionalIndependencies.LMP(G, G.nodes)
-
-    if CI is None or len(CI) == 0:
-        print('No conditional independence is implied.')
-    else:
-        for ci in CI:
-            u = ci['u']
-            W = ci['W']
-            Z = ci['Z']
-
-            Wnames = sorted(list(map(lambda n: n['name'], W)))
-            Znames = sorted(list(map(lambda n: n['name'], Z)))
-
-            print(u['name'] + ' \indep ' + writeNodeNames(Wnames) + ' | ' + writeNodeNames(Znames))
-
-        print('Conditional independencies (' + str(len(CI)) + ') in total):')
+        print('Conditional independencies (' + str(len(CI)) + ') in total.')
 
 
 def parseInput(fileContent):
@@ -98,17 +95,16 @@ if __name__ == '__main__':
     task = sys.argv[1]
     filePath = sys.argv[2]
 
+    validTasks = ['gmp', 'lmp', 'lmpp', 'listci']
+
     try:
         with open(filePath, 'r') as f:
             fileContent = f.read()
 
-            # decide which feature to run
-            if task == 'gmp':
-                GMP(fileContent)
-            elif task == 'lmp':
-                LMP(fileContent)
+            if task in validTasks:
+                outputCIs(fileContent, task)
             else:
-                print('Please specify a valid task to run (e.g., \'gmp\' or \'lmp\').')
+                print('Please specify a valid task to run (e.g., \'gmp\', \'lmp\', or \'lmpp\').')
 
             f.close()
     except IOError:
