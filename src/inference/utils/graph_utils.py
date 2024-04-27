@@ -112,6 +112,11 @@ class GraphUtils():
     def descendants(w, G):
         # return G.descendants(w)
         return GraphUtils.reach(w, G, directedEdgeType, Direction.forward)
+    
+    @staticmethod
+    def descendantsPlus(w, G):
+        w = ou.makeArray(w)
+        return su.union(w, GraphUtils.descendants(w, G))
 
     # Node[]
 

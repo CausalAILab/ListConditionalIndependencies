@@ -23,6 +23,24 @@ def outputCIs(fileContent, task):
     Vordered = None
     namesInOrder = None
 
+    # hack to force certain topo order, making results consistent
+    # fig1b
+    # namesInOrder = ['A', 'D', 'B', 'C', 'E', 'F', 'H', 'J']
+    # fig3a
+    # namesInOrder = ['A3', 'A2', 'A1', 'B1', 'B3', 'B2']
+    # fig3b
+    # namesInOrder = ['A3', 'A1', 'A4', 'A2', 'B3', 'B1', 'B4', 'B2']
+    # fig3c
+    # namesInOrder = ['A2', 'A4', 'A1', 'A_n', 'A3', 'B_n', 'B3', 'B4', 'B2', 'B1']
+    # fig5a
+    # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # noci2
+    # namesInOrder = ['P', 'A', 'B', 'C', 'D', 'H']
+    # list2
+    # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # id72
+    namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
+
     if namesInOrder is not None:
         Vordered = []
 
