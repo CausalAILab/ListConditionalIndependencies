@@ -39,7 +39,7 @@ def outputCIs(fileContent, task):
     # list2
     # namesInOrder = ['A','B','C','D','E','F','H','J']
     # id72
-    namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
+    # namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
 
     if namesInOrder is not None:
         Vordered = []
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 3:
-        print('Please specify 2 arguments: 1) the name of the task (e.g., \'gmp\' or \'lmp\'), and 2) input file path (e.g., graphs/list1.txt).')
+        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', \'lmpp\', or \'listci\'), and 2) input file path (e.g., graphs/list1.txt).')
 
         sys.exit()
 
@@ -122,7 +122,7 @@ if __name__ == '__main__':
             if task in validTasks:
                 outputCIs(fileContent, task)
             else:
-                print('Please specify a valid task to run (e.g., \'gmp\', \'lmp\', or \'lmpp\').')
+                print('Please specify a valid task to run (\'gmp\', \'lmp\', \'lmpp\', or \'listci\').')
 
             f.close()
     except IOError:
