@@ -262,7 +262,7 @@ class ConditionalIndependencies():
         # admissiblePairs = ConditionalIndependencies.ListIRX(G,X,VleqX,I,R)
         # admissiblePairs = ConditionalIndependencies.ListIRXv1(GVleqX,X,VleqX,I,R)
         admissiblePairs = []
-        ConditionalIndependencies.ListIRXv2(GVleqX,X,VleqX,I,R,Iextend,Sp,Sp,admissiblePairs)
+        ConditionalIndependencies.ListIRXv2(GVleqX,X,VleqX,I,R,Sp,Sp,Iextend,admissiblePairs)
 
         if len(admissiblePairs) == 0:
             return
@@ -552,14 +552,14 @@ class ConditionalIndependencies():
 
                 admissiblePairs.append((Iprime,Rprime))
             else:
-                Spuprime = ConditionalIndependencies.GetProperSpv2(GVleqX,X,VleqX,Ieprime,Sp,Spprime)
+                Spuprime = ConditionalIndependencies.GetProperSpv2(GVleqX,X,VleqX,Sp,Spprime,Ieprime)
                 Spdprime = su.difference(Spprime, Spuprime, 'name')
 
                 ConditionalIndependencies.GenerateIRX(GVleqX,X,VleqX,I,Ieprime,R,Sp,Spuprime,Spdprime,admissiblePairs)
 
     @staticmethod
-    def ListIRXv2(GVleqX,X,VleqX,I,R,Iextend,Sp,Spc,admissiblePairs):
-        Spu = ConditionalIndependencies.GetProperSpv2(GVleqX,X,VleqX,Iextend,Sp,Spc)
+    def ListIRXv2(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend,admissiblePairs):
+        Spu = ConditionalIndependencies.GetProperSpv2(GVleqX,X,VleqX,Sp,Spc,Iextend)
         Spd = su.difference(Spc, Spu, 'name')
 
         if su.isEmpty(Spu):
@@ -598,10 +598,10 @@ class ConditionalIndependencies():
 
                 admissiblePairs.append((Iprime,Rprime))
             else:
-                ConditionalIndependencies.ListIRXv2(GVleqX,X,VleqX,I,R,Ieprime,Sp,Spcprime,admissiblePairs)
+                ConditionalIndependencies.ListIRXv2(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
 
     @staticmethod
-    def GetProperSpv2(G,X,VleqX,Iextend,Sp,Spc):
+    def GetProperSpv2(G,X,VleqX,Sp,Spc,Iextend):
         Spu = []
 
         GVleqX = gu.subgraph(G, VleqX)
