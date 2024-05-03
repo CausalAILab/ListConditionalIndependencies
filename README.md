@@ -47,7 +47,7 @@ Each line describes an edge. Two types of edges are supported:
 
 ## How to run experiments
 
-There are two scripts that runs experiments:
+There are two scripts to run experiments:
 - `experiment_graph.py`: Parses a text file containing graph information, constructs a graph, and run experiments.
 - `experiment_bif.py`: Parses a BIF file (BIF stands for Bayesian Interchange Format), constructs a graph, and run experiments.
 
