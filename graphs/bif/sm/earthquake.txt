@@ -1,0 +1,12 @@
+<NODES>
+Burglary  -75,-150
+Earthquake  75,-150
+Alarm  0,0
+JohnCalls  -75,150
+MaryCalls  75,150
+
+<EDGES>
+Burglary -> Alarm
+Earthquake -> Alarm
+Alarm -> JohnCalls
+Alarm -> MaryCalls

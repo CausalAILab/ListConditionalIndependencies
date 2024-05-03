@@ -11,13 +11,15 @@ from src.testable_implications.conditional_independencies import ConditionalInde
 from src.adjustment.adjustment_sets_utils import writeNodeNames
 from src.graph.classes.graph_defs import latentNodeType, bidirectedEdgeType
 
-def outputCIs(fileContent, task):
+def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
 
     if parsedData is None:
-        return
+        return None
 
-    G = parsedData['graph']
+    return parsedData['graph']
+
+def outputCIs(G, alg):
     CI = []
 
     Vordered = None
@@ -48,24 +50,27 @@ def outputCIs(fileContent, task):
             Vs = list(filter(lambda n: n['name'] == name, G.nodes))
             Vordered.append(Vs[0])
 
-    if task == 'gmp':
+    if alg == 'gmp':
         CI = ConditionalIndependencies.GMP(G, G.nodes)
-    elif task == 'lmp':
+    elif alg == 'lmp':
         CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
-    elif task == 'lmpp':
+    elif alg == 'lmpp':
         CI = ConditionalIndependencies.LMPplus(G, G.nodes)
-    elif task == 'listci':
+    elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
+    printCI(CI, alg)
+
+def printCI(CI, alg):
     if CI is None or len(CI) == 0:
         print('No conditional independence is implied.')
     else:
         for ci in CI:
-            if task == 'gmp':
+            if alg == 'gmp':
                 X = ci['X']
                 Y = ci['Y']
                 Z = ci['Z']
-            elif task == 'lmp' or task == 'lmpp' or task == 'listci':
+            elif alg == 'lmp' or alg == 'lmpp' or alg == 'listci':
                 X = [ci['X']]
                 Y = ci['W']
                 Z = ci['Z']
@@ -106,7 +111,7 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 3:
-        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', \'lmpp\', or \'listci\'), and 2) input file path (e.g., graphs/list1.txt).')
+        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', \'lmpp\', or \'listci\'), and 2) input file path (e.g., graphs/paper/fig5a.txt).')
 
         sys.exit()
 
@@ -115,17 +120,17 @@ if __name__ == '__main__':
 
     validTasks = ['gmp', 'lmp', 'lmpp', 'listci']
 
-    try:
-        with open(filePath, 'r') as f:
-            fileContent = f.read()
+    if task not in validTasks:
+        print('Please specify a valid task to run (\'gmp\', \'lmp\', \'lmpp\', or \'listci\').')
+    else:
+        try:
+            with open(filePath, 'r') as f:
+                fileContent = f.read()
+                G = parseGraph(fileContent)
+                outputCIs(G, task)
 
-            if task in validTasks:
-                outputCIs(fileContent, task)
-            else:
-                print('Please specify a valid task to run (\'gmp\', \'lmp\', \'lmpp\', or \'listci\').')
+                f.close()
+        except IOError:
+            line = 'Please specify the input file correctly.'
 
-            f.close()
-    except IOError:
-        line = 'Please specify the input file correctly.'
-
-        print(line)
+            print(line)

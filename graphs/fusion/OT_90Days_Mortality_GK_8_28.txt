@@ -1,0 +1,93 @@
+<NODES>
+age  -360,-420
+gender  -1170,-510
+bmi  -990,-450
+surgery  -300,-480
+trauma  -420,-540
+medical  -450,-330
+apsiii  -690,-180
+sofa  -570,-90
+smoker  -420,-120
+copd  -810,-570
+ischemicHd  -270,-330
+ards  -270,-210
+death  -960,-390
+oxygenation  -1170,-270
+spo2  -960,-270
+fio2  -840,-180
+sao2  -720,-330
+pao2  -1020,-90
+paco2  -510,-210
+ph  -840,-60
+hemoglobin  -1170,-420
+peep  -630,-570
+vt  -1170,-150
+peakAirPressure  -1020,-540
+minVentVol  -1290,-360
+lactate  -540,-450
+
+<EDGES>
+age -> copd
+age -> ischemicHd 0.011927879101774
+age -> death
+age -> sao2
+age -> peep
+gender -> peakAirPressure
+trauma -> surgery
+apsiii -> sofa
+sofa -> sao2
+sofa -> pao2
+smoker -> ischemicHd
+spo2 -> copd
+spo2 -> death
+spo2 -> fio2
+spo2 -> hemoglobin
+fio2 -> sofa
+pao2 -> vt
+paco2 -> medical
+paco2 -> apsiii
+ph -> sao2
+ph -> pao2
+ph -> paco2
+apsiii -> death
+peep -> trauma
+age -> trauma
+peep -> sao2
+peep -> pao2
+peakAirPressure -> sao2
+peakAirPressure -> pao2
+trauma -> lactate
+apsiii -> lactate
+fio2 -> lactate
+lactate -> death
+gender -> minVentVol -0.012198190558516
+apsiii -> peakAirPressure
+hemoglobin -> death
+hemoglobin -> apsiii
+gender -> hemoglobin
+copd -> fio2
+smoker -> paco2
+age -> smoker
+copd -> paco2
+ards -> paco2
+peakAirPressure -> lactate
+lactate -> medical
+copd -> medical
+ards -> medical
+smoker -> medical
+ischemicHd -> medical
+spo2 -> pao2
+spo2 -> oxygenation
+hemoglobin -> oxygenation
+pao2 -> oxygenation
+vt -> oxygenation
+fio2 -> oxygenation
+peakAirPressure -> oxygenation
+minVentVol -> oxygenation
+bmi -> oxygenation
+oxygenation -> death
+bmi -> peakAirPressure
+bmi -> paco2
+copd -> peakAirPressure
+peep -> fio2
+lactate -> sofa
