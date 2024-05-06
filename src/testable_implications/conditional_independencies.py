@@ -370,7 +370,7 @@ class ConditionalIndependencies():
 
                 admissiblePairs.append((Iprime,Rprime))
             else:
-                ConditionalIndependencies.ListIRXv2(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
+                ConditionalIndependencies.ListIRX(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
 
     @staticmethod
     def GetProperSp(G,X,VleqX,I,Sp,Spc,Iextend):
