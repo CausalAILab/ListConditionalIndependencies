@@ -1,13 +1,16 @@
 import Node
 import sys
 import re
+import random
 from datetime import datetime
 
 from src.graph.classes.graph import Graph
-from src.graph.classes.graph_defs import basicNodeType, directedEdgeType, edgeTypeMap
-from src.inference.utils.graph_utils import GraphUtils as gu
+from src.graph.classes.graph_defs import basicNodeType, latentNodeType, directedEdgeType, edgeTypeMap
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
-from src.adjustment.adjustment_sets_utils import writeNodeNames
+from src.inference.utils.graph_utils import GraphUtils as gu
+from src.inference.utils.set_utils import SetUtils as su
+from src.projection.projection_utils import ProjectionUtils as pu
+from src.adjustment.adjustment_sets_utils import writeNodeNames, compareNames
 
 def testAlgorithm(G, alg):
     start = datetime.now()
@@ -179,33 +182,87 @@ def printBIFNodes(nodes):
         #     print(c.getName())
         print('')
 
-def BIFNodesToGraph(parsedNodes):
+def BIFNodesToGraph(parsedNodes, latentFraction = None):
     G = Graph()
 
     if parsedNodes is None:
         return G
 
+    nodesToAdd = []
+    edgesToAdd = []
+
     for bifNode in parsedNodes:
         # construct nodes
         name = bifNode.getName()
         node = {'name': name, 'label': name, 'type_': basicNodeType.id_, 'metadata': {}}
-        G.addNodes(node)
+
+        # if node does not exist, add to nodes list
+        if not su.belongs(node, nodesToAdd, compareNames):
+            nodesToAdd.append(node)
+
+        # nodeExists = gu.getNodeByName(name, G)
+
+        # if not nodeExists:
+        #     node = {'name': name, 'label': name, 'type_': basicNodeType.id_, 'metadata': {}}
+        #     G.addNodes(node)
+        # else:
+        #     node = nodeExists
 
         # add directed edges: Pa -> node
         for bifParent in bifNode.parents:
             parentName = bifParent.getName()
+            parent = {'name': parentName, 'label': parentName, 'type_': basicNodeType.id_, 'metadata': {}}
 
-            # add parent to graph if it doesn't exist yet
-            parentNode = gu.getNodeByName(parentName, G)
-
-            if not parentNode:
-                paNode = {'name': parentName, 'label': parentName, 'type_': basicNodeType.id_, 'metadata': {}}
-                G.addNodes(paNode)
-
-                parentNode = gu.getNodeByName(parentName, G)
+            # if parent does not exist, add to nodes list
+            if not su.belongs(parent, nodesToAdd, compareNames):
+                nodesToAdd.append(parent)
 
             edge = {'from_': parentName, 'to_': name, 'type_': directedEdgeType.id_, 'metadata': {}}
-            G.addEdges(edge)
+            edgesToAdd.append(edge)
+
+            # add parent to graph if it doesn't exist yet
+            # parentNode = gu.getNodeByName(parentName, G)
+
+            # if not parentNode:
+            #     paNode = {'name': parentName, 'label': parentName, 'type_': basicNodeType.id_, 'metadata': {}}
+            #     G.addNodes(paNode)
+
+            #     parentNode = gu.getNodeByName(parentName, G)
+
+            # edge = {'from_': parentName, 'to_': name, 'type_': directedEdgeType.id_, 'metadata': {}}
+            # G.addEdges(edge)
+
+    # sample x% of nodes and turn those to latent
+    if latentFraction is not None:
+        k = int(len(parsedNodes) * latentFraction)
+        indices = random.sample(range(len(parsedNodes)), k)
+
+        V = []
+
+        for i in range(len(nodesToAdd)):
+            if i in indices:
+                node = nodesToAdd[i]
+                node['type_'] = latentNodeType.id_
+
+                # name = G.nodes[i]['name']
+                # node = gu.getNodeByName(name, G)
+                # node['type_'] = latentNodeType.id_
+
+                # G.nodes[i]['type_'] = latentNodeType.id_
+                # print(G.nodes[i])
+            else:
+                V.append(node)
+                # V.append(G.nodes[i])
+        # print(len(parsedNodes))
+        # print(V)
+
+        G.addNodes(nodesToAdd)
+        G.addEdges(edgesToAdd)
+
+        # latents = list(filter(lambda n: n['type_'] == latentNodeType.id_, G.nodes))
+        # print(len(latents))
+
+        G = pu.projectOver(G,V)
 
     return G
 
@@ -249,6 +306,7 @@ if __name__ == '__main__':
             fileContent = f.readlines()
             bifNodes = parseToBIFNodes(fileContent)
             G = BIFNodesToGraph(bifNodes)
+            # G = BIFNodesToGraph(bifNodes, 0.3)
             # printGraphToEditorFormat(G)
 
             if G is not None:

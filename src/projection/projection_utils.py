@@ -7,6 +7,7 @@ from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidir
 
 from src.inference.utils.graph_utils import GraphUtils as gu
 from src.inference.utils.set_utils import SetUtils as su
+from src.common.object_utils import ObjectUtils as ou
 
 
 class ProjectionUtils():

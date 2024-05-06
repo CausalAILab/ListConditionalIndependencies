@@ -21,24 +21,54 @@ def parseGraph(fileContent):
 
     return parsedData['graph']
 
-def testAlgorithm(G, alg):
+def testAlgorithm(G, alg, printCIs = False):
+    Vordered = None
+    namesInOrder = None
+
+    # hack to force certain topo order, making results consistent
+    # fig1b
+    # namesInOrder = ['A', 'D', 'B', 'C', 'E', 'F', 'H', 'J']
+    # fig3a
+    # namesInOrder = ['A3', 'A2', 'A1', 'B1', 'B3', 'B2']
+    # fig3b
+    # namesInOrder = ['A3', 'A1', 'A4', 'A2', 'B3', 'B1', 'B4', 'B2']
+    # fig3c
+    # namesInOrder = ['A2', 'A4', 'A1', 'A_n', 'A3', 'B_n', 'B3', 'B4', 'B2', 'B1']
+    # fig5a
+    # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # noci2
+    # namesInOrder = ['P', 'A', 'B', 'C', 'D', 'H']
+    # list2
+    # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # id72
+    # namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
+
+    if namesInOrder is not None:
+        Vordered = []
+
+        for name in namesInOrder:
+            Vs = list(filter(lambda n: n['name'] == name, G.nodes))
+            Vordered.append(Vs[0])
+    
     start = datetime.now()
 
     if alg == 'gmp':
         CI = ConditionalIndependencies.GMP(G, G.nodes)
     elif alg == 'lmp':
-        CI = ConditionalIndependencies.LMP(G, G.nodes)
+        CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
     elif alg == 'lmpp':
         CI = ConditionalIndependencies.LMPplus(G, G.nodes)
     elif alg == 'listci':
-        CI = ConditionalIndependencies.ListCI(G, G.nodes)
+        CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
     end = datetime.now()
 
     # print runtime
-    print('Time (' + alg + '): ' + str(end - start))
-    print('CIs: ' + str(len(CI)))
-    # printCI(CI, alg)
+    line = 'CIs: ' + str(len(CI)) + ', Time (' + alg + '): ' + str(end - start)
+    print(line)
+
+    if printCIs:
+        printCI(CI, alg)
     
 def printCI(CI, alg):
     if CI is None or len(CI) == 0:
@@ -96,8 +126,11 @@ if __name__ == '__main__':
     filePath = sys.argv[1]
 
     # algorithms = ['gmp', 'lmp', 'listci']
-    algorithms = ['lmp', 'listci']
-    # algorithms = ['listci']
+    # algorithms = ['lmp', 'listci']
+    # algorithms = ['lmp']
+    algorithms = ['listci']
+
+    numExperiments = 1
 
     try:
         with open(filePath, 'r') as f:
@@ -105,8 +138,10 @@ if __name__ == '__main__':
             G = parseGraph(fileContent)
 
             if G is not None:
-                for alg in algorithms:
-                    testAlgorithm(G, alg)
+                for i in range(numExperiments):
+                    for alg in algorithms:
+                        testAlgorithm(G, alg)
+                        # testAlgorithm(G, alg, True)
 
             f.close()
     except IOError:

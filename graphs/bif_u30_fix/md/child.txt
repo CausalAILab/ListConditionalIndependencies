@@ -1,0 +1,37 @@
+<NODES>
+BirthAsphyxia
+DuctFlow
+HypoxiaInO2
+LungParench
+CO2
+ChestXray
+LungFlow
+Grunting
+LVH
+LowerBodyO2
+CO2Report
+Disease
+GruntingReport
+Age
+
+<EDGES>
+BirthAsphyxia -> Disease
+DuctFlow -> LowerBodyO2
+HypoxiaInO2 -> LowerBodyO2
+LungParench -> HypoxiaInO2
+LungParench -> CO2
+LungParench -> ChestXray
+LungParench -> Grunting
+CO2 -> CO2Report
+LungFlow -> ChestXray
+Grunting -> GruntingReport
+Grunting -- Age
+LowerBodyO2 -- HypoxiaInO2
+Disease -> Age
+Disease -> LVH
+Disease -> DuctFlow
+Disease -> LungParench
+Disease -> LungFlow
+Disease -> Grunting
+Disease -> HypoxiaInO2
+Disease -> LowerBodyO2

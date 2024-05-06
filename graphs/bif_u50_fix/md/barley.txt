@@ -1,0 +1,115 @@
+<NODES>
+jordtype
+komm
+nedbarea
+nmin
+aar_mod
+forfrugt
+mod_nmin
+ngodnt
+nopt
+ngodn
+nprot
+saatid
+dgv1059
+sort
+srtprot
+saamng
+keraks
+dgv5980
+aks_vgt
+protein
+spndx
+slt22
+s2528
+bgbyg
+
+<EDGES>
+jordtype -> nmin
+jordtype -> aar_mod
+jordtype -> ngodnt
+jordtype -> nopt
+jordtype -> dgv1059
+jordtype -> dgv5980
+jordtype -> nprot
+jordtype -> ngodn
+jordtype -> keraks
+jordtype -> aks_vgt
+jordtype -> spndx
+komm -> nedbarea
+komm -> aar_mod
+nedbarea -> nmin
+nmin -> mod_nmin
+nmin -> nprot
+nmin -> ngodn
+nmin -> keraks
+nmin -> aks_vgt
+nmin -> spndx
+aar_mod -> mod_nmin
+aar_mod -> nprot
+aar_mod -> ngodn
+aar_mod -> keraks
+aar_mod -> aks_vgt
+aar_mod -> spndx
+forfrugt -> ngodnt
+forfrugt -> nopt
+forfrugt -> nprot
+forfrugt -> ngodn
+forfrugt -> keraks
+forfrugt -> aks_vgt
+forfrugt -> spndx
+mod_nmin -> ngodnt
+ngodnt -> ngodn
+ngodnt -- nopt
+nopt -> ngodn
+ngodn -> nprot
+ngodn -> keraks
+ngodn -> aks_vgt
+ngodn -> spndx
+nprot -> protein
+nprot -- ngodn
+saatid -> dgv1059
+saatid -> keraks
+saatid -> aks_vgt
+saatid -> spndx
+dgv1059 -> keraks
+dgv1059 -> protein
+dgv1059 -> bgbyg
+dgv1059 -- dgv5980
+dgv1059 -> aks_vgt
+sort -> srtprot
+sort -> slt22
+sort -> s2528
+sort -> keraks
+sort -> aks_vgt
+sort -> protein
+sort -> spndx
+srtprot -> protein
+saamng -> keraks
+saamng -> aks_vgt
+keraks -> slt22
+keraks -> s2528
+keraks -- aks_vgt
+keraks -- nprot
+keraks -- ngodn
+keraks -> protein
+keraks -> spndx
+dgv5980 -> aks_vgt
+dgv5980 -> spndx
+dgv5980 -> bgbyg
+aks_vgt -> slt22
+aks_vgt -> s2528
+aks_vgt -- nprot
+aks_vgt -- ngodn
+aks_vgt -> protein
+aks_vgt -> spndx
+protein -- spndx
+protein -- slt22
+protein -- s2528
+spndx -- nprot
+spndx -- ngodn
+spndx -- keraks
+spndx -- aks_vgt
+spndx -- slt22
+spndx -- s2528
+slt22 -- s2528

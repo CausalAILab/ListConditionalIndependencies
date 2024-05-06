@@ -1,0 +1,112 @@
+<NODES>
+nedbarea  -300,-375
+aar_mod  -525,-225
+forfrugt  -375,-225
+potnmin  -525,-75
+jordn  -225,-225
+exptgens  -375,-75
+mod_nmin  -75,-225
+ngodnt  -225,-75
+nopt  -150,-375
+ngodn  75,-225
+saatid  -525,75
+rokap  -75,-75
+sort  -375,75
+dg25  225,-225
+ngtilg  75,-75
+ntilg  375,-225
+saamng  -225,75
+tkvs  -75,75
+partigerm  225,-75
+frspdag  525,-225
+jordinf  375,-75
+markgrm  75,75
+antplnt  -525,225
+sorttkv  -375,225
+aks_m2  -225,225
+keraks  -75,225
+dgv5980  225,75
+aks_vgt  75,225
+srtsize  225,225
+ksort  -225,375
+spndx  375,225
+tkv  525,225
+slt22  -75,375
+s2225  75,375
+
+<EDGES>
+nedbarea -- aar_mod 0.7
+nedbarea -> jordn
+nedbarea -> mod_nmin
+aar_mod -> jordn
+aar_mod -> mod_nmin
+aar_mod -- potnmin 0.7
+aar_mod -- exptgens 0.7
+aar_mod -- rokap 0.7
+forfrugt -> potnmin
+forfrugt -> exptgens
+forfrugt -> ngodnt
+potnmin -> jordn
+potnmin -- exptgens 0.7
+potnmin -- rokap 0.7
+jordn -> ntilg
+jordn -- mod_nmin 0.7
+jordn -- aar_mod 0.7
+jordn -- potnmin 0.7
+jordn -- exptgens 0.7
+jordn -- rokap 0.7
+jordn -> ngodn
+exptgens -> ngodnt
+exptgens -> nopt
+exptgens -- rokap 0.7
+mod_nmin -> ngodnt
+mod_nmin -- aar_mod 0.7
+mod_nmin -- potnmin 0.7
+mod_nmin -- exptgens 0.7
+mod_nmin -- rokap 0.7
+ngodnt -> ngodn
+nopt -- exptgens 0.7
+nopt -> ngodn
+ngodn -> ngtilg
+saatid -> dg25
+saatid -> frspdag
+saatid -> aks_m2
+saatid -> keraks
+rokap -> dgv5980
+rokap -> aks_m2
+rokap -> keraks
+sort -> sorttkv
+sort -> srtsize
+dg25 -> ngtilg
+ngtilg -> ntilg
+ntilg -> aks_m2
+ntilg -> keraks
+ntilg -> aks_vgt
+ntilg -> spndx
+ntilg -> tkv
+saamng -> antplnt
+tkvs -> antplnt
+partigerm -> markgrm
+frspdag -> jordinf
+jordinf -> markgrm
+markgrm -> antplnt
+antplnt -> aks_m2
+sorttkv -> aks_m2
+sorttkv -> tkv
+aks_m2 -> keraks
+aks_m2 -> aks_vgt
+aks_m2 -> tkv
+keraks -> ksort
+keraks -> tkv
+keraks -> slt22
+keraks -> s2225
+keraks -- aks_m2 0.7
+dgv5980 -> aks_vgt
+dgv5980 -> spndx
+aks_vgt -> ksort
+aks_vgt -> slt22
+aks_vgt -> s2225
+srtsize -> ksort
+srtsize -> slt22
+srtsize -> s2225
+ksort -> spndx
