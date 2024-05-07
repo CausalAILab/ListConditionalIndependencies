@@ -40,6 +40,8 @@ def outputCIs(G, alg):
     # namesInOrder = ['P', 'A', 'B', 'C', 'D', 'H']
     # list2
     # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # id7
+    # namesInOrder = ['C', 'A', 'D', 'B', 'X', 'Y', 'E']
     # id72
     # namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
 

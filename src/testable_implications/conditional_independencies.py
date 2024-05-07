@@ -418,9 +418,11 @@ class ConditionalIndependencies():
                 DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
 
                 Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
-                DeAnSpInGprime = gu.descendantsPlus(AnSpprime, Gprime)
+                # DeAnSpInGprime = gu.descendantsPlus(AnSpprime, Gprime)
+                DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
 
-                for d in su.difference(DeAnSpInGprime, AnSpprime, 'name'):
+                # for d in su.difference(DeAnSpInGprime, AnSpprime, 'name'):
+                for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
                     # C = ConditionalIndependencies.C(Gprime, AnSpprime)
                     C = ConditionalIndependencies.C(Gprime, [sprime])
                     
