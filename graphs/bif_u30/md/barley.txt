@@ -1,112 +1,117 @@
 <NODES>
-nedbarea  -300,-375
-aar_mod  -525,-225
-forfrugt  -375,-225
-potnmin  -525,-75
-jordn  -225,-225
-exptgens  -375,-75
-mod_nmin  -75,-225
-ngodnt  -225,-75
-nopt  -150,-375
-ngodn  75,-225
-saatid  -525,75
-rokap  -75,-75
-sort  -375,75
-dg25  225,-225
-ngtilg  75,-75
-ntilg  375,-225
-saamng  -225,75
-tkvs  -75,75
-partigerm  225,-75
-frspdag  525,-225
-jordinf  375,-75
-markgrm  75,75
-antplnt  -525,225
-sorttkv  -375,225
-aks_m2  -225,225
-keraks  -75,225
-dgv5980  225,75
-aks_vgt  75,225
-srtsize  225,225
-ksort  -225,375
-spndx  375,225
-tkv  525,225
-slt22  -75,375
-s2225  75,375
+jordtype
+komm
+nedbarea
+nmin
+aar_mod
+forfrugt
+potnmin
+pesticid
+exptgens
+mod_nmin
+nopt
+ngodnn
+nprot
+rokap
+dgv1059
+dg25
+ngtilg
+ntilg
+tkvs
+partigerm
+frspdag
+jordinf
+markgrm
+antplnt
+aks_m2
+keraks
+dgv5980
+aks_vgt
+srtsize
+protein
+tkv
+slt22
+s2528
+bgbyg
 
 <EDGES>
-nedbarea -- aar_mod 0.7
-nedbarea -> jordn
-nedbarea -> mod_nmin
-aar_mod -> jordn
+jordtype -> nmin
+jordtype -> aar_mod
+jordtype -> potnmin
+jordtype -> exptgens
+jordtype -> rokap
+komm -> nedbarea
+komm -> aar_mod
+nedbarea -> nmin
+nmin -> mod_nmin
+nmin -> ngodnn
+nmin -> nprot
+nmin -> ntilg
 aar_mod -> mod_nmin
-aar_mod -- potnmin 0.7
-aar_mod -- exptgens 0.7
-aar_mod -- rokap 0.7
+aar_mod -> ngodnn
+aar_mod -> nprot
+aar_mod -> ntilg
 forfrugt -> potnmin
 forfrugt -> exptgens
-forfrugt -> ngodnt
-potnmin -> jordn
-potnmin -- exptgens 0.7
-potnmin -- rokap 0.7
-jordn -> ntilg
-jordn -- mod_nmin 0.7
-jordn -- aar_mod 0.7
-jordn -- potnmin 0.7
-jordn -- exptgens 0.7
-jordn -- rokap 0.7
-jordn -> ngodn
-exptgens -> ngodnt
+forfrugt -> nprot
+forfrugt -> ngtilg
+potnmin -> ngodnn
+potnmin -> nprot
+potnmin -> ntilg
+pesticid -> exptgens
+pesticid -> nopt
 exptgens -> nopt
-exptgens -- rokap 0.7
-mod_nmin -> ngodnt
-mod_nmin -- aar_mod 0.7
-mod_nmin -- potnmin 0.7
-mod_nmin -- exptgens 0.7
-mod_nmin -- rokap 0.7
-ngodnt -> ngodn
-nopt -- exptgens 0.7
-nopt -> ngodn
-ngodn -> ngtilg
-saatid -> dg25
-saatid -> frspdag
-saatid -> aks_m2
-saatid -> keraks
+exptgens -> nprot
+exptgens -> ngtilg
+mod_nmin -> nprot
+mod_nmin -> ngtilg
+nopt -> ngodnn
+ngodnn -- ntilg
+ngodnn -> nprot
+ngodnn -> ngtilg
+nprot -> protein
+nprot -- ntilg
+nprot -- ngodnn
+nprot -- ngtilg
+rokap -> dgv1059
 rokap -> dgv5980
-rokap -> aks_m2
-rokap -> keraks
-sort -> sorttkv
-sort -> srtsize
+dgv1059 -> aks_m2
+dgv1059 -> keraks
+dgv1059 -> protein
+dgv1059 -> bgbyg
+dgv1059 -- dg25
+dgv1059 -- frspdag
 dg25 -> ngtilg
+dg25 -- frspdag
 ngtilg -> ntilg
 ntilg -> aks_m2
 ntilg -> keraks
 ntilg -> aks_vgt
-ntilg -> spndx
 ntilg -> tkv
-saamng -> antplnt
 tkvs -> antplnt
 partigerm -> markgrm
 frspdag -> jordinf
 jordinf -> markgrm
 markgrm -> antplnt
 antplnt -> aks_m2
-sorttkv -> aks_m2
-sorttkv -> tkv
 aks_m2 -> keraks
 aks_m2 -> aks_vgt
 aks_m2 -> tkv
-keraks -> ksort
+aks_m2 -- srtsize
 keraks -> tkv
 keraks -> slt22
-keraks -> s2225
-keraks -- aks_m2 0.7
+keraks -> s2528
+keraks -> protein
 dgv5980 -> aks_vgt
-dgv5980 -> spndx
-aks_vgt -> ksort
+dgv5980 -> bgbyg
 aks_vgt -> slt22
-aks_vgt -> s2225
-srtsize -> ksort
+aks_vgt -> s2528
+aks_vgt -> protein
 srtsize -> slt22
-srtsize -> s2225
-ksort -> spndx
+srtsize -> s2528
+srtsize -> protein
+protein -- srtsize
+protein -- aks_m2
+protein -- tkv
+tkv -- aks_m2
+tkv -- srtsize

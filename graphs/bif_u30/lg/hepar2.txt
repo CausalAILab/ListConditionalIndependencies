@@ -1,0 +1,157 @@
+<NODES>
+vh_amn  -1050,225
+THepatitis  -1050,-75
+hospital  -1050,75
+surgery  -900,75
+gallstones  -750,75
+choledocholithotomy  -600,75
+injections  -450,75
+ChHepatitis  -900,225
+sex  -919,-225
+age  -900,-75
+PBC  -750,225
+fibrosis  -1050,375
+diabetes  -769,-375
+obesity  -769,-225
+Cirrhosis  -619,-225
+Hyperbilirubinemia  -469,-225
+RHepatitis  -300,-225
+itching  -900,375
+pressure_ruq  -750,375
+phosphatase  -600,375
+skin  -450,375
+ama  -600,225
+le_cells  -450,225
+joints  -300,225
+pain  -300,375
+edema  -750,-75
+platelet  -150,375
+flatulence  -150,225
+alcohol  -600,-75
+encephalopathy  0,375
+urea  -300,75
+ascites  -450,-75
+hepatomegaly  -300,-75
+hepatalgia  -150,75
+density  0,75
+ESR  150,375
+alt  300,375
+ast  450,375
+amylase  0,225
+hbsag  600,375
+consciousness  150,75
+spiders  -150,-75
+jaundice  750,375
+albumin  0,-75
+edge  150,-75
+irregular_liver  300,-75
+hcv_anti  900,375
+palms  450,-75
+carcinoma  1050,375
+
+<EDGES>
+vh_amn -> ChHepatitis
+vh_amn -> hbsag
+vh_amn -> hcv_anti
+THepatitis -> phosphatase
+THepatitis -> hepatomegaly
+THepatitis -> alt
+THepatitis -> ast
+THepatitis -- RHepatitis 0.7
+hospital -> injections
+hospital -> ChHepatitis
+surgery -> injections
+surgery -> ChHepatitis
+gallstones -> choledocholithotomy
+gallstones -> pressure_ruq
+gallstones -> flatulence
+gallstones -> amylase
+gallstones -> itching
+gallstones -> skin
+gallstones -> jaundice
+choledocholithotomy -> injections
+choledocholithotomy -> ChHepatitis
+injections -> ChHepatitis
+ChHepatitis -> fibrosis
+ChHepatitis -> pressure_ruq
+ChHepatitis -> phosphatase
+ChHepatitis -> ESR
+ChHepatitis -> alt
+ChHepatitis -> ast
+ChHepatitis -> hbsag
+ChHepatitis -> hcv_anti
+ChHepatitis -> itching
+ChHepatitis -> skin
+ChHepatitis -> jaundice
+sex -> PBC
+sex -> Hyperbilirubinemia
+age -> PBC
+age -> Hyperbilirubinemia
+PBC -> pressure_ruq
+PBC -> ama
+PBC -> le_cells
+PBC -> joints
+PBC -> pain
+PBC -> platelet
+PBC -> encephalopathy
+PBC -> ESR
+PBC -> carcinoma
+PBC -> itching
+PBC -> skin
+PBC -> jaundice
+fibrosis -> Cirrhosis
+diabetes -> obesity
+obesity -> Cirrhosis
+obesity -> hepatomegaly
+obesity -> ESR
+obesity -> alt
+obesity -> ast
+Cirrhosis -> phosphatase
+Cirrhosis -> edema
+Cirrhosis -> platelet
+Cirrhosis -> alcohol
+Cirrhosis -> encephalopathy
+Cirrhosis -> alt
+Cirrhosis -> ast
+Cirrhosis -> spiders
+Cirrhosis -> albumin
+Cirrhosis -> edge
+Cirrhosis -> irregular_liver
+Cirrhosis -> palms
+Cirrhosis -> carcinoma
+Cirrhosis -- hepatomegaly 0.7
+Cirrhosis -- ESR 0.7
+Cirrhosis -- THepatitis 0.7
+Cirrhosis -> ascites
+Cirrhosis -> itching
+Cirrhosis -> skin
+Cirrhosis -> jaundice
+Hyperbilirubinemia -> hepatomegaly
+Hyperbilirubinemia -> ESR
+Hyperbilirubinemia -> itching
+Hyperbilirubinemia -> skin
+Hyperbilirubinemia -> jaundice
+RHepatitis -> phosphatase
+RHepatitis -> hepatomegaly
+RHepatitis -> alt
+RHepatitis -> ast
+itching -- skin 0.7
+itching -- jaundice 0.7
+skin -- jaundice 0.7
+joints -> pain
+encephalopathy -> urea
+encephalopathy -> density
+encephalopathy -> consciousness
+hepatomegaly -> hepatalgia
+hepatomegaly -- ESR 0.7
+hepatomegaly -- alt 0.7
+hepatomegaly -- ast 0.7
+hepatomegaly -- THepatitis 0.7
+ESR -- alt 0.7
+ESR -- ast 0.7
+ESR -- THepatitis 0.7
+alt -- Cirrhosis 0.7
+alt -- ast 0.7
+alt -- THepatitis 0.7
+ast -- Cirrhosis 0.7
+ast -- THepatitis 0.7

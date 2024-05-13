@@ -40,8 +40,16 @@ def testAlgorithm(G, alg, printCIs = False):
     # namesInOrder = ['P', 'A', 'B', 'C', 'D', 'H']
     # list2
     # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # id7
+    # namesInOrder = ['C', 'A', 'D', 'B', 'X', 'Y', 'E']
     # id72
     # namesInOrder = ['C', 'A', 'D', 'Z', 'B', 'X', 'Y', 'E']
+    # water_relabel
+    # namesInOrder = ['0', 'D', 'F', 'E', 'H', 'A', 'B', 'C']
+    # bif_u30_fix water [50]
+    # namesInOrder = ['CKNI_12_00', 'CNON_12_00', 'CKND_12_00', 'CKNN_12_00', 'CBODN_12_00', 'C_NI_12_00', 'CNOD_12_15', 'CNON_12_15', 'C_NI_12_15', 'CKNI_12_15', 'CBODN_12_15', 'CKND_12_15', 'CBODN_12_30', 'CNOD_12_30', 'CNON_12_30', 'CKNI_12_45', 'CKNN_12_30', 'C_NI_12_30', 'CNON_12_45', 'CNOD_12_45', 'CKND_12_45', 'CBODN_12_45', 'CBODD_12_45']
+    # bif_u30_fix water [42]
+    # namesInOrder = ['C_NI_12_00', 'CNON_12_00', 'CKNN_12_00', 'CKND_12_00', 'CKNI_12_00', 'CBODN_12_00', 'C_NI_12_15', 'CNON_12_15', 'CBODN_12_15', 'CKND_12_15', 'CNOD_12_15', 'CKNI_12_15', 'CKNN_12_30', 'CNON_12_30', 'CBODN_12_30', 'CNOD_12_30', 'C_NI_12_30', 'CKNI_12_45', 'CKND_12_45', 'CBODN_12_45', 'CNOD_12_45', 'CBODD_12_45', 'CNON_12_45']
 
     if namesInOrder is not None:
         Vordered = []

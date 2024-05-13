@@ -104,6 +104,11 @@ class GraphUtils():
     def ancestors(w, G):
         # return G.ancestors(w)
         return GraphUtils.reach(w, G, directedEdgeType, Direction.backward)
+    
+    @staticmethod
+    def ancestorsPlus(w, G):
+        w = ou.makeArray(w)
+        return su.union(w, GraphUtils.ancestors(w, G))
 
     # Node | Node[], Graph
     # Node[]

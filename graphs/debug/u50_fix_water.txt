@@ -1,0 +1,84 @@
+<NODES>
+cknd00  150,-300
+cbodn00  -450,-150
+cnon00  -300,-150
+cni15  -450,0
+ckni15  -300,0
+cknd15  -150,150
+cnod15  -150,-150
+cnon15  -150,300
+cni30  0,-150
+ckni30  150,-150
+cnod30  -150,0
+cnon30  300,-150
+cni45  0,300
+cbodd45  0,0
+cknd45  450,-150
+cbodn45  150,0
+
+<EDGES>
+cknd00 -> cknd15
+cknd00 -> cnon30
+cknd00 -> cknd45
+cbodn00 -> cnon15
+cbodn00 -> cnod30
+cbodn00 -> cnon30
+cbodn00 -> cbodd45
+cbodn00 -> cbodn45
+cnon00 -> cnod15
+cnon00 -> cnon15
+cnon00 -> cnon30
+cnon00 -> cbodd45
+cnon00 -> cbodn45
+cni15 -> cni30
+cni15 -> cbodd45
+cni15 -> cbodn45
+ckni15 -> ckni30
+ckni15 -- cknd15 0.7
+ckni15 -> cbodd45
+ckni15 -> cbodn45
+ckni15 -> cknd45
+cknd15 -- cnon15 0.7
+cknd15 -> cknd45
+cnod15 -> cnod30
+cnod15 -> cnon30
+cnod15 -- cnon15 0.7
+cnod15 -> cbodd45
+cnod15 -> cbodn45
+cnon15 -> cnod30
+cnon15 -> cnon30
+cnon15 -> cbodd45
+cnon15 -> cbodn45
+cni30 -> cni45
+cni30 -> cbodd45
+ckni30 -> cbodd45
+ckni30 -> cknd45
+cnod30 -> cbodd45
+cnod30 -- cni15 0.7
+cnod30 -- ckni15 0.7
+cnod30 -- cnod15 0.7
+cnod30 -- cknd15 0.7
+cnod30 -- cnon15 0.7
+cnon30 -> cbodn45
+cnon30 -- cknd15 0.7
+cnon30 -- cnon15 0.7
+cnon30 -- cnod15 0.7
+cnon30 -- cnod30 0.7
+cbodd45 -- cbodn45 0.7
+cbodd45 -- cnod30 0.7
+cbodd45 -- cni15 0.7
+cbodd45 -- ckni15 0.7
+cbodd45 -- cnod15 0.7
+cbodd45 -- cknd15 0.7
+cbodd45 -- cnon15 0.7
+cbodd45 -- cnon30 0.7
+cknd45 -- cnon30 0.7
+cknd45 -- cknd15 0.7
+cknd45 -- cnon15 0.7
+cbodn45 -- cnod30 0.7
+cbodn45 -- cni15 0.7
+cbodn45 -- ckni15 0.7
+cbodn45 -- cnod15 0.7
+cbodn45 -- cknd15 0.7
+cbodn45 -- cnon15 0.7
+cbodn45 -- cnon30 0.7

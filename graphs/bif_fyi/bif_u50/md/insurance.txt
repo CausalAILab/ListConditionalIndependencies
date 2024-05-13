@@ -1,0 +1,75 @@
+<NODES>
+GoodStudent  -600,-225
+SocioEcon  -480,-75
+Age  -450,-375
+RiskAversion  0,-375
+Accident  -600,225
+RuggedAuto  -600,75
+MakeModel  -450,75
+Antilock  -300,75
+Mileage  -150,75
+DrivQuality  -450,-225
+DrivingSkill  -330,-75
+SeniorTrain  -300,-225
+ThisCarCost  -488,375
+CarValue  0,75
+Theft  -450,225
+AntiTheft  150,75
+HomeBase  300,75
+OtherCarCost  -300,225
+OtherCar  450,75
+Cushioning  0,375
+Airbag  600,75
+
+<EDGES>
+SocioEcon -> GoodStudent
+SocioEcon -> RiskAversion
+SocioEcon -> MakeModel
+SocioEcon -> HomeBase
+SocioEcon -> AntiTheft
+SocioEcon -> OtherCar
+SocioEcon -> RuggedAuto
+SocioEcon -> Antilock
+SocioEcon -> CarValue
+SocioEcon -> Airbag
+Age -> GoodStudent
+Age -> SocioEcon
+Age -> RiskAversion
+Age -> DrivingSkill
+Age -> SeniorTrain
+RiskAversion -> MakeModel
+RiskAversion -> DrivQuality
+RiskAversion -> SeniorTrain
+RiskAversion -> HomeBase
+RiskAversion -> AntiTheft
+RiskAversion -> RuggedAuto
+RiskAversion -> Antilock
+RiskAversion -> CarValue
+RiskAversion -> Airbag
+Accident -> OtherCarCost
+Accident -> ThisCarCost
+RuggedAuto -> OtherCarCost
+RuggedAuto -> Cushioning
+RuggedAuto -- Antilock 0.7
+RuggedAuto -- CarValue 0.7
+RuggedAuto -- Airbag 0.7
+RuggedAuto -> ThisCarCost
+MakeModel -> RuggedAuto
+MakeModel -> Antilock
+MakeModel -> CarValue
+MakeModel -> Airbag
+Antilock -> Accident
+Antilock -- CarValue 0.7
+Antilock -- Airbag 0.7
+Mileage -> Accident
+Mileage -> CarValue
+DrivQuality -> Accident
+DrivingSkill -> DrivQuality
+SeniorTrain -> DrivingSkill
+CarValue -> ThisCarCost
+CarValue -> Theft
+CarValue -- Airbag 0.7
+Theft -> ThisCarCost
+AntiTheft -> Theft
+HomeBase -> Theft
+Airbag -> Cushioning

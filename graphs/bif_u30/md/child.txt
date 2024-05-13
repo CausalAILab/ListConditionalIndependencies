@@ -1,59 +1,37 @@
 <NODES>
-BirthAsphyxia  -675,-75
-HypDistrib  -525,-75
-DuctFlow  0,-225
-CardiacMixing  -675,75
-HypoxiaInO2  -525,75
-LungParench  -375,75
-ChestXray  -225,75
-LungFlow  -75,75
-Sick  75,75
-LVH  225,75
-LowerBodyO2  -675,225
-RUQO2  -525,225
-CO2Report  375,75
-GruntingReport  525,75
-Age  675,75
+BirthAsphyxia
+DuctFlow
+HypoxiaInO2
+LungParench
+CO2
+ChestXray
+LungFlow
+Grunting
+LVH
+LowerBodyO2
+CO2Report
+Disease
+GruntingReport
+Age
 
 <EDGES>
-BirthAsphyxia -> DuctFlow
-BirthAsphyxia -> CardiacMixing
-BirthAsphyxia -> LungParench
-BirthAsphyxia -> LungFlow
-BirthAsphyxia -> Sick
-BirthAsphyxia -> LVH
-BirthAsphyxia -> Age
-HypDistrib -> LowerBodyO2
-DuctFlow -> HypDistrib
-DuctFlow -- CardiacMixing 0.7
-DuctFlow -- LungParench 0.7
-DuctFlow -- LungFlow 0.7
-DuctFlow -- Sick 0.7
-DuctFlow -- LVH 0.7
-DuctFlow -- Age 0.7
-CardiacMixing -> HypDistrib
-CardiacMixing -> HypoxiaInO2
-CardiacMixing -- LungParench 0.7
-CardiacMixing -- LungFlow 0.7
-CardiacMixing -- Sick 0.7
-CardiacMixing -- LVH 0.7
-CardiacMixing -- Age 0.7
+BirthAsphyxia -> Disease
+DuctFlow -> LowerBodyO2
 HypoxiaInO2 -> LowerBodyO2
-HypoxiaInO2 -> RUQO2
 LungParench -> HypoxiaInO2
+LungParench -> CO2
 LungParench -> ChestXray
-LungParench -- LungFlow 0.7
-LungParench -- Sick 0.7
-LungParench -- LVH 0.7
-LungParench -- Age 0.7
-LungParench -> CO2Report
-LungParench -> GruntingReport
+LungParench -> Grunting
+CO2 -> CO2Report
 LungFlow -> ChestXray
-LungFlow -- Sick 0.7
-LungFlow -- LVH 0.7
-LungFlow -- Age 0.7
-Sick -> Age
-Sick -- LVH 0.7
-Sick -> GruntingReport
-LVH -- Age 0.7
-Age -- Sick 0.7
+Grunting -> GruntingReport
+Grunting -- Age
+LowerBodyO2 -- HypoxiaInO2
+Disease -> Age
+Disease -> LVH
+Disease -> DuctFlow
+Disease -> LungParench
+Disease -> LungFlow
+Disease -> Grunting
+Disease -> HypoxiaInO2
+Disease -> LowerBodyO2

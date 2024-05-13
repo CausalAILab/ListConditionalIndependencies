@@ -1,0 +1,198 @@
+<NODES>
+Fault
+F97
+F2
+F3
+F5
+F56
+F10
+F55
+F52
+F11
+F13
+F14
+F16
+F17
+F44
+F20
+F25
+F92
+F31
+F36
+F37
+F84
+F96
+F38
+F40
+F46
+F47
+F49
+F50
+F51
+F54
+F58
+F59
+F60
+F62
+F63
+F64
+F68
+F72
+F86
+F70
+F75
+F77
+F79
+F81
+F87
+F88
+F89
+F94
+F95
+F99
+F102
+F103
+F106
+F107
+
+<EDGES>
+Fault -> F97
+Fault -> F2
+Fault -> F3
+Fault -> F5
+Fault -> F56
+Fault -> F10
+Fault -> F55
+Fault -> F52
+Fault -> F11
+Fault -> F13
+Fault -> F14
+Fault -> F16
+Fault -> F17
+Fault -> F44
+Fault -> F20
+Fault -> F25
+Fault -> F92
+Fault -> F31
+Fault -> F36
+Fault -> F37
+Fault -> F84
+Fault -> F96
+Fault -> F38
+Fault -> F40
+Fault -> F46
+Fault -> F47
+Fault -> F49
+Fault -> F50
+Fault -> F51
+Fault -> F54
+Fault -> F58
+Fault -> F59
+Fault -> F60
+Fault -> F62
+Fault -> F63
+Fault -> F64
+Fault -> F68
+Fault -> F72
+Fault -> F70
+Fault -> F75
+Fault -> F77
+Fault -> F79
+Fault -> F81
+Fault -> F87
+Fault -> F88
+Fault -> F89
+Fault -> F94
+Fault -> F95
+Fault -> F99
+Fault -> F102
+Fault -> F103
+Fault -> F106
+Fault -> F107
+Fault -> F86
+F97 -> F2
+F97 -> F3
+F97 -> F5
+F97 -> F103
+F97 -> F106
+F97 -> F99
+F97 -> F102
+F2 -> F5
+F56 -> F13
+F55 -> F52
+F52 -> F11
+F44 -> F20
+F44 -> F31
+F44 -> F47
+F44 -> F49
+F44 -> F50
+F44 -> F88
+F44 -> F107
+F44 -> F86
+F20 -> F31
+F20 -> F84
+F20 -> F86
+F20 -- F96
+F20 -- F38
+F20 -- F40
+F20 -- F87
+F20 -- F94
+F20 -- F107
+F31 -> F87
+F31 -> F88
+F31 -> F89
+F31 -- F20
+F31 -- F84
+F31 -- F96
+F31 -- F38
+F31 -- F40
+F31 -- F94
+F31 -- F107
+F84 -> F96
+F84 -> F86
+F84 -- F20
+F84 -- F38
+F84 -- F40
+F84 -- F87
+F84 -- F94
+F84 -- F107
+F84 -> F54
+F96 -> F38
+F96 -> F40
+F96 -> F94
+F96 -- F84
+F96 -- F87
+F96 -- F107
+F38 -- F96
+F38 -- F40
+F38 -- F87
+F38 -- F94
+F38 -- F107
+F40 -- F96
+F40 -- F87
+F40 -- F94
+F40 -- F107
+F54 -- F20
+F54 -- F31
+F54 -- F96
+F54 -- F38
+F54 -- F40
+F54 -- F84
+F54 -- F87
+F54 -- F94
+F54 -- F107
+F62 -- F13
+F72 -> F86
+F72 -> F70
+F72 -> F81
+F72 -> F89
+F72 -> F95
+F86 -> F70
+F86 -> F81
+F87 -> F89
+F87 -- F31
+F87 -- F94
+F87 -- F107
+F88 -> F89
+F94 -- F96
+F94 -- F107

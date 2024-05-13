@@ -280,6 +280,9 @@ def printGraphToEditorFormat(G):
 
     print('\n'.join(edgeList))
 
+    print('Nodes: ' + str(len(G.nodes)))
+    print('Edges: ' + str(len(G.edges)))
+
 # graph files from bnlearn: https://www.bnlearn.com/bnrepository/
 # bif file info (# of nodes)
 # sm: [1,20]
@@ -306,12 +309,12 @@ if __name__ == '__main__':
             fileContent = f.readlines()
             bifNodes = parseToBIFNodes(fileContent)
             G = BIFNodesToGraph(bifNodes)
-            # G = BIFNodesToGraph(bifNodes, 0.3)
+            # G = BIFNodesToGraph(bifNodes, 0.5)
             # printGraphToEditorFormat(G)
 
-            if G is not None:
-                for alg in algorithms:
-                    testAlgorithm(G, alg)
+            # if G is not None:
+            #     for alg in algorithms:
+            #         testAlgorithm(G, alg)
 
             f.close()
     except IOError:
