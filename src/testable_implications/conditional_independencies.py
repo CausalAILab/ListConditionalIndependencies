@@ -264,7 +264,7 @@ class ConditionalIndependencies():
             print('I: ' + nodeNamesToString(I))
             print('R: ' + nodeNamesToString(R))
             print('Spu: ' + nodeNamesToString(Spu))
-            print('Spu_1: ' + nodeNamesToString(Spu_1))
+            print('Spu_1: ' + nodeNamesToString(Spu_bruteforce))
 
         # if X['name'] == 'J':
         #     print('Spu: ' + nodeNamesToString(Spu))
