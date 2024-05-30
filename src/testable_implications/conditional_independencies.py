@@ -257,6 +257,14 @@ class ConditionalIndependencies():
 
         # Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R)
         Spu = ConditionalIndependencies.GetContractionVars(GVleqX,X,VleqX,I,R)
+        Spu_bruteforce = ConditionalIndependencies.GetContractionVarsBruteForce(GVleqX,X,VleqX,I,R)
+        if not su.equals(Spu, Spu_bruteforce, 'name'):
+            print('Different results!')
+            print('X: ' + nodeNamesToString([X]))
+            print('I: ' + nodeNamesToString(I))
+            print('R: ' + nodeNamesToString(R))
+            print('Spu: ' + nodeNamesToString(Spu))
+            print('Spu_1: ' + nodeNamesToString(Spu_1))
 
         # if X['name'] == 'J':
         #     print('Spu: ' + nodeNamesToString(Spu))
@@ -553,6 +561,75 @@ class ConditionalIndependencies():
             #         break
 
         return Spu
+
+
+    @staticmethod
+    def GetContractionVarsBruteForce(GVleqX,X,VleqX,I,R):
+        AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
+        AnSpIcapR = su.intersection(AnSpI, R, 'name')
+        Gprime = gu.subgraph(GVleqX, AnSpIcapR)
+        Ie = ConditionalIndependencies.C(Gprime, [X])
+        Sp = su.difference(Ie, I, 'name')
+        Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
+        Spn = su.intersection(Spn, Sp, 'name')
+
+        # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
+        AnI = gu.ancestorsPlus(I, GVleqX)
+        SpToSearch = su.difference(Spn, AnI, 'name')
+
+        SpIteration = list(map(lambda n: ou.makeArray(n), SpToSearch))
+        SpIteration.extend([[]])
+
+        Spu = []
+
+        for s in SpIteration:
+            Des = gu.descendantsPlus(s, GVleqX)
+            GIs = gu.subgraph(GVleqX, su.difference(Ie, Des, 'name'))
+            Is = ConditionalIndependencies.C(GIs, [X])
+            GRs = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
+            Rs = ConditionalIndependencies.C(GRs, [X])
+
+            AnX = su.union(gu.ancestors(X, GVleqX), [X], 'name')
+            VnonAnX = su.difference(VleqX, AnX, 'name')
+            found = False
+
+            for i in range(len(VnonAnX) + 1):
+                combs = list(itertools.combinations(VnonAnX, i))
+                if found:
+                    break
+
+                for Sminus in combs:
+                    if found:
+                        break
+                    S = su.union(AnX, Sminus, 'name')
+
+                    AnS = gu.ancestors(S, GVleqX)
+
+                    # check if S is ancestral
+                    if not su.equals(S, AnS, 'name'):
+                        continue
+
+                    # C = C(u)_GS
+                    GS = gu.subgraph(GVleqX, S)
+                    CCS = gu.cCompDecomposition(GS)
+                    C = None
+
+                    for ccs in CCS:
+                        if su.belongs(X, ccs, compareNames):
+                            C = ccs
+                            break
+                    
+                    if su.isSubset(Is, C, 'name') and su.isSubset(C, Rs, 'name'):
+                        if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,C):
+                            if len(s) > 0:
+                                Spu.append(s[0])
+                            else:
+                                Spu.append(s)
+                            found = True
+                
+        return Spu
+    
+
     
     @staticmethod
     def GetProperSpv3(GVleqX,X,VleqX,I,R):
