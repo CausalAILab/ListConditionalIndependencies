@@ -251,15 +251,15 @@ class ConditionalIndependencies():
     
     @staticmethod
     def ListCIXone(GVleqX,X,VleqX,I,R,CI):
-        if X['name'] == 'J':
-            print('I: ' + nodeNamesToString(I))
-            print('R: ' + nodeNamesToString(R))
+        # if X['name'] == 'J':
+        #     print('I: ' + nodeNamesToString(I))
+        #     print('R: ' + nodeNamesToString(R))
 
         # Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R)
         Spu = ConditionalIndependencies.GetContractionVars(GVleqX,X,VleqX,I,R)
 
-        if X['name'] == 'J':
-            print('Spu: ' + nodeNamesToString(Spu))
+        # if X['name'] == 'J':
+        #     print('Spu: ' + nodeNamesToString(Spu))
 
         if su.isEmpty(Spu):
             return
@@ -272,9 +272,9 @@ class ConditionalIndependencies():
             RmIe = su.difference(R, Ie, 'name')
 
             if len(RmIe) == 0:
-                if X['name'] == 'J':
-                    print('** Leaf **')
-                    print('Ie: ' + nodeNamesToString(Ie))
+                # if X['name'] == 'J':
+                #     print('** Leaf **')
+                #     print('Ie: ' + nodeNamesToString(Ie))
                 C = Ie
                 Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
                 Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
@@ -461,9 +461,9 @@ class ConditionalIndependencies():
 
         Spu = []
 
-        if X['name'] == 'J':
-            print('Ie: ' + nodeNamesToString(Ie))
-            print('Sp: ' + nodeNamesToString(Sp))
+        # if X['name'] == 'J':
+        #     print('Ie: ' + nodeNamesToString(Ie))
+        #     print('Sp: ' + nodeNamesToString(Sp))
 
         for s in SpIteration:
             # Step 1
@@ -492,7 +492,7 @@ class ConditionalIndependencies():
             # vc2
             # Sminus = gu.descendantsPlus(Sps, GVleqX)
             # dCandidates = su.difference(Sminus, Sps, 'name')
-            
+
             # for d in dCandidates:
             #     # d not in Rs, found candidate
             #     if not su.belongs(d, Rs, compareNames):
