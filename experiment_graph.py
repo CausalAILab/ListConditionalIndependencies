@@ -36,6 +36,17 @@ def testAlgorithm(G, alg, printCIs = False):
     # namesInOrder = ['A2', 'A4', 'A1', 'A_n', 'A3', 'B_n', 'B3', 'B4', 'B2', 'B1']
     # fig5a
     # namesInOrder = ['A','B','C','D','E','F','H','J']
+    # namesInOrder = ['A','C','E','F','H','J']
+    # namesInOrder = ['A','B','C','E','F','J']
+    # step2 bug
+    # namesInOrder = ['F','H','A','B','C','E','J']
+    # namesInOrder = ['F','H','K','A','B','C','E','J']
+    # namesInOrder = ['F','H','K','L','A','B','C','E','J']
+    # test1
+    # namesInOrder = ['F','H','A','B','C','K','L','E','J']
+    # test2
+    # namesInOrder = ['F','H','K','L','A','B','C','E','J']
+    # namesInOrder = ['F','K','L','A','B','C','E','J']
     # noci2
     # namesInOrder = ['P', 'A', 'B', 'C', 'D', 'H']
     # list2
@@ -148,8 +159,8 @@ if __name__ == '__main__':
             if G is not None:
                 for i in range(numExperiments):
                     for alg in algorithms:
-                        testAlgorithm(G, alg)
-                        # testAlgorithm(G, alg, True)
+                        # testAlgorithm(G, alg)
+                        testAlgorithm(G, alg, True)
 
             f.close()
     except IOError:
