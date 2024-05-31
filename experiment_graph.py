@@ -159,8 +159,8 @@ if __name__ == '__main__':
             if G is not None:
                 for i in range(numExperiments):
                     for alg in algorithms:
-                        # testAlgorithm(G, alg)
-                        testAlgorithm(G, alg, True)
+                        testAlgorithm(G, alg)
+                        # testAlgorithm(G, alg, True)
 
             f.close()
     except IOError:
