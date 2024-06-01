@@ -294,7 +294,8 @@ class ConditionalIndependencies():
                 Rprime = ConditionalIndependencies.C(Gprime,X)
 
                 # vc4'
-                AnIs = su.union(gu.ancestorsPlus(I, GVleqX), [s], 'name')
+                # AnIs = su.union(gu.ancestorsPlus(I, GVleqX), [s], 'name')
+                AnIs = gu.ancestorsPlus(su.union(I, [s], 'name'), GVleqX)
                 Gprime = gu.subgraph(GVleqX, AnIs)
                 Iprime = ConditionalIndependencies.C(Gprime, X)
 
