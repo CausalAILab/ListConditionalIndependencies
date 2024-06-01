@@ -309,13 +309,13 @@ class ConditionalIndependencies():
             return I
         else:
             PaR = gu.parentsPlus(R, GVleqX)
-            SpIplus = gu.spouses(I, GVleqX)
-            PaIplus = gu.parentsPlus(I, GVleqX)
+            SpI = gu.spouses(I, GVleqX)
+            PaI = gu.parentsPlus(I, GVleqX)
 
-            dCandidates = gu.descendantsPlus(su.difference(SpIplus, PaIplus, 'name'), GVleqX)
+            dCandidates = gu.descendantsPlus(su.difference(SpI, PaI, 'name'), GVleqX)
 
             for d in dCandidates:
-                Z = FindSeparator(GVleqX, X, d, PaIplus, PaR)
+                Z = FindSeparator(GVleqX, X, d, PaI, PaR)
 
                 if Z is not None:
                     AnIZ = gu.ancestorsPlus(su.union(I, Z, 'name'), GVleqX)
