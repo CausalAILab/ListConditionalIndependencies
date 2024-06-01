@@ -4,7 +4,7 @@ from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
 from src.common.object_utils import ObjectUtils as ou
 from src.inference.utils.graph_utils import compareNames
-from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString, FindSep
+from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString, FindSeparator
 from src.path_analysis.d_separation import DSeparation
 
 def isSymmetric(ci1, ci2):
@@ -252,29 +252,14 @@ class ConditionalIndependencies():
     
     @staticmethod
     def ListCIXVC4(GVleqX,X,VleqX,I,R,CI):
-        AnI = gu.ancestorsPlus(I, GVleqX)
-        GAnI = gu.subgraph(GVleqX, su.intersection(AnI, R, 'name'))
-        Iplus = ConditionalIndependencies.C(GAnI, X)
+        # vc4
+        # AnI = gu.ancestorsPlus(I, GVleqX)
+        # GAnI = gu.subgraph(GVleqX, AnI)
+        # Iplus = ConditionalIndependencies.C(GAnI, X)
+        # vc4'
+        Iplus = I
 
-        isAdm = False
-
-        if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Iplus):
-            isAdm = True
-        else:
-            PaR = gu.parentsPlus(R, GVleqX)
-            SpIplus = gu.spouses(Iplus, GVleqX)
-            PaIplus = gu.parentsPlus(Iplus, GVleqX)
-
-            dCandidates = gu.descendantsPlus(su.difference(SpIplus, PaIplus, 'name'), GVleqX)
-
-            for d in dCandidates:
-                Z = FindSep(GVleqX, X, d, PaIplus, PaR)
-
-                if Z is not None:
-                    isAdm = True
-                    break
-
-        if isAdm:
+        if ConditionalIndependencies.FindAdmissibleC(GVleqX,X,VleqX,Iplus,R) is not None:
             if su.equals(I, R, 'name'):
                 C = I
                 Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
@@ -303,15 +288,43 @@ class ConditionalIndependencies():
 
                 s = sCandidates[0]
                 Des = gu.descendantsPlus(s, GVleqX)
-                Iprime = su.union(I, [s], 'name')
+                # vc4
+                # Iprime = su.union(I, [s], 'name')
                 Gprime = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
                 Rprime = ConditionalIndependencies.C(Gprime,X)
+
+                # vc4'
+                AnIs = su.union(gu.ancestorsPlus(I, GVleqX), [s], 'name')
+                Gprime = gu.subgraph(GVleqX, AnIs)
+                Iprime = ConditionalIndependencies.C(Gprime, X)
 
                 # for R', we can't pick s s.t. X in De(s)
                 if Rprime is not None:
                     ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,I,Rprime,CI)
                 ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,Iprime,R,CI)
     
+    @staticmethod
+    def FindAdmissibleC(GVleqX,X,VleqX,I,R):
+        if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,I):
+            return I
+        else:
+            PaR = gu.parentsPlus(R, GVleqX)
+            SpIplus = gu.spouses(I, GVleqX)
+            PaIplus = gu.parentsPlus(I, GVleqX)
+
+            dCandidates = gu.descendantsPlus(su.difference(SpIplus, PaIplus, 'name'), GVleqX)
+
+            for d in dCandidates:
+                Z = FindSeparator(GVleqX, X, d, PaIplus, PaR)
+
+                if Z is not None:
+                    AnIZ = gu.ancestorsPlus(su.union(I, Z, 'name'), GVleqX)
+                    Gprime = gu.subgraph(GVleqX, AnIZ)
+                    C = ConditionalIndependencies.C(Gprime, X)
+
+                    return C
+        return None
+
     @staticmethod
     def ListCIXone(GVleqX,X,VleqX,I,R,CI):
         # if X['name'] == 'J':
