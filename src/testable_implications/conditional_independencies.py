@@ -4,8 +4,9 @@ from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
 from src.common.object_utils import ObjectUtils as ou
 from src.inference.utils.graph_utils import compareNames
-from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString
+from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString, TestSep
 from src.path_analysis.d_separation import DSeparation
+from src.projection.projection_utils import ProjectionUtils as pu
 
 def isSymmetric(ci1, ci2):
     isXYEqual = su.equals(ci1['X'], ci2['Y'], 'name')
@@ -76,8 +77,8 @@ class ConditionalIndependencies():
         if Vordered is not None:
             V = Vordered
 
-        print('Variables (topo sorted):')
-        print(nodeNamesToString(V, False))
+        # print('Variables (topo sorted):')
+        # print(nodeNamesToString(V, False))
 
         MaxAns = []
         
@@ -368,7 +369,9 @@ class ConditionalIndependencies():
         Rprime = su.difference(R, XY, 'name')
         Z = su.intersection(Rprime, gu.ancestorsPlus(XYI, G), 'name')
 
-        if DSeparation.test(G, X, Y, Z):
+        Ga = pu.unproject(G)
+        if TestSep(Ga, X, Y, Z):
+        # if DSeparation.test(G, X, Y, Z):
             return Z
         else:
             return None
