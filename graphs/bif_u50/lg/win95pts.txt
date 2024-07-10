@@ -1,0 +1,130 @@
+<NODES>
+DataFile
+DskLocal
+PrtPaper
+NetPrint
+PrtDriver
+PrtSel
+PrtDataOut
+NtwrkCnfg
+PTROFFLINE
+NetOK
+PrtPort
+CblPrtHrdwrOK
+LclOK
+PrtMpTPth
+DS_LCLOK
+PC2PRT
+TnrSpply
+Problem1
+AppDtGnTm
+PrntPrcssTm
+PrntngArOK
+CmpltPgPrntd
+GrphcsRltdDrvrSttngs
+EPSGrphc
+PSGRAPHIC
+TrTypFnts
+FntInstlltn
+TTOK
+NnTTOK
+Problem5
+GrbldOtpt
+HrglssDrtnAftrPrnt
+REPEAT
+PSERRMEM
+TstpsTxt
+IncmpltPS
+NtSpd
+Problem2
+
+<EDGES>
+DataFile -> DS_LCLOK
+DataFile -> GrbldOtpt
+DataFile -> PC2PRT
+DataFile -> PrtDataOut
+DskLocal -> PrtDataOut
+PrtPaper -> Problem1
+NetPrint -> PC2PRT
+NetPrint -> GrbldOtpt
+NetPrint -> Problem2
+PrtDriver -> GrbldOtpt
+PrtDriver -> PrtDataOut
+PrtSel -> PrtDataOut
+PrtDataOut -> PC2PRT
+PrtDataOut -- AppDtGnTm
+PrtDataOut -- PrntPrcssTm
+PrtDataOut -- DS_LCLOK
+PrtDataOut -- GrbldOtpt
+NtwrkCnfg -> NetOK
+NtwrkCnfg -> REPEAT
+NtwrkCnfg -> NtSpd
+NtwrkCnfg -> GrbldOtpt
+NtwrkCnfg -> PC2PRT
+PTROFFLINE -> NetOK
+PTROFFLINE -> PC2PRT
+NetOK -> PC2PRT
+PrtPort -> LclOK
+PrtPort -> DS_LCLOK
+CblPrtHrdwrOK -> LclOK
+CblPrtHrdwrOK -> DS_LCLOK
+CblPrtHrdwrOK -> REPEAT
+CblPrtHrdwrOK -> GrbldOtpt
+LclOK -> PC2PRT
+LclOK -- DS_LCLOK
+PrtMpTPth -> PC2PRT
+DS_LCLOK -> PC2PRT
+PC2PRT -- NetOK
+PC2PRT -- DS_LCLOK
+PC2PRT -- GrbldOtpt
+PC2PRT -- PrtDataOut
+PC2PRT -> Problem1
+TnrSpply -> Problem1
+Problem1 -- CmpltPgPrntd
+Problem1 -- PSGRAPHIC
+Problem1 -- TTOK
+Problem1 -- NnTTOK
+Problem1 -- GrbldOtpt
+Problem1 -- NtSpd
+Problem1 -- Problem2
+AppDtGnTm -> HrglssDrtnAftrPrnt
+AppDtGnTm -- PrntPrcssTm
+AppDtGnTm -> NtSpd
+AppDtGnTm -> Problem2
+PrntPrcssTm -> NtSpd
+PrntPrcssTm -> Problem2
+PrntngArOK -> CmpltPgPrntd
+CmpltPgPrntd -> IncmpltPS
+CmpltPgPrntd -- PSGRAPHIC
+CmpltPgPrntd -- TTOK
+CmpltPgPrntd -- NnTTOK
+GrphcsRltdDrvrSttngs -> PSGRAPHIC
+EPSGrphc -> PSGRAPHIC
+PSGRAPHIC -- TTOK
+PSGRAPHIC -- NnTTOK
+TrTypFnts -> Problem5
+FntInstlltn -> TTOK
+FntInstlltn -> NnTTOK
+TTOK -> Problem5
+TTOK -- NnTTOK
+NnTTOK -> Problem5
+GrbldOtpt -- DS_LCLOK
+GrbldOtpt -- CmpltPgPrntd
+GrbldOtpt -- PSGRAPHIC
+GrbldOtpt -- TTOK
+GrbldOtpt -- NnTTOK
+PSERRMEM -- TstpsTxt
+PSERRMEM -- IncmpltPS
+TstpsTxt -- IncmpltPS
+NtSpd -> Problem2
+NtSpd -- CmpltPgPrntd
+NtSpd -- PSGRAPHIC
+NtSpd -- TTOK
+NtSpd -- NnTTOK
+NtSpd -- GrbldOtpt
+Problem2 -- NtSpd
+Problem2 -- CmpltPgPrntd
+Problem2 -- PSGRAPHIC
+Problem2 -- TTOK
+Problem2 -- NnTTOK
+Problem2 -- GrbldOtpt

@@ -1,0 +1,231 @@
+<NODES>
+hepatotoxic
+hospital
+gallstones
+choledocholithotomy
+transfusion
+fibrosis
+diabetes
+Steatosis
+Cirrhosis
+fatigue
+itching
+upper_pain
+pain_ruq
+le_cells
+joints
+inr
+flatulence
+encephalopathy
+urea
+ascites
+hepatomegaly
+ESR
+alt
+amylase
+cholesterol
+hbsag
+hbsag_anti
+nausea
+spiders
+jaundice
+edge
+irregular_liver
+hbc_anti
+palms
+hbeag
+
+<EDGES>
+hepatotoxic -> fatigue
+hepatotoxic -> hepatomegaly
+hepatotoxic -> alt
+hepatotoxic -> nausea
+hepatotoxic -> inr
+hospital -> transfusion
+hospital -> fibrosis
+hospital -> fatigue
+hospital -> inr
+hospital -> ESR
+hospital -> alt
+hospital -> cholesterol
+hospital -> hbsag
+hospital -> hbsag_anti
+hospital -> hbc_anti
+hospital -> hbeag
+hospital -> itching
+hospital -> jaundice
+gallstones -> choledocholithotomy
+gallstones -> upper_pain
+gallstones -> flatulence
+gallstones -> amylase
+gallstones -> itching
+gallstones -> jaundice
+choledocholithotomy -> transfusion
+choledocholithotomy -> fibrosis
+choledocholithotomy -> fatigue
+choledocholithotomy -> inr
+choledocholithotomy -> ESR
+choledocholithotomy -> alt
+choledocholithotomy -> cholesterol
+choledocholithotomy -> hbsag
+choledocholithotomy -> hbsag_anti
+choledocholithotomy -> hbc_anti
+choledocholithotomy -> hbeag
+choledocholithotomy -> itching
+choledocholithotomy -> jaundice
+transfusion -> fibrosis
+transfusion -> fatigue
+transfusion -> inr
+transfusion -> ESR
+transfusion -> alt
+transfusion -> cholesterol
+transfusion -> hbsag
+transfusion -> hbsag_anti
+transfusion -> hbc_anti
+transfusion -> hbeag
+transfusion -> itching
+transfusion -> jaundice
+fibrosis -> Cirrhosis
+fibrosis -- fatigue
+fibrosis -- inr
+fibrosis -- ESR
+fibrosis -- alt
+fibrosis -- cholesterol
+fibrosis -- hbsag
+fibrosis -- hbsag_anti
+fibrosis -- hbc_anti
+fibrosis -- hbeag
+fibrosis -- transfusion
+diabetes -> Steatosis
+Steatosis -> Cirrhosis
+Steatosis -> pain_ruq
+Steatosis -> hepatomegaly
+Steatosis -> ESR
+Steatosis -> alt
+Steatosis -> cholesterol
+Cirrhosis -> inr
+Cirrhosis -> encephalopathy
+Cirrhosis -> alt
+Cirrhosis -> spiders
+Cirrhosis -> edge
+Cirrhosis -> irregular_liver
+Cirrhosis -> palms
+Cirrhosis -> ascites
+Cirrhosis -> itching
+Cirrhosis -> jaundice
+fatigue -- hepatomegaly
+fatigue -- alt
+fatigue -- nausea
+fatigue -- inr
+fatigue -- Steatosis
+fatigue -- ESR
+fatigue -- cholesterol
+fatigue -- hbsag
+fatigue -- hbsag_anti
+fatigue -- hbc_anti
+fatigue -- hbeag
+fatigue -- transfusion
+itching -- jaundice
+itching -- fibrosis
+itching -- fatigue
+itching -- pain_ruq
+itching -- inr
+itching -- hepatomegaly
+itching -- ESR
+itching -- le_cells
+itching -- joints
+itching -- encephalopathy
+itching -- cholesterol
+itching -- alt
+itching -- hbsag
+itching -- hbsag_anti
+itching -- hbc_anti
+itching -- hbeag
+itching -- transfusion
+pain_ruq -- inr
+pain_ruq -- hepatomegaly
+pain_ruq -- ESR
+le_cells -- joints
+le_cells -- encephalopathy
+le_cells -- ESR
+le_cells -- cholesterol
+le_cells -- pain_ruq
+le_cells -- inr
+le_cells -- hepatomegaly
+joints -- encephalopathy
+joints -- ESR
+joints -- cholesterol
+joints -- pain_ruq
+joints -- inr
+joints -- hepatomegaly
+inr -- hepatomegaly
+inr -- ESR
+inr -- alt
+inr -- nausea
+inr -- Steatosis
+inr -- hbsag
+inr -- hbsag_anti
+inr -- hbc_anti
+inr -- hbeag
+inr -- transfusion
+encephalopathy -> urea
+encephalopathy -- ESR
+encephalopathy -- cholesterol
+encephalopathy -- pain_ruq
+encephalopathy -- inr
+encephalopathy -- hepatomegaly
+hepatomegaly -- alt
+hepatomegaly -- nausea
+hepatomegaly -- ESR
+hepatomegaly -- Steatosis
+ESR -- cholesterol
+ESR -- alt
+ESR -- hbsag
+ESR -- hbsag_anti
+ESR -- hbc_anti
+ESR -- hbeag
+ESR -- transfusion
+alt -- nausea
+alt -- Steatosis
+alt -- cholesterol
+alt -- hbsag
+alt -- hbsag_anti
+alt -- hbc_anti
+alt -- hbeag
+alt -- transfusion
+cholesterol -- pain_ruq
+cholesterol -- inr
+cholesterol -- hepatomegaly
+cholesterol -- hbsag
+cholesterol -- hbsag_anti
+cholesterol -- hbc_anti
+cholesterol -- hbeag
+cholesterol -- transfusion
+hbsag -> hbsag_anti
+hbsag -- hbc_anti
+hbsag -- hbeag
+hbsag -- transfusion
+hbsag_anti -- hbsag
+hbsag_anti -- hbc_anti
+hbsag_anti -- hbeag
+hbsag_anti -- transfusion
+nausea -- Steatosis
+jaundice -- fibrosis
+jaundice -- fatigue
+jaundice -- pain_ruq
+jaundice -- inr
+jaundice -- hepatomegaly
+jaundice -- ESR
+jaundice -- le_cells
+jaundice -- joints
+jaundice -- encephalopathy
+jaundice -- cholesterol
+jaundice -- alt
+jaundice -- hbsag
+jaundice -- hbsag_anti
+jaundice -- hbc_anti
+jaundice -- hbeag
+jaundice -- transfusion
+hbc_anti -- hbeag
+hbc_anti -- transfusion
+hbeag -- transfusion

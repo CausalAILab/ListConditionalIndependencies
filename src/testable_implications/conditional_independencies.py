@@ -231,8 +231,8 @@ class ConditionalIndependencies():
         if Vordered is not None:
             V = Vordered
 
-        print('Variables (topo sorted):')
-        print(nodeNamesToString(V, False))
+        # print('Variables (topo sorted):')
+        # print(nodeNamesToString(V, False))
 
         for X in V:
             VleqX = V[:V.index(X)+1]
