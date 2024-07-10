@@ -51,22 +51,22 @@ from src.path_analysis.d_separation import DSeparation
 
 #     return True
 
-def FindSeparator(G, X, Y, I, R):
-    X = ou.makeArray(X)
-    Y = ou.makeArray(Y)
-    I = ou.makeArray(I)
-    R = ou.makeArray(R)
+# def FindSeparator(G, X, Y, I, R):
+#     X = ou.makeArray(X)
+#     Y = ou.makeArray(Y)
+#     I = ou.makeArray(I)
+#     R = ou.makeArray(R)
 
-    XY = su.union(X, Y, 'name')
-    XYI = su.union(XY, I, 'name')
-    Rprime = su.difference(R, XY, 'name')
-    Z = su.intersection(Rprime, gu.ancestorsPlus(XYI, G), 'name')
+#     XY = su.union(X, Y, 'name')
+#     XYI = su.union(XY, I, 'name')
+#     Rprime = su.difference(R, XY, 'name')
+#     Z = su.intersection(Rprime, gu.ancestorsPlus(XYI, G), 'name')
 
-    # if TestSep(G, X, Y, Z):
-    if DSeparation.test(G, X, Y, Z):
-        return Z
-    else:
-        return None
+#     # if TestSep(G, X, Y, Z):
+#     if DSeparation.test(G, X, Y, Z):
+#         return Z
+#     else:
+#         return None
 
 def writeNodeNames(nodes):
     return ', '.join(nodes) if len(nodes) > 0 else '\emptyset'

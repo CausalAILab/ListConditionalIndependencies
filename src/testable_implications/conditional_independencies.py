@@ -4,7 +4,7 @@ from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
 from src.common.object_utils import ObjectUtils as ou
 from src.inference.utils.graph_utils import compareNames
-from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString, FindSeparator
+from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString
 from src.path_analysis.d_separation import DSeparation
 
 def isSymmetric(ci1, ci2):
@@ -245,33 +245,18 @@ class ConditionalIndependencies():
             I = ConditionalIndependencies.C(GAnX,X)
             R = ConditionalIndependencies.C(GVleqX,X)
 
-            # ConditionalIndependencies.ListCIXone(GVleqX,X,VleqX,I,R,CI)
-            ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,I,R,CI)
+            ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,I,R,CI)
 
         return CI
     
     @staticmethod
-    def ListCIXVC4(GVleqX,X,VleqX,I,R,CI):
-        # vc4
-        # AnI = gu.ancestorsPlus(I, GVleqX)
-        # GAnI = gu.subgraph(GVleqX, AnI)
-        # Iplus = ConditionalIndependencies.C(GAnI, X)
-        # vc4'
-        Iplus = I
-
-        if ConditionalIndependencies.FindAdmissibleC(GVleqX,X,VleqX,Iplus,R) is not None:
+    def ListCIX(GVleqX,X,VleqX,I,R,CI):
+        if ConditionalIndependencies.FindAdmissibleC(GVleqX,X,VleqX,I,R) is not None:
             if su.equals(I, R, 'name'):
                 C = I
                 Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
                 Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
                 W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
-
-                if len(W) == 0:
-                    print('Bug (empty W)!')
-                    print('X: ' + nodeNamesToString([X]))
-                    print('C: ' + nodeNamesToString(C))
-                    print('Z: ' + nodeNamesToString(Z))
-                    print('S+: ' + nodeNamesToString(Splus))
 
                 CI.append({
                     'X': X,
@@ -279,30 +264,67 @@ class ConditionalIndependencies():
                     'Z': Z
                 })
             else:
-                RmI = su.difference(R, I, 'name')
                 SpI = su.difference(gu.spouses(I, GVleqX), I, 'name')
-                sCandidates = su.intersection(RmI, SpI, 'name')
+                T = su.intersection(R, SpI, 'name')
 
-                if su.isEmpty(sCandidates):
+                if su.isEmpty(T):
+                    print('Bug: T cannot be empty!')
                     return
 
-                s = sCandidates[0]
+                s = T[0]
                 Des = gu.descendantsPlus(s, GVleqX)
-                # vc4
-                # Iprime = su.union(I, [s], 'name')
                 Gprime = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
                 Rprime = ConditionalIndependencies.C(Gprime,X)
 
-                # vc4'
-                # AnIs = su.union(gu.ancestorsPlus(I, GVleqX), [s], 'name')
                 AnIs = gu.ancestorsPlus(su.union(I, [s], 'name'), GVleqX)
                 Gprime = gu.subgraph(GVleqX, AnIs)
                 Iprime = ConditionalIndependencies.C(Gprime, X)
 
-                # for R', we can't pick s s.t. X in De(s)
-                if Rprime is not None:
-                    ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,I,Rprime,CI)
-                ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,Iprime,R,CI)
+                ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,I,Rprime,CI)
+                ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,Iprime,R,CI)
+    
+    # @staticmethod
+    # def ListCIXVC4(GVleqX,X,VleqX,I,R,CI):
+    #     Iplus = I
+
+        # if ConditionalIndependencies.FindAdmissibleC(GVleqX,X,VleqX,Iplus,R) is not None:
+        #     if su.equals(I, R, 'name'):
+        #         C = I
+        #         Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
+        #         Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+        #         W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
+
+        #         CI.append({
+        #             'X': X,
+        #             'W': W,
+        #             'Z': Z
+        #         })
+        #     else:
+        #         RmI = su.difference(R, I, 'name')
+        #         SpI = su.difference(gu.spouses(I, GVleqX), I, 'name')
+        #         T = su.intersection(RmI, SpI, 'name')
+
+        #         if su.isEmpty(T):
+        #             print('Bug: T cannot be empty!')
+        #             return
+
+        #         s = T[0]
+        #         Des = gu.descendantsPlus(s, GVleqX)
+        #         # vc4
+        #         # Iprime = su.union(I, [s], 'name')
+        #         Gprime = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
+        #         Rprime = ConditionalIndependencies.C(Gprime,X)
+
+        #         # vc4'
+        #         # AnIs = su.union(gu.ancestorsPlus(I, GVleqX), [s], 'name')
+        #         AnIs = gu.ancestorsPlus(su.union(I, [s], 'name'), GVleqX)
+        #         Gprime = gu.subgraph(GVleqX, AnIs)
+        #         Iprime = ConditionalIndependencies.C(Gprime, X)
+
+        #         # for R', we can't pick s s.t. X in De(s)
+        #         if Rprime is not None:
+        #             ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,I,Rprime,CI)
+        #         ConditionalIndependencies.ListCIXVC4(GVleqX,X,VleqX,Iprime,R,CI)
     
     @staticmethod
     def FindAdmissibleC(GVleqX,X,VleqX,I,R):
@@ -314,10 +336,10 @@ class ConditionalIndependencies():
             PaI = gu.parentsPlus(I, GVleqX)
 
             dCandidates = gu.descendantsPlus(su.difference(SpI, PaI, 'name'), GVleqX)
-
+            
             for d in dCandidates:
-                Z = FindSeparator(GVleqX, X, d, PaI, PaR)
-
+                Z = ConditionalIndependencies.FindSeparator(GVleqX, X, d, PaI, PaR)
+                
                 if Z is not None:
                     AnIZ = gu.ancestorsPlus(su.union(I, Z, 'name'), GVleqX)
                     Gprime = gu.subgraph(GVleqX, AnIZ)
@@ -325,200 +347,193 @@ class ConditionalIndependencies():
 
                     return C
         return None
-
-    @staticmethod
-    def ListCIXone(GVleqX,X,VleqX,I,R,CI):
-        # if X['name'] == 'J':
-        #     print('I: ' + nodeNamesToString(I))
-        #     print('R: ' + nodeNamesToString(R))
-
-        # Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R)
-        Spu = ConditionalIndependencies.GetContractionVars(GVleqX,X,VleqX,I,R)
-        # Spu = ConditionalIndependencies.GetContractionVarsVC4(GVleqX,X,VleqX,I,R)
-
-        # if X['name'] == 'J':
-        #     print('Spu: ' + nodeNamesToString(Spu))
-
-        if su.isEmpty(Spu):
-            return
-        
-        if (len(Spu) == 1 and Spu[0] == []):
-            AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
-            AnSpIcapR = su.intersection(AnSpI, R, 'name')
-            Gprime = gu.subgraph(GVleqX, AnSpIcapR)
-            Ie = ConditionalIndependencies.C(Gprime, [X])
-            RmIe = su.difference(R, Ie, 'name')
-
-            if len(RmIe) == 0:
-                # if X['name'] == 'J':
-                #     print('** Leaf **')
-                #     print('Ie: ' + nodeNamesToString(Ie))
-                C = Ie
-                Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-                Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
-                W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
-
-                if len(W) == 0:
-                    print('Bug (empty W)!')
-                    print('X: ' + nodeNamesToString([X]))
-                    print('C: ' + nodeNamesToString(C))
-                    print('Z: ' + nodeNamesToString(Z))
-                    print('S+: ' + nodeNamesToString(Splus))
-
-                CI.append({
-                    'X': X,
-                    'W': W,
-                    'Z': Z
-                })
-
-                return
-            else:
-                s = RmIe[0]
-        else:
-            s = Spu[0]
-
-        Des = gu.descendantsPlus(s, GVleqX)
-        Iprime = su.union(I, [s], 'name')
-        Gprime = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
-        Rprime = ConditionalIndependencies.C(Gprime,[X])
-
-        ConditionalIndependencies.ListCIXone(GVleqX,X,VleqX,I,Rprime,CI)
-        ConditionalIndependencies.ListCIXone(GVleqX,X,VleqX,Iprime,R,CI)
     
     @staticmethod
-    def ListCIXv3(GVleqX,X,VleqX,I,R,CI):
-        Sp = su.difference(gu.ancestorsPlus(gu.spouses(I, GVleqX), GVleqX), I, 'name')
-        Sp = su.intersection(Sp, R, 'name')
-        Iextend = su.union(I, Sp, 'name')
+    def IsAdmissible(GVleqX,X,VleqX,C):
+        Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
+        Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+        W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
 
-        # if X['name'] == 'B' or X['name'] == 'C':
-        if X['name'] == 'B':
-            print('X: ' + nodeNamesToString([X]))
-            print('I: ' + nodeNamesToString(I))
-            print('R: ' + nodeNamesToString(R))
-            print('Sp: ' + nodeNamesToString(Sp))
-            # print('Ie: ' + nodeNamesToString(Rprime))
-
-        admissiblePairs = []
-        ConditionalIndependencies.ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Sp,Iextend,admissiblePairs)
-
-        if len(admissiblePairs) == 0:
-            return
-
-        for (Iprime,Rprime) in admissiblePairs:
-            if Iprime is None and Rprime is None:
-                return
-
-            if su.equals(Iprime, Rprime, 'name'):
-                C = Iprime
-                Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-                Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
-                W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
-
-                if len(W) == 0:
-                    print('Bug (empty W)!')
-                    print('X: ' + nodeNamesToString([X]))
-                    print('C: ' + nodeNamesToString(C))
-                    print('Z: ' + nodeNamesToString(Z))
-                    print('S+: ' + nodeNamesToString(Splus))
-
-                CI.append({
-                    'X': X,
-                    'W': W,
-                    'Z': Z
-                })
-            else:
-                # if X['name'] == 'B' or X['name'] == 'C':
-                if X['name'] == 'B':
-                    print('X: ' + nodeNamesToString([X]))
-                    print('Iprime: ' + nodeNamesToString(Iprime))
-                    print('Rprime: ' + nodeNamesToString(Rprime))
-
-                # if len(Iprime) > len(Rprime):
-                #     print('Iprime: ' + nodeNamesToString(Iprime))
-                #     print('Rprime: ' + nodeNamesToString(Rprime))
-
-                ConditionalIndependencies.ListCIXv3(GVleqX,X,VleqX,Iprime,Rprime,CI)
-
+        return not su.isEmpty(W)
+    
     @staticmethod
-    def ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend,admissiblePairs):
-        Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend)
-        Spd = su.difference(Spc, Spu, 'name')
+    def FindSeparator(G, X, Y, I, R):
+        X = ou.makeArray(X)
+        Y = ou.makeArray(Y)
+        I = ou.makeArray(I)
+        R = ou.makeArray(R)
 
-        # Spc -> Spn, Spa
-        Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
-        Spn = su.intersection(Spn, Spc, 'name')
-        Spa = su.difference(Spc, Spn, 'name')
+        XY = su.union(X, Y, 'name')
+        XYI = su.union(XY, I, 'name')
+        Rprime = su.difference(R, XY, 'name')
+        Z = su.intersection(Rprime, gu.ancestorsPlus(XYI, G), 'name')
 
-        # if X['name'] == 'B' or X['name'] == 'C':
-        if X['name'] == 'B':
-            print('X: ' + nodeNamesToString([X]))
-            print('Spc: ' + nodeNamesToString(Spc))
-            print('Spu: ' + nodeNamesToString(Spu))
+        if DSeparation.test(G, X, Y, Z):
+            return Z
+        else:
+            return None
 
-        if su.isEmpty(Spu):
-            return
+    # @staticmethod
+    # def ListCIXone(GVleqX,X,VleqX,I,R,CI):
+    #     # Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R)
+    #     Spu = ConditionalIndependencies.GetContractionVars(GVleqX,X,VleqX,I,R)
+    #     # Spu = ConditionalIndependencies.GetContractionVarsVC4(GVleqX,X,VleqX,I,R)
+
+    #     if su.isEmpty(Spu):
+    #         return
         
-        if (len(Spu) == 1 and Spu[0] == []):
-            Iprime = Iextend
-            Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
-            # some s of Sp can't be removed if s is in An(I')
-            AnIprime = gu.ancestorsPlus(Iprime, GVleqX)
-            Rminus = su.difference(Rminus, AnIprime, 'name')
-            DeRminus = gu.descendantsPlus(Rminus, GVleqX)
-            GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
-            Rprime = ConditionalIndependencies.C(GR,X)
+    #     if (len(Spu) == 1 and Spu[0] == []):
+    #         AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
+    #         AnSpIcapR = su.intersection(AnSpI, R, 'name')
+    #         Gprime = gu.subgraph(GVleqX, AnSpIcapR)
+    #         Ie = ConditionalIndependencies.C(Gprime, [X])
+    #         RmIe = su.difference(R, Ie, 'name')
 
-            admissiblePairs.append((Iprime,Rprime))
-            return
+    #         if len(RmIe) == 0:
+    #             C = Ie
+    #             Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
+    #             Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+    #             W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
 
-        Decs = []
+    #             CI.append({
+    #                 'X': X,
+    #                 'W': W,
+    #                 'Z': Z
+    #             })
 
-        if [] in Spu:
-            Decs.append([])
-            del Spu[Spu.index([])]
+    #             return
+    #         else:
+    #             s = RmIe[0]
+    #     else:
+    #         s = Spu[0]
 
-        sortedSpu = su.intersection(VleqX, Spu, 'name')
+    #     Des = gu.descendantsPlus(s, GVleqX)
+    #     Iprime = su.union(I, [s], 'name')
+    #     Gprime = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
+    #     Rprime = ConditionalIndependencies.C(Gprime,[X])
 
-        Decs.extend(ConditionalIndependencies.ListDec(GVleqX, sortedSpu))
+    #     ConditionalIndependencies.ListCIXone(GVleqX,X,VleqX,I,Rprime,CI)
+    #     ConditionalIndependencies.ListCIXone(GVleqX,X,VleqX,Iprime,R,CI)
+    
+    # @staticmethod
+    # def ListCIXv3(GVleqX,X,VleqX,I,R,CI):
+    #     Sp = su.difference(gu.ancestorsPlus(gu.spouses(I, GVleqX), GVleqX), I, 'name')
+    #     Sp = su.intersection(Sp, R, 'name')
+    #     Iextend = su.union(I, Sp, 'name')
 
-        for D in Decs:
-            DeD = gu.descendantsPlus(D, GVleqX)
-            Dprime = su.intersection(DeD, Sp, 'name')
-            Spcprime = su.difference(Spd, Dprime, 'name')
-            Ieprime = su.difference(Iextend, Dprime, 'name')
+    #     # if X['name'] == 'B' or X['name'] == 'C':
+    #     if X['name'] == 'B':
+    #         print('X: ' + nodeNamesToString([X]))
+    #         print('I: ' + nodeNamesToString(I))
+    #         print('R: ' + nodeNamesToString(R))
+    #         print('Sp: ' + nodeNamesToString(Sp))
+    #         # print('Ie: ' + nodeNamesToString(Rprime))
 
-            # spa-
-            Gprime = gu.subgraph(GVleqX, su.difference(R, Dprime, 'name'))
-            Spaminus = su.difference(Spa, ConditionalIndependencies.C(Gprime,[X]), 'name')
+    #     admissiblePairs = []
+    #     ConditionalIndependencies.ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Sp,Iextend,admissiblePairs)
+
+    #     if len(admissiblePairs) == 0:
+    #         return
+
+    #     for (Iprime,Rprime) in admissiblePairs:
+    #         if Iprime is None and Rprime is None:
+    #             return
+
+    #         if su.equals(Iprime, Rprime, 'name'):
+    #             C = Iprime
+    #             Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
+    #             Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+    #             W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
+
+    #             if len(W) == 0:
+    #                 print('Bug (empty W)!')
+    #                 print('X: ' + nodeNamesToString([X]))
+    #                 print('C: ' + nodeNamesToString(C))
+    #                 print('Z: ' + nodeNamesToString(Z))
+    #                 print('S+: ' + nodeNamesToString(Splus))
+
+    #             CI.append({
+    #                 'X': X,
+    #                 'W': W,
+    #                 'Z': Z
+    #             })
+    #         else:
+    #             # if X['name'] == 'B' or X['name'] == 'C':
+    #             if X['name'] == 'B':
+    #                 print('X: ' + nodeNamesToString([X]))
+    #                 print('Iprime: ' + nodeNamesToString(Iprime))
+    #                 print('Rprime: ' + nodeNamesToString(Rprime))
+
+    #             # if len(Iprime) > len(Rprime):
+    #             #     print('Iprime: ' + nodeNamesToString(Iprime))
+    #             #     print('Rprime: ' + nodeNamesToString(Rprime))
+
+    #             ConditionalIndependencies.ListCIXv3(GVleqX,X,VleqX,Iprime,Rprime,CI)
+
+    # @staticmethod
+    # def ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend,admissiblePairs):
+        # Spu = ConditionalIndependencies.GetProperSpv3(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend)
+        # Spd = su.difference(Spc, Spu, 'name')
+
+        # # Spc -> Spn, Spa
+        # Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
+        # Spn = su.intersection(Spn, Spc, 'name')
+        # Spa = su.difference(Spc, Spn, 'name')
+
+        # if su.isEmpty(Spu):
+        #     return
+        
+        # if (len(Spu) == 1 and Spu[0] == []):
+        #     Iprime = Iextend
+        #     Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
+        #     # some s of Sp can't be removed if s is in An(I')
+        #     AnIprime = gu.ancestorsPlus(Iprime, GVleqX)
+        #     Rminus = su.difference(Rminus, AnIprime, 'name')
+        #     DeRminus = gu.descendantsPlus(Rminus, GVleqX)
+        #     GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
+        #     Rprime = ConditionalIndependencies.C(GR,X)
+
+        #     admissiblePairs.append((Iprime,Rprime))
+        #     return
+
+        # Decs = []
+
+        # if [] in Spu:
+        #     Decs.append([])
+        #     del Spu[Spu.index([])]
+
+        # sortedSpu = su.intersection(VleqX, Spu, 'name')
+
+        # Decs.extend(ConditionalIndependencies.ListDec(GVleqX, sortedSpu))
+
+        # for D in Decs:
+        #     DeD = gu.descendantsPlus(D, GVleqX)
+        #     Dprime = su.intersection(DeD, Sp, 'name')
+        #     Spcprime = su.difference(Spd, Dprime, 'name')
+        #     Ieprime = su.difference(Iextend, Dprime, 'name')
+
+        #     # spa-
+        #     Gprime = gu.subgraph(GVleqX, su.difference(R, Dprime, 'name'))
+        #     Spaminus = su.difference(Spa, ConditionalIndependencies.C(Gprime,[X]), 'name')
             
-            # remove spa-?
-            Spcprime = su.difference(Spcprime, Spaminus, 'name')
-            Ieprime = su.difference(Ieprime, Spaminus, 'name')
+        #     # remove spa-?
+        #     Spcprime = su.difference(Spcprime, Spaminus, 'name')
+        #     Ieprime = su.difference(Ieprime, Spaminus, 'name')
 
-            if X['name'] == 'B':
-                print('X: ' + nodeNamesToString([X]))
-                print('D: ' + nodeNamesToString(D))
-                print('Dprime: ' + nodeNamesToString(Dprime))
-                print('Spcprime: ' + nodeNamesToString(Spcprime))
+            # if su.isEmpty(Spcprime):
+            #     # When Iprime > Rprime?
+            #     Iprime = Ieprime
+            #     Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
+            #     # some s of Sp can't be removed if s is in An(I')
+            #     AnIprime = gu.ancestorsPlus(Iprime, GVleqX)
+            #     Rminus = su.difference(Rminus, AnIprime, 'name')
+            #     DeRminus = gu.descendantsPlus(Rminus, GVleqX)
+            #     GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
+            #     Rprime = ConditionalIndependencies.C(GR,X)
 
-            # ?
-            # ConditionalIndependencies.ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
-
-            if su.isEmpty(Spcprime):
-                # When Iprime > Rprime?
-                Iprime = Ieprime
-                Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
-                # some s of Sp can't be removed if s is in An(I')
-                AnIprime = gu.ancestorsPlus(Iprime, GVleqX)
-                Rminus = su.difference(Rminus, AnIprime, 'name')
-                DeRminus = gu.descendantsPlus(Rminus, GVleqX)
-                GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
-                Rprime = ConditionalIndependencies.C(GR,X)
-
-                admissiblePairs.append((Iprime,Rprime))
-            else:
-                ConditionalIndependencies.ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
+            #     admissiblePairs.append((Iprime,Rprime))
+            # else:
+            #     ConditionalIndependencies.ListIRXv3(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
 
     # @staticmethod
     # def GetContractionVarsVC4(GVleqX,X,VleqX,I,R):
@@ -577,455 +592,402 @@ class ConditionalIndependencies():
 
     #     return Spu
 
-    @staticmethod
-    def GetContractionVars(GVleqX,X,VleqX,I,R):
-        AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
-        AnSpIcapR = su.intersection(AnSpI, R, 'name')
-        Gprime = gu.subgraph(GVleqX, AnSpIcapR)
-        Ie = ConditionalIndependencies.C(Gprime, [X])
-        Sp = su.difference(Ie, I, 'name')
-        Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
-        Spn = su.intersection(Spn, Sp, 'name')
+    # @staticmethod
+    # def GetContractionVars(GVleqX,X,VleqX,I,R):
+    #     AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
+    #     AnSpIcapR = su.intersection(AnSpI, R, 'name')
+    #     Gprime = gu.subgraph(GVleqX, AnSpIcapR)
+    #     Ie = ConditionalIndependencies.C(Gprime, [X])
+    #     Sp = su.difference(Ie, I, 'name')
+    #     Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
+    #     Spn = su.intersection(Spn, Sp, 'name')
 
-        # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
-        AnI = gu.ancestorsPlus(I, GVleqX)
-        SpToSearch = su.difference(Spn, AnI, 'name')
+    #     # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
+    #     AnI = gu.ancestorsPlus(I, GVleqX)
+    #     SpToSearch = su.difference(Spn, AnI, 'name')
 
-        SpIteration = list(map(lambda n: ou.makeArray(n), SpToSearch))
-        SpIteration.extend([[]])
+    #     SpIteration = list(map(lambda n: ou.makeArray(n), SpToSearch))
+    #     SpIteration.extend([[]])
 
-        Spu = []
+    #     Spu = []
 
-        # if X['name'] == 'J':
-        #     print('Ie: ' + nodeNamesToString(Ie))
-        #     print('Sp: ' + nodeNamesToString(Sp))
+    #     for s in SpIteration:
+    #         # Step 1
+    #         Des = gu.descendantsPlus(s, GVleqX)
+    #         GIs = gu.subgraph(GVleqX, su.difference(Ie, Des, 'name'))
+    #         Is = ConditionalIndependencies.C(GIs, [X])
 
-        for s in SpIteration:
-            # Step 1
-            Des = gu.descendantsPlus(s, GVleqX)
-            GIs = gu.subgraph(GVleqX, su.difference(Ie, Des, 'name'))
-            Is = ConditionalIndependencies.C(GIs, [X])
-
-            if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Is):
-                if len(s) > 0:
-                    Spu.append(s[0])
-                else:
-                    Spu.append(s)
+    #         if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Is):
+    #             if len(s) > 0:
+    #                 Spu.append(s[0])
+    #             else:
+    #                 Spu.append(s)
                 
-                continue
+    #             continue
 
-            # Step 2
-            SpIs = gu.spouses(Is,GVleqX)
-            PaIs = gu.parentsPlus(Is, GVleqX)
-            Spprime = su.difference(SpIs, PaIs, 'name')
-            Spprime = su.intersection(Spprime, R, 'name')
-            Sps = su.difference(Spprime, Des, 'name')
+    #         # Step 2
+    #         SpIs = gu.spouses(Is,GVleqX)
+    #         PaIs = gu.parentsPlus(Is, GVleqX)
+    #         Spprime = su.difference(SpIs, PaIs, 'name')
+    #         Spprime = su.intersection(Spprime, R, 'name')
+    #         Sps = su.difference(Spprime, Des, 'name')
 
-            GRs = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
-            Rs = ConditionalIndependencies.C(GRs, X)
+    #         GRs = gu.subgraph(GVleqX, su.difference(R, Des, 'name'))
+    #         Rs = ConditionalIndependencies.C(GRs, X)
 
-            Sminus = gu.descendantsPlus(Sps, GVleqX)
-            dCandidates = su.difference(Sminus, Sps, 'name')
+    #         Sminus = gu.descendantsPlus(Sps, GVleqX)
+    #         dCandidates = su.difference(Sminus, Sps, 'name')
 
-            # vc2
-            # for d in dCandidates:
-            #     # d not in Rs, found candidate
-            #     if not su.belongs(d, Rs, compareNames):
-            #         if len(s) > 0:
-            #             Spu.append(s[0])
-            #         else:
-            #             Spu.append(s)
-            #         break
+    #         # vc2
+    #         # for d in dCandidates:
+    #         #     # d not in Rs, found candidate
+    #         #     if not su.belongs(d, Rs, compareNames):
+    #         #         if len(s) > 0:
+    #         #             Spu.append(s[0])
+    #         #         else:
+    #         #             Spu.append(s)
+    #         #         break
 
-            # vc3
-            for d in dCandidates:
-                And = gu.ancestorsPlus(d, GVleqX)
-                Spd = gu.spouses(d, GVleqX)
-                Spd = list(filter(lambda sp: not su.belongs(sp, And, compareNames), Spd))
-                Sminus = gu.descendantsPlus(Spd, GVleqX)
-                GRsprime = gu.subgraph(GVleqX, su.difference(Rs, Sminus, 'name'))
-                Rsprime = ConditionalIndependencies.C(GRsprime, X)
+    #         # vc3
+    #         for d in dCandidates:
+    #             And = gu.ancestorsPlus(d, GVleqX)
+    #             Spd = gu.spouses(d, GVleqX)
+    #             Spd = list(filter(lambda sp: not su.belongs(sp, And, compareNames), Spd))
+    #             Sminus = gu.descendantsPlus(Spd, GVleqX)
+    #             GRsprime = gu.subgraph(GVleqX, su.difference(Rs, Sminus, 'name'))
+    #             Rsprime = ConditionalIndependencies.C(GRsprime, X)
 
-                if not su.belongs(d, Rsprime, compareNames):
-                    if len(s) > 0:
-                        Spu.append(s[0])
-                    else:
-                        Spu.append(s)
-                    break
+    #             if not su.belongs(d, Rsprime, compareNames):
+    #                 if len(s) > 0:
+    #                     Spu.append(s[0])
+    #                 else:
+    #                     Spu.append(s)
+    #                 break
 
-            # va2
-            # PaRs = gu.parentsPlus(Rs, GVleqX)
+    #         # va2
+    #         # PaRs = gu.parentsPlus(Rs, GVleqX)
 
-            # dCandidates = gu.descendantsPlus(su.difference(SpIs, PaIs, 'name'), GVleqX)
+    #         # dCandidates = gu.descendantsPlus(su.difference(SpIs, PaIs, 'name'), GVleqX)
 
-            # # if X['name'] == 'J':
-            # #     print('s: ' + nodeNamesToString(s))
-            # #     print('Is: ' + nodeNamesToString(Is))
-            # #     print('Rs: ' + nodeNamesToString(Rs))
-            # #     print('D: ' + nodeNamesToString(dCandidates))
-            # #     print('Sps: ' + nodeNamesToString(Sps))
+    #         # for d in dCandidates:
+    #         #     Z = FindSep(GVleqX, X, d, PaIs, PaRs)
 
-            # for d in dCandidates:
-            #     Z = FindSep(GVleqX, X, d, PaIs, PaRs)
+    #         #     if Z is not None:
+    #         #         if len(s) > 0:
+    #         #             Spu.append(s[0])
+    #         #         else:
+    #         #             Spu.append(s)
+    #         #         break
 
-            #     if Z is not None:
-            #         if len(s) > 0:
-            #             Spu.append(s[0])
-            #         else:
-            #             Spu.append(s)
-            #         break
+    #         # for sprime in Sps:
+    #         #     Ansprime = gu.ancestorsPlus(sprime, GVleqX)
+    #         #     # AnSpprime = su.intersection(Ansprime, Spprime, 'name')
+    #         #     AnSpprime = su.intersection(Ansprime, Sps, 'name')
 
-            # for sprime in Sps:
-            #     Ansprime = gu.ancestorsPlus(sprime, GVleqX)
-            #     # AnSpprime = su.intersection(Ansprime, Spprime, 'name')
-            #     AnSpprime = su.intersection(Ansprime, Sps, 'name')
+    #         #     DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
+    #         #     # DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
+    #         #     DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Sps, AnSpprime, 'name'), GVleqX)
 
-            #     DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
-            #     # DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
-            #     DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Sps, AnSpprime, 'name'), GVleqX)
+    #         #     Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
+    #         #     DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
 
-            #     Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
-            #     DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
-
-            #     for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
-            #         # C = ConditionalIndependencies.C(Gprime, [sprime])
-            #         C = ConditionalIndependencies.C(GVleqX, [sprime])
+    #         #     for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
+    #         #         # C = ConditionalIndependencies.C(Gprime, [sprime])
+    #         #         C = ConditionalIndependencies.C(GVleqX, [sprime])
                     
-            #         if not su.belongs(d, C, compareNames):
-            #             isSproper = True
+    #         #         if not su.belongs(d, C, compareNames):
+    #         #             isSproper = True
 
-            #             if len(s) > 0:
-            #                 Spu.append(s[0])
-            #             else:
-            #                 Spu.append(s)
-            #             break
+    #         #             if len(s) > 0:
+    #         #                 Spu.append(s[0])
+    #         #             else:
+    #         #                 Spu.append(s)
+    #         #             break
 
-            #     if isSproper:
-            #         break
+    #         #     if isSproper:
+    #         #         break
 
-        return Spu
+    #     return Spu
     
-    @staticmethod
-    def GetProperSpv3(GVleqX,X,VleqX,I,R):
-        AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
-        AnSpIcapR = su.intersection(AnSpI, R, 'name')
-        Gprime = gu.subgraph(GVleqX, AnSpIcapR)
-        Ie = ConditionalIndependencies.C(Gprime, [X])
-        Sp = su.difference(Ie, I, 'name')
+    # @staticmethod
+    # def GetProperSpv3(GVleqX,X,VleqX,I,R):
+    #     AnSpI = gu.ancestorsPlus(su.union(gu.spouses(I, GVleqX), I, 'name'), GVleqX)
+    #     AnSpIcapR = su.intersection(AnSpI, R, 'name')
+    #     Gprime = gu.subgraph(GVleqX, AnSpIcapR)
+    #     Ie = ConditionalIndependencies.C(Gprime, [X])
+    #     Sp = su.difference(Ie, I, 'name')
 
-        Spu = []
+    #     Spu = []
 
-        # Sp -> Spn
-        Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
-        Spn = su.intersection(Spn, Sp, 'name')
+    #     # Sp -> Spn
+    #     Spn = su.difference(gu.spouses(I, GVleqX), I, 'name')
+    #     Spn = su.intersection(Spn, Sp, 'name')
 
-        # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
-        AnI = gu.ancestorsPlus(I, GVleqX)
-        SpToSearch = su.difference(Spn, AnI, 'name')
+    #     # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
+    #     AnI = gu.ancestorsPlus(I, GVleqX)
+    #     SpToSearch = su.difference(Spn, AnI, 'name')
 
-        SpIteration = list(map(lambda n: ou.makeArray(n), SpToSearch))
-        SpIteration.extend([[]])
+    #     SpIteration = list(map(lambda n: ou.makeArray(n), SpToSearch))
+    #     SpIteration.extend([[]])
 
-        # SpIteration = [[]]
-        # SpIteration.extend(list(map(lambda n: ou.makeArray(n), SpToSearch)))
+    #     # SpIteration = [[]]
+    #     # SpIteration.extend(list(map(lambda n: ou.makeArray(n), SpToSearch)))
 
-        for s in SpIteration:
-            # Step 1
-            Des = gu.descendantsPlus(s, GVleqX)
-            Gprime = gu.subgraph(GVleqX, su.difference(Ie, Des, 'name'))
-            Ieprime = ConditionalIndependencies.C(Gprime, [X])
+    #     for s in SpIteration:
+    #         # Step 1
+    #         Des = gu.descendantsPlus(s, GVleqX)
+    #         Gprime = gu.subgraph(GVleqX, su.difference(Ie, Des, 'name'))
+    #         Ieprime = ConditionalIndependencies.C(Gprime, [X])
 
-            if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Ieprime):
-                if len(s) > 0:
-                    Spu.append(s[0])
-                else:
-                    Spu.append(s)
+    #         if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Ieprime):
+    #             if len(s) > 0:
+    #                 Spu.append(s[0])
+    #             else:
+    #                 Spu.append(s)
                 
-                continue
+    #             continue
 
-            # Step 2
-            PaIeprime = gu.parentsPlus(Ieprime, GVleqX)
-            SpIeprime = gu.spouses(Ieprime,GVleqX)
-            Spprime = su.difference(SpIeprime, PaIeprime, 'name')
-            Spprime = su.intersection(Spprime, R, 'name')
-            # Sps = su.difference(Spprime, su.intersection(Des, Sp, 'name'), 'name')
-            Sps = su.difference(Spprime, Des, 'name')
+    #         # Step 2
+    #         PaIeprime = gu.parentsPlus(Ieprime, GVleqX)
+    #         SpIeprime = gu.spouses(Ieprime,GVleqX)
+    #         Spprime = su.difference(SpIeprime, PaIeprime, 'name')
+    #         Spprime = su.intersection(Spprime, R, 'name')
+    #         # Sps = su.difference(Spprime, su.intersection(Des, Sp, 'name'), 'name')
+    #         Sps = su.difference(Spprime, Des, 'name')
 
-            # if X['name'] == 'J':
-            #     print('s: ' + nodeNamesToString(s))
-            #     print('Ie: ' + nodeNamesToString(Ie))
-            #     print('Is: ' + nodeNamesToString(Ieprime))
-            #     print('Sps: ' + nodeNamesToString(Sps))
+    #         isSproper = False
 
-            isSproper = False
+    #         for sprime in Sps:
+    #             Ansprime = gu.ancestorsPlus(sprime, GVleqX)
+    #             # AnSpprime = su.intersection(Ansprime, Spprime, 'name')
+    #             AnSpprime = su.intersection(Ansprime, Sps, 'name')
 
-            for sprime in Sps:
-                Ansprime = gu.ancestorsPlus(sprime, GVleqX)
-                # AnSpprime = su.intersection(Ansprime, Spprime, 'name')
-                AnSpprime = su.intersection(Ansprime, Sps, 'name')
+    #             DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
+    #             # DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
+    #             DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Sps, AnSpprime, 'name'), GVleqX)
 
-                DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
-                # DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
-                DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Sps, AnSpprime, 'name'), GVleqX)
+    #             Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
+    #             DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
 
-                Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
-                DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
-
-                for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
-                    # C = ConditionalIndependencies.C(Gprime, [sprime])
-                    C = ConditionalIndependencies.C(GVleqX, [sprime])
+    #             for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
+    #                 # C = ConditionalIndependencies.C(Gprime, [sprime])
+    #                 C = ConditionalIndependencies.C(GVleqX, [sprime])
                     
-                    if not su.belongs(d, C, compareNames):
+    #                 if not su.belongs(d, C, compareNames):
                         
-                        isSproper = True
-                        if len(s) > 0:
-                            Spu.append(s[0])
-                        else:
-                            Spu.append(s)
-                        break
+    #                     isSproper = True
+    #                     if len(s) > 0:
+    #                         Spu.append(s[0])
+    #                     else:
+    #                         Spu.append(s)
+    #                     break
 
-                if isSproper:
-                    break
+    #             if isSproper:
+    #                 break
 
-        return Spu
+    #     return Spu
 
-    @staticmethod
-    def ListCIX(GVleqX,X,VleqX,I,R,CI):
-        Sp = su.difference(gu.spouses(I, GVleqX), I, 'name')
-        Sp = su.intersection(Sp, R, 'name')
-        Iextend = su.union(I, Sp, 'name')
+    # @staticmethod
+    # def ListCIX(GVleqX,X,VleqX,I,R,CI):
+    #     Sp = su.difference(gu.spouses(I, GVleqX), I, 'name')
+    #     Sp = su.intersection(Sp, R, 'name')
+    #     Iextend = su.union(I, Sp, 'name')
 
-        admissiblePairs = []
-        ConditionalIndependencies.ListIRX(GVleqX,X,VleqX,I,R,Sp,Sp,Iextend,admissiblePairs)
+    #     admissiblePairs = []
+    #     ConditionalIndependencies.ListIRX(GVleqX,X,VleqX,I,R,Sp,Sp,Iextend,admissiblePairs)
 
-        if len(admissiblePairs) == 0:
-            return
+    #     if len(admissiblePairs) == 0:
+    #         return
 
-        for (Iprime,Rprime) in admissiblePairs:
-            if Iprime is None and Rprime is None:
-                return
+    #     for (Iprime,Rprime) in admissiblePairs:
+    #         if Iprime is None and Rprime is None:
+    #             return
 
-            if su.equals(Iprime, Rprime, 'name'):
-                C = Iprime
-                Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-                Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
-                W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
+    #         if su.equals(Iprime, Rprime, 'name'):
+    #             C = Iprime
+    #             Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
+    #             Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+    #             W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
 
-                # if X['name'] == 'J':
-                #     print('Output CI')
-                #     ConditionalIndependencies.printCI(X,W,Z)
+    #             CI.append({
+    #                 'X': X,
+    #                 'W': W,
+    #                 'Z': Z
+    #             })
+    #         else:
+    #             ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,Iprime,Rprime,CI)
 
-                if len(W) == 0:
-                    print('Bug (empty W)!')
-                    print('X: ' + nodeNamesToString([X]))
-                    print('C: ' + nodeNamesToString(C))
-                    print('Z: ' + nodeNamesToString(Z))
+    # @staticmethod
+    # def ListIRX(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend,admissiblePairs):
+        # Spu = ConditionalIndependencies.GetProperSp(GVleqX,X,VleqX,I,Sp,Spc,Iextend)
+        # Spd = su.difference(Spc, Spu, 'name')
 
-                CI.append({
-                    'X': X,
-                    'W': W,
-                    'Z': Z
-                })
-            else:
-                # if len(su.difference(Iprime, Rprime, 'name')) > 0:
-                #     print('X: ' + nodeNamesToString([X]))
-                #     print('Sp: ' + nodeNamesToString(Sp))
-                #     print('Ie: ' + nodeNamesToString(Iextend))
-                #     print('I: ' + nodeNamesToString(I))
-                #     print('R: ' + nodeNamesToString(R))
-                #     print('Iprime: ' + nodeNamesToString(Iprime))
-                #     print('Rprime: ' + nodeNamesToString(Rprime))
-                #     return
-
-                # print('Iprime: ' + nodeNamesToString(Iprime))
-                # print('Rprime: ' + nodeNamesToString(Rprime))
-
-                ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,Iprime,Rprime,CI)
-
-    @staticmethod
-    def ListIRX(GVleqX,X,VleqX,I,R,Sp,Spc,Iextend,admissiblePairs):
-        Spu = ConditionalIndependencies.GetProperSp(GVleqX,X,VleqX,I,Sp,Spc,Iextend)
-        Spd = su.difference(Spc, Spu, 'name')
-
-        # if X['name'] == 'R':
-        #     print('X: ' + nodeNamesToString([X]))
-        #     print('Sp: ' + nodeNamesToString(Sp))
-        #     print('Spu: ' + nodeNamesToString(Spu))
-        #     print('Spd: ' + nodeNamesToString(Spd))
-
-        if su.isEmpty(Spu):
-            return
+        # if su.isEmpty(Spu):
+        #     return
         
-        if (len(Spu) == 1 and Spu[0] == []):
-            Iprime = Iextend
-            Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
-            # some s of Sp can't be removed if s is in An(I')
-            AnIprime = su.union(Iprime, gu.ancestors(Iprime, GVleqX), 'name')
-            Rminus = su.difference(Rminus, AnIprime, 'name')
-            DeRminus = gu.descendantsPlus(Rminus, GVleqX)
-            GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
-            Rprime = ConditionalIndependencies.C(GR,X)
+        # if (len(Spu) == 1 and Spu[0] == []):
+        #     Iprime = Iextend
+        #     Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
+        #     # some s of Sp can't be removed if s is in An(I')
+        #     AnIprime = su.union(Iprime, gu.ancestors(Iprime, GVleqX), 'name')
+        #     Rminus = su.difference(Rminus, AnIprime, 'name')
+        #     DeRminus = gu.descendantsPlus(Rminus, GVleqX)
+        #     GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
+        #     Rprime = ConditionalIndependencies.C(GR,X)
 
-            admissiblePairs.append((Iprime,Rprime))
-            return
+        #     admissiblePairs.append((Iprime,Rprime))
+        #     return
 
-        Decs = []
+        # Decs = []
 
-        if [] in Spu:
-            Decs.append([])
-            del Spu[Spu.index([])]
+        # if [] in Spu:
+        #     Decs.append([])
+        #     del Spu[Spu.index([])]
 
-        sortedSpu = su.intersection(VleqX, Spu, 'name')
+        # sortedSpu = su.intersection(VleqX, Spu, 'name')
 
-        Decs.extend(ConditionalIndependencies.ListDec(GVleqX, sortedSpu))
+        # Decs.extend(ConditionalIndependencies.ListDec(GVleqX, sortedSpu))
 
-        for D in Decs:
-            DeD = gu.descendantsPlus(D, GVleqX)
-            Dprime = su.intersection(DeD, Sp, 'name')
-            Spcprime = su.difference(Spd, Dprime, 'name')
-            Ieprime = su.difference(Iextend, Dprime, 'name')
+        # for D in Decs:
+        #     DeD = gu.descendantsPlus(D, GVleqX)
+        #     Dprime = su.intersection(DeD, Sp, 'name')
+        #     Spcprime = su.difference(Spd, Dprime, 'name')
+        #     Ieprime = su.difference(Iextend, Dprime, 'name')
 
-            # if X['name'] == 'R':
-            #     print('X: ' + nodeNamesToString([X]))
-            #     print('Spu: ' + nodeNamesToString(Spu))
-            #     print('Dprime: ' + nodeNamesToString(Dprime))
-            #     print('Spcprime: ' + nodeNamesToString(Spcprime))
-            #     print('Ieprime: ' + nodeNamesToString(Ieprime))
+            # if su.isEmpty(Spcprime):
+            #     Iprime = Ieprime
+            #     Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
+            #     # some s of Sp can't be removed if s is in An(I')
+            #     AnIprime = su.union(Iprime, gu.ancestors(Iprime, GVleqX), 'name')
+            #     Rminus = su.difference(Rminus, AnIprime, 'name')
+            #     DeRminus = gu.descendantsPlus(Rminus, GVleqX)
+            #     GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
+            #     Rprime = ConditionalIndependencies.C(GR,X)
 
-            if su.isEmpty(Spcprime):
-                Iprime = Ieprime
-                Rminus = su.difference(Sp, su.difference(Iprime, I, 'name'), 'name')
-                # some s of Sp can't be removed if s is in An(I')
-                AnIprime = su.union(Iprime, gu.ancestors(Iprime, GVleqX), 'name')
-                Rminus = su.difference(Rminus, AnIprime, 'name')
-                DeRminus = gu.descendantsPlus(Rminus, GVleqX)
-                GR = gu.subgraph(GVleqX, su.difference(R, DeRminus, 'name'))
-                Rprime = ConditionalIndependencies.C(GR,X)
+            #     admissiblePairs.append((Iprime,Rprime))
+            # else:
+            #     ConditionalIndependencies.ListIRX(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
 
-                admissiblePairs.append((Iprime,Rprime))
-            else:
-                ConditionalIndependencies.ListIRX(GVleqX,X,VleqX,I,R,Sp,Spcprime,Ieprime,admissiblePairs)
+    # @staticmethod
+    # def GetProperSp(GVleqX,X,VleqX,I,Sp,Spc,Iextend):
+    #     Spu = []
 
-    @staticmethod
-    def GetProperSp(GVleqX,X,VleqX,I,Sp,Spc,Iextend):
-        Spu = []
+    #     # An(X) cannot be excluded from G
+    #     # SpToSearch = su.difference(Spc, gu.ancestors(X,GVleqX), 'name')
+    #     # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
+    #     AnI = su.union(I, gu.ancestors(I, GVleqX), 'name')
+    #     SpToSearch = su.difference(Spc, AnI, 'name')
 
-        # An(X) cannot be excluded from G
-        # SpToSearch = su.difference(Spc, gu.ancestors(X,GVleqX), 'name')
-        # s to be removed cannot be in An(I), otherwise Ie' is not ancestral
-        AnI = su.union(I, gu.ancestors(I, GVleqX), 'name')
-        SpToSearch = su.difference(Spc, AnI, 'name')
+    #     SpIteration = [[]]
+    #     SpIteration.extend(list(map(lambda n: ou.makeArray(n), SpToSearch)))
 
-        SpIteration = [[]]
-        SpIteration.extend(list(map(lambda n: ou.makeArray(n), SpToSearch)))
+    #     for s in SpIteration:
+    #         # Step 1
+    #         Des = gu.descendantsPlus(s, GVleqX)
+    #         DesSp = su.intersection(Des, Sp, 'name')
+    #         Ieprime = su.difference(Iextend, DesSp, 'name')
 
-        for s in SpIteration:
-            # Step 1
-            Des = gu.descendantsPlus(s, GVleqX)
-            DesSp = su.intersection(Des, Sp, 'name')
-            Ieprime = su.difference(Iextend, DesSp, 'name')
-
-            if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Ieprime):
-                if len(s) > 0:
-                    Spu.append(s[0])
-                else:
-                    Spu.append(s)
+    #         if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,Ieprime):
+    #             if len(s) > 0:
+    #                 Spu.append(s[0])
+    #             else:
+    #                 Spu.append(s)
                 
-                continue
+    #             continue
 
-            # Step 2
-            PaIeprime = gu.parentsPlus(Ieprime, GVleqX)
-            SpIeprime = gu.spouses(Ieprime,GVleqX)
-            Spprime = su.difference(SpIeprime, PaIeprime, 'name')
-            Sps = su.difference(SpIeprime, DesSp, 'name')
-            Sps = su.difference(Sps, PaIeprime, 'name')
+    #         # Step 2
+    #         PaIeprime = gu.parentsPlus(Ieprime, GVleqX)
+    #         SpIeprime = gu.spouses(Ieprime,GVleqX)
+    #         Spprime = su.difference(SpIeprime, PaIeprime, 'name')
+    #         Sps = su.difference(SpIeprime, DesSp, 'name')
+    #         Sps = su.difference(Sps, PaIeprime, 'name')
 
-            isSproper = False
+    #         isSproper = False
 
-            for sprime in Sps:
-                Ansprime = su.union([sprime], gu.ancestors(sprime, GVleqX), 'name')
-                AnSpprime = su.intersection(Ansprime, Spprime, 'name')
+    #         for sprime in Sps:
+    #             Ansprime = su.union([sprime], gu.ancestors(sprime, GVleqX), 'name')
+    #             AnSpprime = su.intersection(Ansprime, Spprime, 'name')
 
-                DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
-                DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
+    #             DeAnSpprime = gu.descendantsPlus(AnSpprime, GVleqX)
+    #             DeSpprimeMinusAnSpprime = gu.descendantsPlus(su.difference(Spprime, AnSpprime, 'name'), GVleqX)
 
-                Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
-                # DeAnSpInGprime = gu.descendantsPlus(AnSpprime, Gprime)
-                DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
+    #             Gprime = gu.subgraph(GVleqX, su.difference(DeAnSpprime, DeSpprimeMinusAnSpprime, 'name'))
+    #             # DeAnSpInGprime = gu.descendantsPlus(AnSpprime, Gprime)
+    #             DeAnSpInGprime = gu.descendantsPlus(sprime, Gprime)
 
-                # for d in su.difference(DeAnSpInGprime, AnSpprime, 'name'):
-                for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
-                    # C = ConditionalIndependencies.C(Gprime, AnSpprime)
-                    C = ConditionalIndependencies.C(Gprime, [sprime])
+    #             # for d in su.difference(DeAnSpInGprime, AnSpprime, 'name'):
+    #             for d in su.difference(DeAnSpInGprime, [sprime], 'name'):
+    #                 # C = ConditionalIndependencies.C(Gprime, AnSpprime)
+    #                 C = ConditionalIndependencies.C(Gprime, [sprime])
                     
-                    if not su.belongs(d, C, compareNames):
+    #                 if not su.belongs(d, C, compareNames):
                         
-                        isSproper = True
-                        if len(s) > 0:
-                            Spu.append(s[0])
-                        else:
-                            Spu.append(s)
-                        break
+    #                     isSproper = True
+    #                     if len(s) > 0:
+    #                         Spu.append(s[0])
+    #                     else:
+    #                         Spu.append(s)
+    #                     break
 
-                if isSproper:
-                    break
+    #             if isSproper:
+    #                 break
 
-        return Spu
+    #     return Spu
     
-    @staticmethod
-    def ListDec(G, sortedV):
-        if len(sortedV) == 0:
-            return []
+    # @staticmethod
+    # def ListDec(G, sortedV):
+    #     if len(sortedV) == 0:
+    #         return []
 
-        marks = {}
+    #     marks = {}
 
-        for v in sortedV:
-            marks[v['name']] = None
+    #     for v in sortedV:
+    #         marks[v['name']] = None
 
-        descSets = []
-        stack = [0]
+    #     descSets = []
+    #     stack = [0]
 
-        while len(stack) > 0:
-            j = stack[len(stack)-1]
-            Vj = sortedV[j]
+    #     while len(stack) > 0:
+    #         j = stack[len(stack)-1]
+    #         Vj = sortedV[j]
 
-            if marks[Vj['name']] == None:
-                # include al descendants of Vj
-                De = gu.descendants(Vj, G)
+    #         if marks[Vj['name']] == None:
+    #             # include al descendants of Vj
+    #             De = gu.descendants(Vj, G)
 
-                for n in De:
-                    marks[n['name']] = True
-            elif marks[Vj['name']] == True:
-                # we are backtracking, change the value of this node to false and unmark all descendants
-                De = gu.descendants(Vj, G)
+    #             for n in De:
+    #                 marks[n['name']] = True
+    #         elif marks[Vj['name']] == True:
+    #             # we are backtracking, change the value of this node to false and unmark all descendants
+    #             De = gu.descendants(Vj, G)
 
-                for n in De:
-                    marks[n['name']] = None
+    #             for n in De:
+    #                 marks[n['name']] = None
 
-                marks[Vj['name']] = False
-            else:
-                marks[Vj['name']] = None
-                stack.pop()
-                # continue to the next iteration before adding a new node to the stack
-                continue
+    #             marks[Vj['name']] = False
+    #         else:
+    #             marks[Vj['name']] = None
+    #             stack.pop()
+    #             # continue to the next iteration before adding a new node to the stack
+    #             continue
 
-            # add next unmarked node to the stack
-            added = False
+    #         # add next unmarked node to the stack
+    #         added = False
 
-            for k in range(j+1, len(sortedV)):
-                if marks[sortedV[k]['name']] == None:
-                    stack.append(k)
-                    added = True
-                    break
+    #         for k in range(j+1, len(sortedV)):
+    #             if marks[sortedV[k]['name']] == None:
+    #                 stack.append(k)
+    #                 added = True
+    #                 break
 
-            # no more variables to process, this is a set, save it
-            if not added:
-                descSet = list(filter(lambda n: marks[n['name']] == True, sortedV))
+    #         # no more variables to process, this is a set, save it
+    #         if not added:
+    #             descSet = list(filter(lambda n: marks[n['name']] == True, sortedV))
 
-                if len(descSet) > 0:
-                    descSets.append(descSet)
+    #             if len(descSet) > 0:
+    #                 descSets.append(descSet)
 
-        return descSets
+    #     return descSets
 
     # @staticmethod
     # def ListDec(G, T):
@@ -1052,16 +1014,6 @@ class ConditionalIndependencies():
     #                 Decs.append(I)
 
     #     return Decs
-    
-
-    @staticmethod
-    def IsAdmissible(GVleqX,X,VleqX,C):
-        Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-        Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
-        W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
-
-        return not su.isEmpty(W)
-
 
     @staticmethod
     def C(G,X):
