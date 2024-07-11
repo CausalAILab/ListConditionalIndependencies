@@ -1,0 +1,8 @@
+<NODES>
+Pollution
+Smoker
+Dyspnoea
+
+<EDGES>
+Pollution -> Dyspnoea
+Smoker -> Dyspnoea

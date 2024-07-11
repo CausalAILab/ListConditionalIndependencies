@@ -1,0 +1,11 @@
+<NODES>
+lung
+either
+xray
+dysp
+
+<EDGES>
+lung -> either
+either -> xray
+either -> dysp
+dysp -- lung

@@ -1,0 +1,10 @@
+<NODES>
+Earthquake  0,-150
+Alarm  0,0
+JohnCalls  -75,150
+MaryCalls  75,150
+
+<EDGES>
+Earthquake -> Alarm
+Alarm -> JohnCalls
+Alarm -> MaryCalls

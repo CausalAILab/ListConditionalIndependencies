@@ -22,10 +22,9 @@ python3 main.py listci graphs/paper/fig1b.txt
 
 ## Arguments
 
-1. First argument: `gmp`, `lmp`, `lmpp`, or `listci`.
+1. First argument: `gmp`, `lmp`, or `listci`.
 - `gmp`: The global Markov property
 - `lmp`: The ordered local Markov property
-- `lmpp`: The augmented ordered local Markov property
 - `listci`: The augmented ordered local Markov property (poly-delay)
 
 2. Second argument: `graphs/paper/fig1b.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
@@ -67,7 +66,7 @@ python3 experiment_bif.py bif/sm/asia.bif
 
 1. First argument: `graphs/paper/fig1b.txt` or `bif/sm/asia.bif`. The path to a text or BIF file.
 
-The supported algorithms are: [`gmp`, `lmp`, `lmpp`, `listci`]. By default, two algorithms [`lmp`, `listci`] will run, but you may modify the `algorithms` variable in `experiment_graph.py` or `experiment_bif.py` to change the sets of algorithms to run.
+The supported algorithms are: [`gmp`, `lmp`, `listci`]. By default, two algorithms [`lmp`, `listci`] will run, but you may modify the `algorithms` variable in `experiment_graph.py` or `experiment_bif.py` to change the sets of algorithms to run.
 
 ## BIF format details
 

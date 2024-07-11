@@ -1,0 +1,17 @@
+<NODES>
+Erk
+Jnk
+Raf
+P38
+PIP3
+Plcg
+
+<EDGES>
+Erk -- Jnk
+Erk -- Raf
+Erk -- P38
+Jnk -- Raf
+Jnk -- P38
+Raf -- P38
+Raf -> Erk
+Plcg -> PIP3

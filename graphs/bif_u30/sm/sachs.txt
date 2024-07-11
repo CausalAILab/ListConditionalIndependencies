@@ -1,0 +1,30 @@
+<NODES>
+Erk  -75,150
+Mek  -120,0
+Jnk  -225,300
+PKC  30,0
+Raf  -75,300
+P38  75,300
+PIP2  225,-300
+PIP3  225,-150
+
+<EDGES>
+Erk -- Mek 0.7
+Erk -- Jnk 0.7
+Erk -- Raf 0.7
+Erk -- P38 0.7
+Mek -> Erk
+Mek -- Jnk 0.7
+Mek -- Raf 0.7
+Mek -- P38 0.7
+Jnk -- Raf 0.7
+Jnk -- P38 0.7
+PKC -> Jnk
+PKC -> Mek
+PKC -> P38
+PKC -> Raf
+PKC -> Erk
+Raf -> Mek
+Raf -- P38 0.7
+PIP2 -- PIP3 0.7
+PIP3 -> PIP2
