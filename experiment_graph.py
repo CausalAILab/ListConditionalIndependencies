@@ -83,7 +83,7 @@ def testAlgorithm(G, alg, printCIs = False):
     end = datetime.now()
 
     # print runtime
-    line = 'CIs: ' + str(len(CI)) + ', Time (' + alg + '): ' + str(end - start)
+    line = 'CIs: ' + str(len(CI)) + ', Time (' + alg + '): \n' + str(end - start)
     print(line)
 
     if printCIs:
