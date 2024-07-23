@@ -54,8 +54,8 @@ if __name__ == '__main__':
     numEdges = int(numNodes * 2)
     bidirectedEdgesDivisions = 10
 
-    # for k in range(bidirectedEdgesDivisions):
-    #     bidirectedEdgesFraction = k * 0.1
-    #     testRandomGraphs('listci',numGraphs, numNodes, numEdges, bidirectedEdgesFraction)
+    for k in range(bidirectedEdgesDivisions):
+        bidirectedEdgesFraction = k * 0.1
+        testRandomGraphs('listci',numGraphs, numNodes, numEdges, bidirectedEdgesFraction)
 
-    testRandomGraphs('listci',numGraphs, numNodes, numEdges, 0.5)
+    # testRandomGraphs('listci',numGraphs, numNodes, numEdges, 0.5)

@@ -83,8 +83,8 @@ if __name__ == '__main__':
     numDirectedEdges = int(numNodes * 2)
     numLatentRatio = 10
 
-    # for k in range(numLatentRatio):
-    #     latentFraction = k * 0.1
-    #     testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, latentFraction)
+    for k in range(numLatentRatio):
+        latentFraction = k * 0.1
+        testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, latentFraction)
 
-    testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, 0.3)
+    # testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, 0.3)
