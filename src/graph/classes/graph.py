@@ -1,3 +1,5 @@
+import random
+
 import networkx as nx
 from typing import Dict, Any
 
@@ -51,8 +53,6 @@ class Graph():
 
         return ns
 
-        # return self.nx.nodes(data = True)
-
     @nodes.setter
     def nodes(self, nodes):
         self.nx.clear()
@@ -91,6 +91,69 @@ class Graph():
         self.nx = nx.Graph(self.nx)
 
         # change all edge types
+
+    def toRandomGraph(self, n, m, bidirectedEdgesFraction=None):
+        nodes = []
+
+        for i in range(n):
+            node = {'name': str(i),'label': str(i),'type_': basicNodeType.id_,'metadata': {}}
+            nodes.append(node)
+        
+        self.nodes = nodes
+
+        edges = []
+        edgeCount = 0
+
+        while (edgeCount < m):
+            x = int(random.random() * n)
+            y = int(random.random() * n)
+
+            if x == y:
+                continue
+
+            edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
+
+            if not self.nx.has_edge(edge['from_'], edge['to_']):
+                self.__addEdge(edge)
+
+                try:
+                    cycle = nx.find_cycle(self.nx)
+                    self.__deleteEdge(edge)
+                except nx.exception.NetworkXNoCycle:
+                    edgeCount = edgeCount + 1
+                    edges.append(edge)
+                    continue
+
+            if not self.nx.has_edge(edge['to_'], edge['from_']):
+                edge = {'from_': str(y), 'to_': str(x), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
+                self.__addEdge(edge)
+
+                try:
+                    cycle = nx.find_cycle(self.nx)
+                    self.__deleteEdge(edge)
+                except nx.exception.NetworkXNoCycle:
+                    edgeCount = edgeCount + 1
+                    edges.append(edge)
+                    continue
+
+        # # sample x% of edges and turn those to bidirected
+        if bidirectedEdgesFraction is not None:
+            k = int(m * bidirectedEdgesFraction)
+            indices = random.sample(range(m), k)
+
+            newEdges = []
+            
+            for i in range(m):
+                edge = edges[i]
+
+                if i in indices:
+                    edge['type_'] = bidirectedEdgeType.id_
+                    
+                newEdges.append(edge)
+
+            self.edges = newEdges
+        else:
+            self.edges = edges
 
     def addNodes(self, nodes):
         nodes = ou.makeArray(nodes)
@@ -140,19 +203,15 @@ class Graph():
             return
 
         for edge in edges:
-            # if not hasattr(edge, 'from_') or not hasattr(edge, 'to_'):
             if 'from_' not in edge or 'to_' not in edge:
                 continue
 
-            # if not hasattr(edge, 'label'):
             if 'label' not in edge:
                 edge['label'] = None
 
-            # if not hasattr(edge, 'type_'):
             if 'type_' not in edge:
                 edge['type_'] = directedEdgeType.id_
 
-            # if not hasattr(edge, 'metadata'):
             if 'metadata' not in edge:
                 edge['metadata'] = dict()
 

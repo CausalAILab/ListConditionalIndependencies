@@ -19,8 +19,6 @@ def testAlgorithm(G, alg):
         CI = ConditionalIndependencies.GMP(G, G.nodes)
     elif alg == 'lmp':
         CI = ConditionalIndependencies.LMP(G, G.nodes)
-    elif alg == 'lmpp':
-        CI = ConditionalIndependencies.LMPplus(G, G.nodes)
     elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes)
 
@@ -200,14 +198,6 @@ def BIFNodesToGraph(parsedNodes, latentFraction = None):
         if not su.belongs(node, nodesToAdd, compareNames):
             nodesToAdd.append(node)
 
-        # nodeExists = gu.getNodeByName(name, G)
-
-        # if not nodeExists:
-        #     node = {'name': name, 'label': name, 'type_': basicNodeType.id_, 'metadata': {}}
-        #     G.addNodes(node)
-        # else:
-        #     node = nodeExists
-
         # add directed edges: Pa -> node
         for bifParent in bifNode.parents:
             parentName = bifParent.getName()
@@ -220,18 +210,6 @@ def BIFNodesToGraph(parsedNodes, latentFraction = None):
             edge = {'from_': parentName, 'to_': name, 'type_': directedEdgeType.id_, 'metadata': {}}
             edgesToAdd.append(edge)
 
-            # add parent to graph if it doesn't exist yet
-            # parentNode = gu.getNodeByName(parentName, G)
-
-            # if not parentNode:
-            #     paNode = {'name': parentName, 'label': parentName, 'type_': basicNodeType.id_, 'metadata': {}}
-            #     G.addNodes(paNode)
-
-            #     parentNode = gu.getNodeByName(parentName, G)
-
-            # edge = {'from_': parentName, 'to_': name, 'type_': directedEdgeType.id_, 'metadata': {}}
-            # G.addEdges(edge)
-
     # sample x% of nodes and turn those to latent
     if latentFraction is not None:
         k = int(len(parsedNodes) * latentFraction)
@@ -243,24 +221,11 @@ def BIFNodesToGraph(parsedNodes, latentFraction = None):
             if i in indices:
                 node = nodesToAdd[i]
                 node['type_'] = latentNodeType.id_
-
-                # name = G.nodes[i]['name']
-                # node = gu.getNodeByName(name, G)
-                # node['type_'] = latentNodeType.id_
-
-                # G.nodes[i]['type_'] = latentNodeType.id_
-                # print(G.nodes[i])
             else:
                 V.append(node)
-                # V.append(G.nodes[i])
-        # print(len(parsedNodes))
-        # print(V)
 
         G.addNodes(nodesToAdd)
         G.addEdges(edgesToAdd)
-
-        # latents = list(filter(lambda n: n['type_'] == latentNodeType.id_, G.nodes))
-        # print(len(latents))
 
         G = pu.projectOver(G,V)
 

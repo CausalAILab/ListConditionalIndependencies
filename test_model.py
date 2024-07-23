@@ -58,17 +58,7 @@ def parseDataset(G, lines):
     return parsedDataset
 
 def testModel(G, Pv, pValue, outputCIs = False):
-    Vordered = None
-    namesInOrder = None
-
-    if namesInOrder is not None:
-        Vordered = []
-
-        for name in namesInOrder:
-            Vs = list(filter(lambda n: n['name'] == name, G.nodes))
-            Vordered.append(Vs[0])
-
-    CIs = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
+    CIs = ConditionalIndependencies.ListCI(G, G.nodes)
 
     # tests: 'fisherz', 'kci'
     # https://github.com/py-why/causal-learn/blob/main/causallearn/utils/cit.py
@@ -98,8 +88,9 @@ def testModel(G, Pv, pValue, outputCIs = False):
 
         if p >= pValue:
             violatedCIs.append(CI)
-            printCI(CI)
-            print(p)
+        
+        printCI(CI)
+        print(p)
 
     line = 'CIs total: ' + str(len(CIs))
     print(line)
@@ -164,6 +155,8 @@ if __name__ == '__main__':
     graphFilePath = sys.argv[1]
     datasetFilePath = sys.argv[2]
 
+    pValue = 0.05
+
     try:
         with open(graphFilePath, 'r') as fg:
             fileContent = fg.read()
@@ -175,8 +168,8 @@ if __name__ == '__main__':
                 Pv = parseDataset(G, lines)
 
                 if G is not None:
-                    testModel(G, Pv, 0.05)
-                    # testModel(G, Pv, 0.05, True)
+                    testModel(G, Pv, pValue)
+                    # testModel(G, Pv, pValue, True)
 
                 fd.close()
 

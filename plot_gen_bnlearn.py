@@ -16,6 +16,7 @@ def parseData(lines):
     names = lines[0]
     nodes = lines[1]
     edges = lines[2]
+    Csize = []
 
     data = {
         'names': names,
@@ -58,9 +59,14 @@ def parseData(lines):
             except:
                 numCIs.append(np.nan)
         
+        # parse s
+        if i == 2:
+            Csize = list(map(lambda n: int(n), lines[9]))
+
         parsedData = {
             'runtime': np.array(runtimes),
-            'CI': np.array(numCIs)
+            'CI': np.array(numCIs),
+            'C': np.array(Csize)
         }
 
         if i == 0:
@@ -76,18 +82,20 @@ def drawPlot(data):
     # print(data)
     nodes = data['nodes']
     npNodes = np.array(nodes)
-    npListGMP = np.array(data['ListGMP']['runtime'])
-    npListCIBF = np.array(data['ListCIBF']['runtime'])
-    npListCI = np.array(data['ListCI']['runtime'])
+    npListGMPruntime = np.array(data['ListGMP']['runtime'])
+    npListCIBFruntime = np.array(data['ListCIBF']['runtime'])
+    npListCIruntime = np.array(data['ListCI']['runtime'])
+    # npListGMP = data['ListGMP']['CI']
+    # npListCIBF = data['ListCIBF']['CI']
+    # npListCI = data['ListCI']['CI']
+    # npListC = data['ListCI']['C']
 
-    plt.plot(npNodes, npListGMP, linestyle='--', marker='o', color='r', label='ListGMP')
-    plt.plot(npNodes, npListCIBF, linestyle='--', marker='o', color='b', label='ListCIBF')
-    plt.plot(npNodes, npListCI, linestyle='--', marker='o', color='g', label='ListCI')
-    # plt.loglog(npNodes, npListGMP, linestyle='--', marker='o', color='r', label='ListGMP')
-    # plt.loglog(npNodes, npListCIBF, linestyle='--', marker='o', color='b', label='ListCIBF')
-    # plt.loglog(npNodes, npListCI, linestyle='--', marker='o', color='g', label='ListCI')
+    plt.plot(npNodes, npListGMPruntime, linestyle='--', marker='o', color='r', label='ListGMP')
+    plt.plot(npNodes, npListCIBFruntime, linestyle='--', marker='o', color='#2D7BB1', label='ListCIBF')
+    plt.plot(npNodes, npListCIruntime, linestyle='--', marker='o', color='#5CB769', label='ListCI')
+    # plt.scatter(npListC, npListCIruntime, color='#5CB769', label='ListCI')
+    # plt.scatter(npListC, npListCI, color='#5CB769', label='ListCI')
 
-    # set y axis as log
     plt.yscale('log')
 
     # set boundaries of axis values
@@ -98,6 +106,10 @@ def drawPlot(data):
     labelFontsize = 16
     plt.xlabel('Number of variables', fontsize=labelFontsize)
     plt.ylabel('Runtime in seconds', fontsize=labelFontsize)
+    # plt.ylabel('Number of CIs', fontsize=labelFontsize)
+
+    # plt.xlabel('s size', fontsize=labelFontsize)
+    # plt.ylabel('Runtime in seconds', fontsize=labelFontsize)
 
     plt.legend()
     plt.show()

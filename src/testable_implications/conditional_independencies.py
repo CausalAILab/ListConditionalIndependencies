@@ -1,5 +1,7 @@
 import itertools
 
+from src.graph.classes.graph import Graph
+from src.graph.classes.graph_defs import directedEdgeType, bidirectedEdgeType
 from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
 from src.common.object_utils import ObjectUtils as ou
@@ -66,6 +68,119 @@ class ConditionalIndependencies():
         return CI
 
     @staticmethod
+    def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None):
+        if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
+            return []
+
+        CI = []
+
+        V = su.intersection(gu.topoSort(G), V, 'name')
+
+        if Vordered is not None:
+            V = Vordered
+
+        # construct graph with flipped directed edges
+        # compute descendant sets (= ancestral sets)
+        directedEdgesToAdd = []
+        directedEdges = list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges))
+        bidirectedEdges = list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges))
+
+        for edge in directedEdges:
+            e = {
+                'from_': edge['to_'],
+                'to_': edge['from_'],
+                'label': edge['label'],
+                'type_': edge['type_'],
+                'metadata': edge['metadata']
+            }
+
+            directedEdgesToAdd.append(e)
+
+        Gprime = Graph()
+        Gprime.addNodes(G.nodes)
+        Gprime.addEdges(directedEdgesToAdd)
+        Gprime.addEdges(bidirectedEdges)
+        
+        # print('Variables (topo sorted):')
+        # print(nodeNamesToString(V, False))
+
+        Ans = []
+        MaxAns = []
+
+        for X in V:
+            VleqX = V[:V.index(X)+1]
+            GVleqX = gu.subgraph(G, VleqX)
+
+            # unresolved: how can we compute S that includes X using ListDec?
+            # Vprime = list(reversed(VleqX))
+            # AnX = gu.ancestorsPlus(X, GVleqX)
+            # Vprime = su.difference(Vprime, AnX, 'name')
+
+            # Scollection = ConditionalIndependencies.ListDec(Gprime, Vprime)
+
+            Scollection = ConditionalIndependencies.ListDec(Gprime, VleqX)
+            
+            for S in Scollection:
+                # S = su.union(S, AnX, 'name')
+
+                # skip ancestral sets without X
+                if not su.belongs(X, S, compareNames):
+                    continue
+
+                # get node objects in GVleqX
+                # nodeNames = list(map(lambda n: n['name'], S))
+                # S = gu.getNodesByName(nodeNames, GVleqX)
+
+                # check if S is ancestral
+                AnS = gu.ancestorsPlus(S, GVleqX)
+
+                if not su.equals(S, AnS, 'name'):
+                    continue
+
+                Ans.append(S)
+
+                GS = gu.subgraph(GVleqX, S)
+                C = ConditionalIndependencies.C(GS, X)
+
+                if onlyMaximalAns:
+                    # check if S is maximal w.r.t. Z = mb(X,S)
+                    # S+ = V<=X \ De( Sp(C) \ (Z + {X}) )
+                    # Lemma 5, Richardson 2003
+                    PaC = gu.parentsPlus(C, GS)
+                    Sp = su.difference(gu.spouses(C, GVleqX), PaC, 'name')
+                    DeSp = gu.descendants(Sp, GVleqX)
+                    Sminus = su.union(Sp, DeSp, 'name')
+                    Splus = su.difference(VleqX, Sminus, 'name')
+
+                    if not su.equals(S, Splus):
+                        continue
+
+                    MaxAns.append(Splus)
+
+                    W = su.difference(Splus, PaC, 'name')
+                else:
+                    PaC = gu.parentsPlus(C, GS)
+                    W = su.difference(S, PaC, 'name')
+
+                # check valid CI
+                if su.isEmpty(W):
+                    continue
+
+                # Z = Pa(C)_GS \ {u}
+                Z = su.difference(PaC, [X], 'name')
+
+                CI.append({
+                    'X': X,
+                    'W': W,
+                    'Z': Z
+                })
+        
+        # print('# S : ' + str(len(Ans)))
+        # print('# S+: ' + str(len(MaxAns)))
+
+        return CI
+
+    @staticmethod
     def LMP(G, V, onlyMaximalAns = True, Vordered = None):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
@@ -80,38 +195,35 @@ class ConditionalIndependencies():
         # print('Variables (topo sorted):')
         # print(nodeNamesToString(V, False))
 
+        Ans = []
         MaxAns = []
-        
+        AC = []
+
         for X in V:
             VleqX = V[:V.index(X)+1]
             GVleqX = gu.subgraph(G, VleqX)
             
             # brute force all maximal ancestral sets S+
-            Anu = su.union(gu.ancestors(X, GVleqX), [X], 'name')
-            VnonAnu = su.difference(VleqX, Anu, 'name')
+            AnX = gu.ancestorsPlus(X, GVleqX)
+            VnonAnX = su.difference(VleqX, AnX, 'name')
 
-            for i in range(len(VnonAnu) + 1):
-                combs = list(itertools.combinations(VnonAnu, i))
+            for i in range(len(VnonAnX) + 1):
+                combs = list(itertools.combinations(VnonAnX, i))
 
                 for Sminus in combs:
-                    S = su.union(Anu, Sminus, 'name')
-
-                    AnS = gu.ancestors(S, GVleqX)
+                    S = su.union(AnX, Sminus, 'name')
 
                     # check if S is ancestral
+                    AnS = gu.ancestors(S, GVleqX)
+
                     if not su.equals(S, AnS, 'name'):
                         continue
 
                     GS = gu.subgraph(GVleqX, S)
+                    C = ConditionalIndependencies.C(GS, X)
 
-                    # C = C(u)_GS
-                    CCS = gu.cCompDecomposition(GS)
-                    C = None
-
-                    for ccs in CCS:
-                        if su.belongs(X, ccs, compareNames):
-                            C = ccs
-                            break
+                    Ans.append(S)
+                    AC.append(C)
                     
                     if onlyMaximalAns:
                         # check if S is maximal w.r.t. Z = mb(X,S)
@@ -145,78 +257,10 @@ class ConditionalIndependencies():
                         'W': W,
                         'Z': Z
                     })
-        
-        return CI
 
-    # used for comparing outputs with LMP
-    # it is still brute force (checks all ancestral sets)
-
-    @staticmethod
-    def LMPplus(G, V):
-        if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
-            return []
-
-        CI = []
-
-        V = su.intersection(gu.topoSort(G), V, 'name')
-
-        # print('Variables (topo sorted):')
-        # print(nodeNamesToString(V, False))
-
-        for X in V:
-            VleqX = V[:V.index(X)+1]
-            GVleqX = gu.subgraph(G, VleqX)
-
-            AC_X = []
-            
-            # brute force all ancestral sets S
-            AnX = su.union(gu.ancestors(X, GVleqX), [X], 'name')
-            VnonAnX = su.difference(VleqX, AnX, 'name')
-
-            for i in range(len(VnonAnX) + 1):
-                combs = list(itertools.combinations(VnonAnX, i))
-
-                for Sminus in combs:
-                    S = su.union(AnX, Sminus, 'name')
-
-                    AnS = gu.ancestors(S, GVleqX)
-
-                    # check if S is ancestral
-                    if not su.equals(S, AnS, 'name'):
-                        continue
-
-                    # C = C(u)_GS
-                    GS = gu.subgraph(GVleqX, S)
-                    CCS = gu.cCompDecomposition(GS)
-                    C = None
-
-                    for ccs in CCS:
-                        if su.belongs(X, ccs, compareNames):
-                            C = ccs
-                            break
-
-                    AC_X.append(C)
-
-            # remove duplicates
-            AC_X = su.uniqueWith(AC_X, su.isEqual)
-
-            for C in AC_X:
-                Splus = ConditionalIndependencies.Splus(G,VleqX,X,C)
-                PaC = gu.parentsPlus(C, GVleqX)
-                W = su.difference(Splus, PaC, 'name')
-
-                # check valid CI
-                if su.isEmpty(W):
-                    continue
-
-                # Z = Pa(C)_GS \ {u}
-                Z = su.difference(PaC, [X], 'name')
-
-                CI.append({
-                    'X': X,
-                    'W': W,
-                    'Z': Z
-                })
+        print('# S : ' + str(len(Ans)))
+        print('# S+: ' + str(len(MaxAns)))
+        print('s: ' + str(len(max(AC, key=len))))
 
         return CI
     
@@ -937,60 +981,60 @@ class ConditionalIndependencies():
 
     #     return Spu
     
-    # @staticmethod
-    # def ListDec(G, sortedV):
-    #     if len(sortedV) == 0:
-    #         return []
+    @staticmethod
+    def ListDec(G, sortedV):
+        if len(sortedV) == 0:
+            return []
 
-    #     marks = {}
+        marks = {}
 
-    #     for v in sortedV:
-    #         marks[v['name']] = None
+        for v in sortedV:
+            marks[v['name']] = None
 
-    #     descSets = []
-    #     stack = [0]
+        descSets = []
+        stack = [0]
 
-    #     while len(stack) > 0:
-    #         j = stack[len(stack)-1]
-    #         Vj = sortedV[j]
+        while len(stack) > 0:
+            j = stack[len(stack)-1]
+            Vj = sortedV[j]
 
-    #         if marks[Vj['name']] == None:
-    #             # include al descendants of Vj
-    #             De = gu.descendants(Vj, G)
+            if marks[Vj['name']] == None:
+                # include al descendants of Vj
+                De = gu.descendants(Vj, G)
 
-    #             for n in De:
-    #                 marks[n['name']] = True
-    #         elif marks[Vj['name']] == True:
-    #             # we are backtracking, change the value of this node to false and unmark all descendants
-    #             De = gu.descendants(Vj, G)
+                for n in De:
+                    marks[n['name']] = True
+            elif marks[Vj['name']] == True:
+                # we are backtracking, change the value of this node to false and unmark all descendants
+                De = gu.descendants(Vj, G)
 
-    #             for n in De:
-    #                 marks[n['name']] = None
+                for n in De:
+                    marks[n['name']] = None
 
-    #             marks[Vj['name']] = False
-    #         else:
-    #             marks[Vj['name']] = None
-    #             stack.pop()
-    #             # continue to the next iteration before adding a new node to the stack
-    #             continue
+                marks[Vj['name']] = False
+            else:
+                marks[Vj['name']] = None
+                stack.pop()
+                # continue to the next iteration before adding a new node to the stack
+                continue
 
-    #         # add next unmarked node to the stack
-    #         added = False
+            # add next unmarked node to the stack
+            added = False
 
-    #         for k in range(j+1, len(sortedV)):
-    #             if marks[sortedV[k]['name']] == None:
-    #                 stack.append(k)
-    #                 added = True
-    #                 break
+            for k in range(j+1, len(sortedV)):
+                if marks[sortedV[k]['name']] == None:
+                    stack.append(k)
+                    added = True
+                    break
 
-    #         # no more variables to process, this is a set, save it
-    #         if not added:
-    #             descSet = list(filter(lambda n: marks[n['name']] == True, sortedV))
+            # no more variables to process, this is a set, save it
+            if not added:
+                descSet = list(filter(lambda n: marks[n['name']] == True, sortedV))
 
-    #             if len(descSet) > 0:
-    #                 descSets.append(descSet)
+                if len(descSet) > 0:
+                    descSets.append(descSet)
 
-    #     return descSets
+        return descSets
 
     # @staticmethod
     # def ListDec(G, T):
@@ -1021,7 +1065,6 @@ class ConditionalIndependencies():
     @staticmethod
     def C(G,X):
         X = ou.makeArray(X)
-
         CC = gu.cCompDecomposition(G)
 
         for cc in CC:

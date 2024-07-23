@@ -75,8 +75,7 @@ def testAlgorithm(G, alg, printCIs = False):
         CI = ConditionalIndependencies.GMP(G, G.nodes)
     elif alg == 'lmp':
         CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
-    elif alg == 'lmpp':
-        CI = ConditionalIndependencies.LMPplus(G, G.nodes)
+        # CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, Vordered)
     elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
