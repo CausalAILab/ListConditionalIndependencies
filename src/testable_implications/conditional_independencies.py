@@ -181,7 +181,7 @@ class ConditionalIndependencies():
     #     return CI
 
     @staticmethod
-    def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None):
+    def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None, measuredParams=None):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
 
@@ -195,8 +195,8 @@ class ConditionalIndependencies():
         # print('Variables (topo sorted):')
         # print(nodeNamesToString(V, False))
 
-        Ans = []
-        MaxAns = []
+        Ss = []
+        Spluss = []
         AC = []
 
         for X in V:
@@ -222,7 +222,7 @@ class ConditionalIndependencies():
                     GS = gu.subgraph(GVleqX, S)
                     C = ConditionalIndependencies.C(GS, X)
 
-                    Ans.append(S)
+                    Ss.append(S)
                     AC.append(C)
                     
                     if onlyMaximalAns:
@@ -238,7 +238,7 @@ class ConditionalIndependencies():
                         if not su.equals(S, Splus):
                             continue
 
-                        MaxAns.append(Splus)
+                        Spluss.append(Splus)
 
                         W = su.difference(Splus, PaC, 'name')
                     else:
@@ -258,9 +258,14 @@ class ConditionalIndependencies():
                         'Z': Z
                     })
 
-        # print('# S : ' + str(len(Ans)))
-        # print('# S+: ' + str(len(MaxAns)))
-        # print('s: ' + str(len(max(AC, key=len))))
+        if measuredParams is not None:
+            measuredParams['Snum'] = len(Ss)
+            measuredParams['Splusnum'] = len(Spluss)
+
+            if len(AC) > 0:
+                measuredParams['s'] = len(max(AC, key=len))
+            else:
+                measuredParams['s'] = 1
 
         return CI
     
