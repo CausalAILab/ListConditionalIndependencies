@@ -1,0 +1,196 @@
+<NODES>
+alcoholism
+vh_amn
+hepatotoxic
+THepatitis
+hospital
+surgery
+gallstones
+choledocholithotomy
+injections
+transfusion
+ChHepatitis
+sex
+age
+PBC
+fibrosis
+diabetes
+obesity
+Steatosis
+Cirrhosis
+Hyperbilirubinemia
+triglycerides
+RHepatitis
+fatigue
+bilirubin
+itching
+upper_pain
+fat
+pain_ruq
+pressure_ruq
+phosphatase
+skin
+ama
+le_cells
+joints
+pain
+proteins
+edema
+platelet
+inr
+bleeding
+flatulence
+alcohol
+encephalopathy
+urea
+ascites
+hepatomegaly
+hepatalgia
+density
+ESR
+alt
+ast
+amylase
+ggtp
+cholesterol
+hbsag
+hbsag_anti
+anorexia
+nausea
+spleen
+consciousness
+spiders
+jaundice
+albumin
+edge
+irregular_liver
+hbc_anti
+hcv_anti
+palms
+hbeag
+carcinoma
+
+<EDGES>
+alcoholism -> THepatitis
+alcoholism -> Steatosis
+vh_amn -> ChHepatitis
+vh_amn -> hbsag
+vh_amn -> hbsag_anti
+vh_amn -> hbc_anti
+vh_amn -> hcv_anti
+vh_amn -> hbeag
+hepatotoxic -> THepatitis
+hepatotoxic -> RHepatitis
+THepatitis -> fatigue
+THepatitis -> phosphatase
+THepatitis -> inr
+THepatitis -> hepatomegaly
+THepatitis -> alt
+THepatitis -> ast
+THepatitis -> ggtp
+THepatitis -> anorexia
+THepatitis -> nausea
+THepatitis -> spleen
+hospital -> injections
+hospital -> transfusion
+surgery -> injections
+surgery -> transfusion
+gallstones -> choledocholithotomy
+gallstones -> bilirubin
+gallstones -> upper_pain
+gallstones -> fat
+gallstones -> pressure_ruq
+gallstones -> flatulence
+gallstones -> amylase
+choledocholithotomy -> injections
+choledocholithotomy -> transfusion
+injections -> ChHepatitis
+transfusion -> ChHepatitis
+ChHepatitis -> fibrosis
+ChHepatitis -> fatigue
+ChHepatitis -> bilirubin
+ChHepatitis -> pressure_ruq
+ChHepatitis -> phosphatase
+ChHepatitis -> inr
+ChHepatitis -> ESR
+ChHepatitis -> alt
+ChHepatitis -> ast
+ChHepatitis -> ggtp
+ChHepatitis -> cholesterol
+ChHepatitis -> hbsag
+ChHepatitis -> hbsag_anti
+ChHepatitis -> hbc_anti
+ChHepatitis -> hcv_anti
+ChHepatitis -> hbeag
+sex -> PBC
+sex -> Hyperbilirubinemia
+age -> PBC
+age -> Hyperbilirubinemia
+PBC -> bilirubin
+PBC -> pressure_ruq
+PBC -> ama
+PBC -> le_cells
+PBC -> joints
+PBC -> pain
+PBC -> platelet
+PBC -> encephalopathy
+PBC -> ESR
+PBC -> ggtp
+PBC -> cholesterol
+PBC -> carcinoma
+fibrosis -> Cirrhosis
+diabetes -> obesity
+obesity -> Steatosis
+Steatosis -> Cirrhosis
+Steatosis -> triglycerides
+Steatosis -> pain_ruq
+Steatosis -> hepatomegaly
+Steatosis -> ESR
+Steatosis -> alt
+Steatosis -> ast
+Steatosis -> ggtp
+Steatosis -> cholesterol
+Cirrhosis -> bilirubin
+Cirrhosis -> phosphatase
+Cirrhosis -> proteins
+Cirrhosis -> edema
+Cirrhosis -> platelet
+Cirrhosis -> inr
+Cirrhosis -> alcohol
+Cirrhosis -> encephalopathy
+Cirrhosis -> alt
+Cirrhosis -> ast
+Cirrhosis -> spleen
+Cirrhosis -> spiders
+Cirrhosis -> albumin
+Cirrhosis -> edge
+Cirrhosis -> irregular_liver
+Cirrhosis -> palms
+Cirrhosis -> carcinoma
+Hyperbilirubinemia -> bilirubin
+Hyperbilirubinemia -> pain_ruq
+Hyperbilirubinemia -> inr
+Hyperbilirubinemia -> hepatomegaly
+Hyperbilirubinemia -> ESR
+Hyperbilirubinemia -> ggtp
+RHepatitis -> fatigue
+RHepatitis -> phosphatase
+RHepatitis -> hepatomegaly
+RHepatitis -> alt
+RHepatitis -> ast
+RHepatitis -> ggtp
+RHepatitis -> anorexia
+RHepatitis -> nausea
+RHepatitis -> spleen
+bilirubin -> itching
+bilirubin -> skin
+bilirubin -> jaundice
+joints -> pain
+proteins -> ascites
+platelet -> bleeding
+inr -> bleeding
+encephalopathy -> urea
+encephalopathy -> density
+encephalopathy -> consciousness
+hepatomegaly -> hepatalgia
+hbsag -> hbsag_anti
