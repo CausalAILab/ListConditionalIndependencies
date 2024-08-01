@@ -92,7 +92,30 @@ class Graph():
 
         # change all edge types
 
-    def toRandomGraph(self, n, m, bidirectedEdgesFraction=None):
+    # def toErdosRenyiGraph(self, n, p):
+    #     self.nx = nx.erdos_renyi_graph(n, p)
+
+    #     # convert names (numbers) to strings
+    #     nodes = self.nodes
+    #     newNodes = []
+
+    #     for node in nodes:
+    #         node['name'] = str(node['name'])
+    #         node['label'] = str(node['label'])
+    #         newNodes.append(node)
+
+    #     edges = self.edges
+    #     newEdges = []
+        
+    #     for edge in edges:
+    #         edge['from_'] = str(edge['from_'])
+    #         edge['to_'] = str(edge['to_'])
+    #         newEdges.append(edge)
+
+    #     self.nodes = newNodes
+    #     self.edges = newEdges
+
+    def toRandomGraph(self, n, m, edgeType=directedEdgeType.id_):
         nodes = []
 
         for i in range(n):
@@ -104,56 +127,54 @@ class Graph():
         edges = []
         edgeCount = 0
 
-        while (edgeCount < m):
-            x = int(random.random() * n)
-            y = int(random.random() * n)
+        if edgeType == directedEdgeType.id_:
+            while (edgeCount < m):
+                x = int(random.random() * n)
+                y = int(random.random() * n)
 
-            if x == y:
-                continue
-
-            edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
-
-            if not self.nx.has_edge(edge['from_'], edge['to_']):
-                self.__addEdge(edge)
-
-                try:
-                    cycle = nx.find_cycle(self.nx)
-                    self.__deleteEdge(edge)
-                except nx.exception.NetworkXNoCycle:
-                    edgeCount = edgeCount + 1
-                    edges.append(edge)
+                if x == y:
                     continue
 
-            if not self.nx.has_edge(edge['to_'], edge['from_']):
-                edge = {'from_': str(y), 'to_': str(x), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
-                self.__addEdge(edge)
+                edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
 
-                try:
-                    cycle = nx.find_cycle(self.nx)
-                    self.__deleteEdge(edge)
-                except nx.exception.NetworkXNoCycle:
-                    edgeCount = edgeCount + 1
-                    edges.append(edge)
+                if not self.nx.has_edge(edge['from_'], edge['to_']):
+                    self.__addEdge(edge)
+
+                    try:
+                        cycle = nx.find_cycle(self.nx)
+                        self.__deleteEdge(edge)
+                    except nx.exception.NetworkXNoCycle:
+                        edgeCount = edgeCount + 1
+                        edges.append(edge)
+                        continue
+
+                if not self.nx.has_edge(edge['to_'], edge['from_']):
+                    edge = {'from_': str(y), 'to_': str(x), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
+                    self.__addEdge(edge)
+
+                    try:
+                        cycle = nx.find_cycle(self.nx)
+                        self.__deleteEdge(edge)
+                    except nx.exception.NetworkXNoCycle:
+                        edgeCount = edgeCount + 1
+                        edges.append(edge)
+                        continue
+        elif edgeType == bidirectedEdgeType.id_:
+            while (edgeCount < m):
+                x = int(random.random() * n)
+                y = int(random.random() * n)
+
+                if x == y:
                     continue
 
-        # # sample x% of edges and turn those to bidirected
-        if bidirectedEdgesFraction is not None:
-            k = int(m * bidirectedEdgesFraction)
-            indices = random.sample(range(m), k)
+                edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': bidirectedEdgeType.id_, 'metadata': {}}
 
-            newEdges = []
-            
-            for i in range(m):
-                edge = edges[i]
+                if not self.nx.has_edge(edge['from_'], edge['to_']) and not self.nx.has_edge(edge['to_'], edge['from_']):
+                    self.__addEdge(edge)
+                    edgeCount = edgeCount + 1
+                    edges.append(edge)
 
-                if i in indices:
-                    edge['type_'] = bidirectedEdgeType.id_
-                    
-                newEdges.append(edge)
-
-            self.edges = newEdges
-        else:
-            self.edges = edges
+        self.edges = edges
 
     def addNodes(self, nodes):
         nodes = ou.makeArray(nodes)
@@ -215,7 +236,9 @@ class Graph():
             if 'metadata' not in edge:
                 edge['metadata'] = dict()
 
-            # nx has a 'bug': if X -- Y exists, adding X -> Y will overwrite X -- Y, or vice versa
+            # nx has an unintended feature
+            # calling add_edge(X,Y,..) overwrites an existing edge with from: X and to: Y
+            # e.g., if X -- Y exists, adding X -> Y will overwrite X -- Y, or vice versa
             if self.nx.has_edge(edge['from_'], edge['to_']):
                 existingEdge = None
 
@@ -264,6 +287,22 @@ class Graph():
 
             # test if the new edge generates a cycle
             self.__addEdge(edge)
+
+            # due to the implemenation that X -- Y is stored as a directed edge in nx graph,
+            # nx.find_cycle may incorrectly report a cycle
+            # if edge['type_'] == directedEdgeType.id_:
+            #     fromNode = gu.getNodeByName(edge['from_'], self)
+            #     toNode = gu.getNodeByName(edge['to_'], self)
+
+            #     if fromNode is not None and toNode is not None:
+            #         if fromNode['type_'] == basicNodeType.id_ and toNode['type_'] == basicNodeType.id_:
+            #             try:
+            #                 cycle = nx.find_cycle(self.nx)
+            #                 self.__deleteEdge(edge)
+            #                 if cycle is not None:
+            #                     raise Exception('Adding the edge ' + edge['from_'] + ' ' + edgeTypeMap[edge['type_']].shortId + ' ' + edge['to_'] + ' creates a cycle.')
+            #             except nx.exception.NetworkXNoCycle:
+            #                 continue
 
     def deleteEdges(self, edges):
         edges = ou.makeArray(edges)

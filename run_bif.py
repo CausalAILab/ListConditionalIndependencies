@@ -16,9 +16,9 @@ def testAlgorithm(G, alg):
     start = datetime.now()
 
     if alg == 'gmp':
-        CI = ConditionalIndependencies.GMP(G, G.nodes)
+        CI = ConditionalIndependencies.ListGMP(G, G.nodes)
     elif alg == 'lmp':
-        CI = ConditionalIndependencies.LMP(G, G.nodes)
+        CI = ConditionalIndependencies.ListCIBF(G, G.nodes)
     elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes)
 
@@ -228,6 +228,9 @@ def BIFNodesToGraph(parsedNodes, latentFraction = None):
         G.addEdges(edgesToAdd)
 
         G = pu.projectOver(G,V)
+    else:
+        G.addNodes(nodesToAdd)
+        G.addEdges(edgesToAdd)
 
     return G
 
@@ -245,8 +248,8 @@ def printGraphToEditorFormat(G):
 
     print('\n'.join(edgeList))
 
-    print('Nodes: ' + str(len(G.nodes)))
-    print('Edges: ' + str(len(G.edges)))
+    # print('Nodes: ' + str(len(G.nodes)))
+    # print('Edges: ' + str(len(G.edges)))
 
 # graph files from bnlearn: https://www.bnlearn.com/bnrepository/
 # bif file info (# of nodes)

@@ -3,14 +3,14 @@ import random
 from datetime import datetime
 
 from src.graph.classes.graph import Graph
-from src.graph.classes.graph_defs import latentNodeType
+from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidirectedEdgeType
 from src.inference.utils.set_utils import SetUtils as su
 from src.inference.utils.graph_utils import GraphUtils as gu
 from src.projection.projection_utils import ProjectionUtils as pu
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
 from src.adjustment.adjustment_sets_utils import writeNodeNames
 
-def testRandomGraphs(alg, numGraphs, n, e, latentFraction=None):
+def testRandomGraphs(numGraphs, n, m, latentFraction=None):
     CIs = []
     runtimes = []
 
@@ -18,7 +18,7 @@ def testRandomGraphs(alg, numGraphs, n, e, latentFraction=None):
 
     for i in range(numGraphs):
         G = Graph()
-        G.toRandomGraph(n,e)
+        G.toRandomGraph(n,m)
 
         nodes = G.nodes
         edges = G.edges
@@ -40,36 +40,35 @@ def testRandomGraphs(alg, numGraphs, n, e, latentFraction=None):
                     Obs.append(node)
 
                 V.append(node)
+        else:
+            V = nodes
         
         G.nodes = V
         G.edges = edges
-
         G = pu.projectOver(G,Obs)
 
+        # numNodes = len(G.nodes)
+        # numEdges = len(G.edges)
+        # bidirectedEdges = list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges))
+        # numBidir = len(bidirectedEdges)
+        # line = str(numNodes) + ' ' + str(numEdges) + ' ' + str(numBidir)
+        # print(line)
+
         start = datetime.now()
+        CI = ConditionalIndependencies.ListCI(G, G.nodes)
+        end = datetime.now()
 
-        if alg == 'gmp':
-            CI = ConditionalIndependencies.GMP(G, G.nodes)
-            end = datetime.now()
-        elif alg == 'lmp':
-            CI = ConditionalIndependencies.LMP(G, G.nodes, True)
-            end = datetime.now()
-        elif alg == 'listci':
-            CI = ConditionalIndependencies.ListCI(G, G.nodes)
-            end = datetime.now()
+        V = su.intersection(gu.topoSort(G), G.nodes, 'name')
+        ACsizes = []
 
-            V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-            ACsizes = []
+        for X in V:
+            VleqX = V[:V.index(X)+1]
+            GVleqX = gu.subgraph(G, VleqX)
+            
+            R = ConditionalIndependencies.C(GVleqX,X)
+            ACsizes.append(len(R))
 
-            for X in V:
-                VleqX = V[:V.index(X)+1]
-                GVleqX = gu.subgraph(G, VleqX)
-                
-                GVleqX = gu.subgraph(G, VleqX)
-                R = ConditionalIndependencies.C(GVleqX,X)
-                ACsizes.append(len(R))
-
-            s = max(ACsizes)
+        s = max(ACsizes)
 
         CIs.append(CI)
         runtimes.append(end - start)
@@ -79,12 +78,12 @@ def testRandomGraphs(alg, numGraphs, n, e, latentFraction=None):
 
 if __name__ == '__main__':
     numGraphs = 10
-    numNodes = 100
-    numDirectedEdges = int(numNodes * 2)
-    numLatentRatio = 10
+    n = 30
+    m = int(n * 2)
+    numDivisions = 10
 
-    for k in range(numLatentRatio):
+    for k in range(numDivisions):
         latentFraction = k * 0.1
-        testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, latentFraction)
+        testRandomGraphs(numGraphs, n, m, latentFraction)
 
-    # testRandomGraphs('listci', numGraphs, numNodes, numDirectedEdges, 0.3)
+    # testRandomGraphs(numGraphs, n, m, 0.8)

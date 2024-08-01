@@ -19,7 +19,7 @@ def isSymmetric(ci1, ci2):
 class ConditionalIndependencies():
 
     @staticmethod
-    def GMP(G,V):
+    def ListGMP(G,V):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
         
@@ -67,121 +67,121 @@ class ConditionalIndependencies():
 
         return CI
 
+    # @staticmethod
+    # def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None):
+    #     if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
+    #         return []
+
+    #     CI = []
+
+    #     V = su.intersection(gu.topoSort(G), V, 'name')
+
+    #     if Vordered is not None:
+    #         V = Vordered
+
+    #     # construct graph with flipped directed edges
+    #     # compute descendant sets (= ancestral sets)
+    #     directedEdgesToAdd = []
+    #     directedEdges = list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges))
+    #     bidirectedEdges = list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges))
+
+    #     for edge in directedEdges:
+    #         e = {
+    #             'from_': edge['to_'],
+    #             'to_': edge['from_'],
+    #             'label': edge['label'],
+    #             'type_': edge['type_'],
+    #             'metadata': edge['metadata']
+    #         }
+
+    #         directedEdgesToAdd.append(e)
+
+    #     Gprime = Graph()
+    #     Gprime.addNodes(G.nodes)
+    #     Gprime.addEdges(directedEdgesToAdd)
+    #     Gprime.addEdges(bidirectedEdges)
+        
+    #     # print('Variables (topo sorted):')
+    #     # print(nodeNamesToString(V, False))
+
+    #     Ans = []
+    #     MaxAns = []
+
+    #     for X in V:
+    #         VleqX = V[:V.index(X)+1]
+    #         GVleqX = gu.subgraph(G, VleqX)
+
+    #         # unresolved: how can we compute S that includes X using ListDec?
+    #         # Vprime = list(reversed(VleqX))
+    #         # AnX = gu.ancestorsPlus(X, GVleqX)
+    #         # Vprime = su.difference(Vprime, AnX, 'name')
+
+    #         # Scollection = ConditionalIndependencies.ListDec(Gprime, Vprime)
+
+    #         Scollection = ConditionalIndependencies.ListDec(Gprime, VleqX)
+            
+    #         for S in Scollection:
+    #             # S = su.union(S, AnX, 'name')
+
+    #             # skip ancestral sets without X
+    #             if not su.belongs(X, S, compareNames):
+    #                 continue
+
+    #             # get node objects in GVleqX
+    #             # nodeNames = list(map(lambda n: n['name'], S))
+    #             # S = gu.getNodesByName(nodeNames, GVleqX)
+
+    #             # check if S is ancestral
+    #             AnS = gu.ancestorsPlus(S, GVleqX)
+
+    #             if not su.equals(S, AnS, 'name'):
+    #                 continue
+
+    #             Ans.append(S)
+
+    #             GS = gu.subgraph(GVleqX, S)
+    #             C = ConditionalIndependencies.C(GS, X)
+
+    #             if onlyMaximalAns:
+    #                 # check if S is maximal w.r.t. Z = mb(X,S)
+    #                 # S+ = V<=X \ De( Sp(C) \ (Z + {X}) )
+    #                 # Lemma 5, Richardson 2003
+    #                 PaC = gu.parentsPlus(C, GS)
+    #                 Sp = su.difference(gu.spouses(C, GVleqX), PaC, 'name')
+    #                 DeSp = gu.descendants(Sp, GVleqX)
+    #                 Sminus = su.union(Sp, DeSp, 'name')
+    #                 Splus = su.difference(VleqX, Sminus, 'name')
+
+    #                 if not su.equals(S, Splus):
+    #                     continue
+
+    #                 MaxAns.append(Splus)
+
+    #                 W = su.difference(Splus, PaC, 'name')
+    #             else:
+    #                 PaC = gu.parentsPlus(C, GS)
+    #                 W = su.difference(S, PaC, 'name')
+
+    #             # check valid CI
+    #             if su.isEmpty(W):
+    #                 continue
+
+    #             # Z = Pa(C)_GS \ {u}
+    #             Z = su.difference(PaC, [X], 'name')
+
+    #             CI.append({
+    #                 'X': X,
+    #                 'W': W,
+    #                 'Z': Z
+    #             })
+        
+    #     # print('# S : ' + str(len(Ans)))
+    #     # print('# S+: ' + str(len(MaxAns)))
+
+    #     return CI
+
     @staticmethod
     def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None):
-        if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
-            return []
-
-        CI = []
-
-        V = su.intersection(gu.topoSort(G), V, 'name')
-
-        if Vordered is not None:
-            V = Vordered
-
-        # construct graph with flipped directed edges
-        # compute descendant sets (= ancestral sets)
-        directedEdgesToAdd = []
-        directedEdges = list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges))
-        bidirectedEdges = list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges))
-
-        for edge in directedEdges:
-            e = {
-                'from_': edge['to_'],
-                'to_': edge['from_'],
-                'label': edge['label'],
-                'type_': edge['type_'],
-                'metadata': edge['metadata']
-            }
-
-            directedEdgesToAdd.append(e)
-
-        Gprime = Graph()
-        Gprime.addNodes(G.nodes)
-        Gprime.addEdges(directedEdgesToAdd)
-        Gprime.addEdges(bidirectedEdges)
-        
-        # print('Variables (topo sorted):')
-        # print(nodeNamesToString(V, False))
-
-        Ans = []
-        MaxAns = []
-
-        for X in V:
-            VleqX = V[:V.index(X)+1]
-            GVleqX = gu.subgraph(G, VleqX)
-
-            # unresolved: how can we compute S that includes X using ListDec?
-            # Vprime = list(reversed(VleqX))
-            # AnX = gu.ancestorsPlus(X, GVleqX)
-            # Vprime = su.difference(Vprime, AnX, 'name')
-
-            # Scollection = ConditionalIndependencies.ListDec(Gprime, Vprime)
-
-            Scollection = ConditionalIndependencies.ListDec(Gprime, VleqX)
-            
-            for S in Scollection:
-                # S = su.union(S, AnX, 'name')
-
-                # skip ancestral sets without X
-                if not su.belongs(X, S, compareNames):
-                    continue
-
-                # get node objects in GVleqX
-                # nodeNames = list(map(lambda n: n['name'], S))
-                # S = gu.getNodesByName(nodeNames, GVleqX)
-
-                # check if S is ancestral
-                AnS = gu.ancestorsPlus(S, GVleqX)
-
-                if not su.equals(S, AnS, 'name'):
-                    continue
-
-                Ans.append(S)
-
-                GS = gu.subgraph(GVleqX, S)
-                C = ConditionalIndependencies.C(GS, X)
-
-                if onlyMaximalAns:
-                    # check if S is maximal w.r.t. Z = mb(X,S)
-                    # S+ = V<=X \ De( Sp(C) \ (Z + {X}) )
-                    # Lemma 5, Richardson 2003
-                    PaC = gu.parentsPlus(C, GS)
-                    Sp = su.difference(gu.spouses(C, GVleqX), PaC, 'name')
-                    DeSp = gu.descendants(Sp, GVleqX)
-                    Sminus = su.union(Sp, DeSp, 'name')
-                    Splus = su.difference(VleqX, Sminus, 'name')
-
-                    if not su.equals(S, Splus):
-                        continue
-
-                    MaxAns.append(Splus)
-
-                    W = su.difference(Splus, PaC, 'name')
-                else:
-                    PaC = gu.parentsPlus(C, GS)
-                    W = su.difference(S, PaC, 'name')
-
-                # check valid CI
-                if su.isEmpty(W):
-                    continue
-
-                # Z = Pa(C)_GS \ {u}
-                Z = su.difference(PaC, [X], 'name')
-
-                CI.append({
-                    'X': X,
-                    'W': W,
-                    'Z': Z
-                })
-        
-        # print('# S : ' + str(len(Ans)))
-        # print('# S+: ' + str(len(MaxAns)))
-
-        return CI
-
-    @staticmethod
-    def LMP(G, V, onlyMaximalAns = True, Vordered = None):
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
 
@@ -258,9 +258,9 @@ class ConditionalIndependencies():
                         'Z': Z
                     })
 
-        print('# S : ' + str(len(Ans)))
-        print('# S+: ' + str(len(MaxAns)))
-        print('s: ' + str(len(max(AC, key=len))))
+        # print('# S : ' + str(len(Ans)))
+        # print('# S+: ' + str(len(MaxAns)))
+        # print('s: ' + str(len(max(AC, key=len))))
 
         return CI
     

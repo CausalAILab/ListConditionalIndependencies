@@ -53,11 +53,9 @@ def outputCIs(G, alg):
             Vordered.append(Vs[0])
 
     if alg == 'gmp':
-        CI = ConditionalIndependencies.GMP(G, G.nodes)
+        CI = ConditionalIndependencies.ListGMP(G, G.nodes)
     elif alg == 'lmp':
-        CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
-    elif alg == 'lmpp':
-        CI = ConditionalIndependencies.LMPplus(G, G.nodes)
+        CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, Vordered)
     elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
@@ -120,7 +118,7 @@ if __name__ == '__main__':
     task = sys.argv[1]
     filePath = sys.argv[2]
 
-    validTasks = ['gmp', 'lmp', 'lmpp', 'listci']
+    validTasks = ['gmp', 'lmp', 'listci']
 
     if task not in validTasks:
         print('Please specify a valid task to run (\'gmp\', \'lmp\', \'lmpp\', or \'listci\').')

@@ -72,10 +72,9 @@ def testAlgorithm(G, alg, printCIs = False):
     start = datetime.now()
 
     if alg == 'gmp':
-        CI = ConditionalIndependencies.GMP(G, G.nodes)
+        CI = ConditionalIndependencies.ListGMP(G, G.nodes)
     elif alg == 'lmp':
-        CI = ConditionalIndependencies.LMP(G, G.nodes, True, Vordered)
-        # CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, Vordered)
+        CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, Vordered)
     elif alg == 'listci':
         CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
@@ -137,7 +136,7 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 2:
-        print('Please specify input file path (e.g., graphs/list1.txt).')
+        print('Please specify input file path (e.g., graphs/paper/fig5a.txt).')
 
         sys.exit()
 
