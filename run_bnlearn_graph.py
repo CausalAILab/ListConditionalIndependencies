@@ -75,61 +75,89 @@ def applyProjection(G, latentFraction=0.3):
 
     return Gp
 
+def measureParamsFromProjectedGraph(alg, G, latentFraction=0.3):
+    G = applyProjection(G, latentFraction)
+
+    measuredParams = {}
+    s = 1
+
+    start = datetime.now()
+
+    if alg == 'gmp':
+        CI = ConditionalIndependencies.ListGMP(G, G.nodes)
+        end = datetime.now()
+    elif alg == 'lmp':
+        CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, None, measuredParams)
+        end = datetime.now()
+
+        Snum = measuredParams['Snum']
+        Splusnum = measuredParams['Splusnum']
+        s = measuredParams['s']
+    elif alg == 'listci':
+        CI = ConditionalIndependencies.ListCI(G, G.nodes)
+        end = datetime.now()
+
+        V = su.intersection(gu.topoSort(G), G.nodes, 'name')
+        ACsizes = []
+
+        for X in V:
+            VleqX = V[:V.index(X)+1]
+            GVleqX = gu.subgraph(G, VleqX)
+            
+            R = ConditionalIndependencies.C(GVleqX,X)
+            ACsizes.append(len(R))
+
+        if len(ACsizes) > 0:
+            s = max(ACsizes)
+
+    # get parameters
+    n = len(G.nodes)
+    m = len(G.edges)
+    md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
+    mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
+    CIsize = len(CI)
+    runtime = end - start
+
+    params = []
+
+    if alg == 'gmp':
+        params = [n, m, md, mb, CIsize, runtime]
+    elif alg == 'lmp':
+        params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
+    elif alg == 'listci':
+        params = [n, m, md, mb, CIsize, runtime, s]
+
+    return params
+
 def testProjectedGraphs(alg, G, numGraphs, latentFraction=0.3):
+    paramsCollection = []
+
     for i in range(numGraphs):
-        G = applyProjection(G, latentFraction)
+        paramsCollection.append([])
 
-        measuredParams = {}
-        s = 1
+        params = measureParamsFromProjectedGraph(alg, G, latentFraction)
+        paramsToStr = list(map(lambda n: str(n), params))
+        paramsCollection[i].extend(paramsToStr)
 
-        start = datetime.now()
+    for line in paramsCollection:
+        print(' '.join(line))
 
-        if alg == 'gmp':
-            CI = ConditionalIndependencies.ListGMP(G, G.nodes)
-            end = datetime.now()
-        elif alg == 'lmp':
-            CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, None, measuredParams)
-            end = datetime.now()
+def testProjectedGraphsBatch(alg, G, numGraphs):
+    paramsCollection = []
 
-            Snum = measuredParams['Snum']
-            Splusnum = measuredParams['Splusnum']
-            s = measuredParams['s']
-        elif alg == 'listci':
-            CI = ConditionalIndependencies.ListCI(G, G.nodes)
-            end = datetime.now()
+    numDivisions = 10
 
-            V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-            ACsizes = []
+    for i in range(numGraphs):
+        paramsCollection.append([])
 
-            for X in V:
-                VleqX = V[:V.index(X)+1]
-                GVleqX = gu.subgraph(G, VleqX)
-                
-                R = ConditionalIndependencies.C(GVleqX,X)
-                ACsizes.append(len(R))
+        for j in range(numDivisions):
+            latentFraction = j * 0.1
+            params = measureParamsFromProjectedGraph(alg, G, latentFraction)
+            paramsToStr = list(map(lambda n: str(n), params))
+            paramsCollection[i].extend(paramsToStr)
 
-            if len(ACsizes) > 0:
-                s = max(ACsizes)
-
-        # output parameters
-        n = len(G.nodes)
-        m = len(G.edges)
-        md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
-        mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
-        CIsize = len(CI)
-        runtime = end - start
-
-        params = []
-
-        if alg == 'gmp':
-            params = [n, m, md, mb, CIsize, runtime]
-        elif alg == 'lmp':
-            params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
-        elif alg == 'listci':
-            params = [n, m, md, mb, CIsize, runtime, s]
-
-        line = ' '.join(list(map(lambda n: str(n), params)))
-        print(line)
+    for line in paramsCollection:
+        print(' '.join(line))
 
 if __name__ == '__main__':
 
@@ -141,13 +169,11 @@ if __name__ == '__main__':
 
     filePath = sys.argv[1]
 
-    # algorithms = ['lmp', 'listci']
-    # algorithms = ['gmp']
-    # algorithms = ['lmp']
-    algorithms = ['listci']
+    # algorithm = 'gmp'
+    # algorithm = 'lmp'
+    algorithm = 'listci'
 
-    numGraphs = 1
-    numDivisions = 10
+    numGraphs = 2
 
     try:
         with open(filePath, 'r') as f:
@@ -155,12 +181,8 @@ if __name__ == '__main__':
             G = parseGraph(fileContent)
 
             if G is not None:
-                for alg in algorithms:
-                    for k in range(numDivisions):
-                        latentFraction = k * 0.1
-                        testProjectedGraphs(alg, G, numGraphs, latentFraction)
-
-                    # testProjectedGraphs(alg, G, numGraphs, 0.4)
+                testProjectedGraphsBatch(algorithm, G, numGraphs)
+                # testProjectedGraphs(algorithm, G, numGraphs, 0.4)
 
             f.close()
     except IOError:
