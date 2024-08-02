@@ -71,9 +71,10 @@ def applyProjection(G, latentFraction=0.3):
 
         V.append(node)
     
-    G.nodes = V
-    G.edges = edges
-    Gp = pu.projectOver(G,Obs)
+    Gp = G.copy()
+    Gp.nodes = V
+    Gp.edges = edges
+    Gp = pu.projectOver(Gp,Obs)
 
     return Gp
 
@@ -137,8 +138,8 @@ def testProjectedGraphs(alg, G, numGraphs, latentFraction=0.3):
     for i in range(numGraphs):
         paramsCollection.append([])
 
-        G = applyProjection(G, latentFraction)
-        params = measureParams(alg, G)
+        Gp = applyProjection(G, latentFraction)
+        params = measureParams(alg, Gp)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -155,8 +156,8 @@ def testProjectedGraphsBatch(alg, G, numGraphs):
 
         for j in range(numDivisions):
             latentFraction = j * 0.1
-            G = applyProjection(G, latentFraction)
-            params = measureParams(alg, G)
+            Gp = applyProjection(G, latentFraction)
+            params = measureParams(alg, Gp)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
