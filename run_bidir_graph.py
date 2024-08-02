@@ -1,164 +1,190 @@
-# import sys
 import random
 from datetime import datetime
 
 from src.graph.classes.graph import Graph
-from src.graph.classes.graph_defs import bidirectedEdgeType
+from src.graph.classes.graph_defs import directedEdgeType, bidirectedEdgeType
 from src.inference.utils.set_utils import SetUtils as su
 from src.inference.utils.graph_utils import GraphUtils as gu
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
-from src.adjustment.adjustment_sets_utils import writeNodeNames
 
-# def testERBidirGraphs(numGraphs, n, p):
-#     CIs = []
-#     runtimes = []
 
-#     line = ''
+def measureParams(G):
+    start = datetime.now()
+    CI = ConditionalIndependencies.ListCI(G, G.nodes)
+    end = datetime.now()
 
-#     for i in range(numGraphs):
-#         G = Graph()
-#         G.toErdosRenyiGraph(n,p)
+    V = su.intersection(gu.topoSort(G), G.nodes, 'name')
+    ACsizes = []
 
-#         # make edges as bidirected
-#         edges = G.edges
-#         newEdges = []
+    for X in V:
+        VleqX = V[:V.index(X)+1]
+        GVleqX = gu.subgraph(G, VleqX)
         
-#         for edge in edges:
-#             edge['type_'] = bidirectedEdgeType.id_
-#             newEdges.append(edge)
+        R = ConditionalIndependencies.C(GVleqX,X)
+        ACsizes.append(len(R))
 
-#         G.edges = newEdges
+    if len(ACsizes) > 0:
+        s = max(ACsizes)
+    else:
+        s = 1
 
-#         start = datetime.now()
-#         CI = ConditionalIndependencies.ListCI(G, G.nodes)
-#         end = datetime.now()
+    # get parameters
+    n = len(G.nodes)
+    m = len(G.edges)
+    md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
+    mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
+    CIsize = len(CI)
+    runtime = end - start
 
-#         CIs.append(CI)
-#         runtimes.append(end - start)
+    # params = [n, m, md, mb, CIsize, runtime, s]
+    params = [s, CIsize, runtime]
 
-#         V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-#         ACsizes = []
+    return params
 
-#         for X in V:
-#             VleqX = V[:V.index(X)+1]
-#             GVleqX = gu.subgraph(G, VleqX)
-            
-#             R = ConditionalIndependencies.C(GVleqX,X)
-#             ACsizes.append(len(R))
 
-#         s = max(ACsizes)
+def constructBidirGraph(n,m):
+    G = Graph()
+    G.toRandomGraph(n,m,bidirectedEdgeType.id_)
 
-#         line = str(s) + ' ' + str(len(CI)) + ' ' + str(end - start)
-#         print(line)
+    return G
+
+
+def constructBidirConvGraph(n, m, mb=0):
+    G = Graph()
+    G.toRandomGraph(n,m)
+
+    # # sample x% of edges and turn those to bidirected
+    if mb > 0 and mb <= m:
+        edges = G.edges
+
+        indices = random.sample(range(m), mb)
+
+        newEdges = []
+        
+        for i in range(m):
+            edge = edges[i]
+
+            if i in indices:
+                edge['type_'] = bidirectedEdgeType.id_
+                
+            newEdges.append(edge)
+
+        G.edges = newEdges
+
+    return G
+
 
 def testBidirGraphs(numGraphs, n, m):
-    CIs = []
-    runtimes = []
-
-    line = ''
+    paramsCollection = []
 
     for i in range(numGraphs):
-        G = Graph()
-        G.toRandomGraph(n,m,bidirectedEdgeType.id_)
+        paramsCollection.append([])
 
-        start = datetime.now()
-        CI = ConditionalIndependencies.ListCI(G, G.nodes)
-        end = datetime.now()
+        G = constructBidirGraph(n,m)
+        params = measureParams(G)
+        paramsToStr = list(map(lambda n: str(n), params))
+        paramsCollection[i].extend(paramsToStr)
 
-        CIs.append(CI)
-        runtimes.append(end - start)
-
-        V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-        ACsizes = []
-
-        for X in V:
-            VleqX = V[:V.index(X)+1]
-            GVleqX = gu.subgraph(G, VleqX)
-            
-            R = ConditionalIndependencies.C(GVleqX,X)
-            ACsizes.append(len(R))
-
-        s = max(ACsizes)
-
-        line = str(s) + ' ' + str(len(CI)) + ' ' + str(end - start)
-        print(line)
+    for line in paramsCollection:
+        print(' '.join(line))
 
 
-def testBidirConvertedGraphs(numGraphs, n, m, bidirectedEdgesFraction=None):
-    CIs = []
-    runtimes = []
-
-    line = ''
+def testBidirGraphsBatch(numGraphs, n, m, numDivisions=10):
+    paramsCollection = []
 
     for i in range(numGraphs):
-        G = Graph()
-        G.toRandomGraph(n,m)
+        paramsCollection.append([])
 
-        # # sample x% of edges and turn those to bidirected
-        if bidirectedEdgesFraction is not None:
-            edges = G.edges
+        for j in range(numDivisions):
+            bidirectedEdgesFraction = j * 0.1
+            G = constructBidirGraph(n, int(m * bidirectedEdgesFraction))
+            params = measureParams(G)
+            paramsToStr = list(map(lambda n: str(n), params))
+            paramsCollection[i].extend(paramsToStr)
 
-            k = int(m * bidirectedEdgesFraction)
-            indices = random.sample(range(m), k)
+    for line in paramsCollection:
+        print(' '.join(line))
 
-            newEdges = []
-            
-            for i in range(m):
-                edge = edges[i]
 
-                if i in indices:
-                    edge['type_'] = bidirectedEdgeType.id_
-                    
-                newEdges.append(edge)
+def testBidirConvertedGraphs(numGraphs, n, m, bidirectedEdgesFraction=0):
+    paramsCollection = []
 
-            G.edges = newEdges
+    for i in range(numGraphs):
+        paramsCollection.append([])
 
-        start = datetime.now()
-        CI = ConditionalIndependencies.ListCI(G, G.nodes)
-        end = datetime.now()
+        G = constructBidirConvGraph(n, m, int(m * bidirectedEdgesFraction))
+        params = measureParams(G)
+        paramsToStr = list(map(lambda n: str(n), params))
+        paramsCollection[i].extend(paramsToStr)
 
-        CIs.append(CI)
-        runtimes.append(end - start)
+    for line in paramsCollection:
+        print(' '.join(line))
 
-        V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-        ACsizes = []
 
-        for X in V:
-            VleqX = V[:V.index(X)+1]
-            GVleqX = gu.subgraph(G, VleqX)
-            
-            R = ConditionalIndependencies.C(GVleqX,X)
-            ACsizes.append(len(R))
+def testBidirConvertedGraphsBatch(numGraphs, n, m, numDivisions=10):
+    paramsCollection = []
 
-        s = max(ACsizes)
+    for i in range(numGraphs):
+        paramsCollection.append([])
 
-        line = str(s) + ' ' + str(len(CI)) + ' ' + str(end - start)
-        print(line)
+        for j in range(numDivisions):
+            bidirectedEdgesFraction = j * 0.1
+            G = constructBidirConvGraph(n, m, int(m * bidirectedEdgesFraction))
+            params = measureParams(G)
+            paramsToStr = list(map(lambda n: str(n), params))
+            paramsCollection[i].extend(paramsToStr)
+
+    for line in paramsCollection:
+        print(' '.join(line))
+
+
+def testCliqueGraphs(numGraphs, n, m, bidirectedEdgesFraction=0):
+    paramsCollection = []
+
+    mMax = int(0.5 * n * (n-1))
+
+    for i in range(numGraphs):
+        paramsCollection.append([])
+
+        G = constructBidirGraph(n, int(mMax * bidirectedEdgesFraction))
+        params = measureParams(G)
+        paramsToStr = list(map(lambda n: str(n), params))
+        paramsCollection[i].extend(paramsToStr)
+
+    for line in paramsCollection:
+        print(' '.join(line))
+
+
+def testCliqueGraphsBatch(numGraphs, n, numDivisions=20):
+    paramsCollection = []
+
+    mMax = int(0.5 * n * (n-1))
+
+    for i in range(numGraphs):
+        paramsCollection.append([])
+
+        for j in range(numDivisions):
+            bidirectedEdgesFraction = j * 0.05
+            G = constructBidirGraph(n, int(mMax * bidirectedEdgesFraction))
+            params = measureParams(G)
+            paramsToStr = list(map(lambda n: str(n), params))
+            paramsCollection[i].extend(paramsToStr)
+
+    for line in paramsCollection:
+        print(' '.join(line))
+
 
 if __name__ == '__main__':
-    numGraphs = 9
-    n = 30
+    numGraphs = 10
+    n = 10
     m = int(n * 1.5)
     numDivisions = 10
 
-    # test bidirected graphs
-    # for k in range(numDivisions):
-    #     bidirectedEdgesFraction = k * 0.1
-    #     testBidirGraphs(numGraphs, n, int(m * bidirectedEdgesFraction))
+    testBidirGraphsBatch(numGraphs, n, m, numDivisions)
+    # testBidirGraphs(numGraphs, n, int(m * 0.2))
 
-    testBidirGraphs(numGraphs, n, int(m * 0.7))
+    # testBidirConvertedGraphsBatch(numGraphs, n, m, numDivisions)
+    # testBidirConvertedGraphs(numGraphs, n, m, 0.3)
 
-    # test bidirected (converted) graphs
-    # for k in range(numDivisions):
-    #     bidirectedEdgesFraction = k * 0.1
-    #     testBidirConvertedGraphs(numGraphs, n, m, bidirectedEdgesFraction)
-
-    # testBidirConvertedGraphs(numGraphs, n, m, 0.1)
-
-    # test clique graphs
-    # for k in range(numDivisions):
-    #     bidirectedEdgesFraction = k * (1.0/numDivisions) + 0.05
-    #     maxNumEdges = int(0.5 * n * (n-1))
-    #     testBidirGraphs(numGraphs, n, int(maxNumEdges * bidirectedEdgesFraction))
-
-    # testBidirGraphs(numGraphs, n, 0)
+    # testCliqueGraphsBatch(numGraphs, n, numDivisions)
+    # testCliqueGraphs(numGraphs, n, 0.2)

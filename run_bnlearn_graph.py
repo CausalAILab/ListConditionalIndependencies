@@ -14,6 +14,7 @@ from src.editor.input_parser import InputParser
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
 from src.adjustment.adjustment_sets_utils import writeNodeNames
 
+
 def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
 
@@ -45,6 +46,7 @@ def getEdgesSection():
 
     return EdgesSection(edgeTypeParsers)
 
+
 def applyProjection(G, latentFraction=0.3):
     if latentFraction == 0:
         return G
@@ -75,9 +77,8 @@ def applyProjection(G, latentFraction=0.3):
 
     return Gp
 
-def measureParamsFromProjectedGraph(alg, G, latentFraction=0.3):
-    G = applyProjection(G, latentFraction)
 
+def measureParams(alg, G):
     measuredParams = {}
     s = 1
 
@@ -129,13 +130,15 @@ def measureParamsFromProjectedGraph(alg, G, latentFraction=0.3):
 
     return params
 
+
 def testProjectedGraphs(alg, G, numGraphs, latentFraction=0.3):
     paramsCollection = []
 
     for i in range(numGraphs):
         paramsCollection.append([])
 
-        params = measureParamsFromProjectedGraph(alg, G, latentFraction)
+        G = applyProjection(G, latentFraction)
+        params = measureParams(alg, G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -152,7 +155,8 @@ def testProjectedGraphsBatch(alg, G, numGraphs):
 
         for j in range(numDivisions):
             latentFraction = j * 0.1
-            params = measureParamsFromProjectedGraph(alg, G, latentFraction)
+            G = applyProjection(G, latentFraction)
+            params = measureParams(alg, G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
@@ -173,7 +177,7 @@ if __name__ == '__main__':
     # algorithm = 'lmp'
     algorithm = 'listci'
 
-    numGraphs = 2
+    numGraphs = 10
 
     try:
         with open(filePath, 'r') as f:
