@@ -1,22 +1,12 @@
 import sys
 import csv
-import datetime
-import time
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 
-def durationStringToSeconds(runtime):
-    # convert durating string '00:00:00' to seconds
-    x = time.strptime(runtime,'%H:%M:%S')
-    seconds = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,seconds=x.tm_sec).total_seconds()
+from src.testable_implications.ci_utils import ConditionalIndependenceUtils as cu
 
-    # round up to avoid undefined value in log-log plot
-    if seconds == 0.0:
-        seconds = seconds + 1
-
-    return seconds
 
 def parseData(lines):
     ssCollection = []
@@ -38,7 +28,7 @@ def parseData(lines):
             CIsizeCollection.extend(CIsizes)
         # runtime
         elif i % 3 == 2:
-            runtimes = list(map(lambda t: durationStringToSeconds(t), line))
+            runtimes = list(map(lambda t: cu.durationStringToSeconds(t), line))
             runtimeCollection.extend(runtimes)
 
     data = {
@@ -55,7 +45,7 @@ def drawPlot(data):
     CIsizes = data['CI']
     runtimes = data['runtime']
 
-    numDivisions = 10
+    numDivisions = 20
     numSamples = data['numSamples']
 
     listciLabel = 'ListCI'
@@ -99,9 +89,9 @@ def drawPlot(data):
             plt.scatter(ss, CIsizes, color=blueColor)
             
             # n = 10
-            # m = n * 1.5
+            # m = n * 2
             # mMax = n*(n-1) / 2
-
+            
             # for i in range(numDivisions):
             #     startIndex = i * numSamples
             #     endIndex = ((i+1) * numSamples)-1
@@ -109,10 +99,11 @@ def drawPlot(data):
             #     md = m - mb
             #     p1 = round(md / mMax, 3)
             #     p2 = round(mb / mMax, 3)
-            #     label = 'md (p1) = ' + str(md) + ' (' + str(p1) + '), mb (p2) = ' + str(mb) + ' (' + str(p2) + ')'
+            #     label = 'md (p1) = ' + str(md) + ' (' + str(p1) + ')/, mb (p2) = ' + str(mb) + ' (' + str(p2) + ')'
             #     # label = 'mb (p2) = ' + str(mb) + '(' + str(p2) + ')'
             #     plt.scatter(ss[startIndex : endIndex], CIsizes[startIndex : endIndex], color=colors[i], label=label)
 
+            # plt.legend()
             yLabel = 'Number of CIs'
 
         xLabel = 's'
@@ -225,7 +216,7 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 2:
-        print('Please specify input file path (e.g., u30.csv).')
+        print('Please specify input file path correctly.')
 
         sys.exit()
 

@@ -1,4 +1,7 @@
 networkx
 pydash
 toposort
+numpy
+scipy
+matplotlib
 causal-learn

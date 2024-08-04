@@ -1,12 +1,9 @@
 import itertools
 
-from src.graph.classes.graph import Graph
-from src.graph.classes.graph_defs import directedEdgeType, bidirectedEdgeType
 from src.inference.utils.graph_utils import GraphUtils as gu, sortByName
 from src.inference.utils.set_utils import SetUtils as su
 from src.common.object_utils import ObjectUtils as ou
-from src.inference.utils.graph_utils import compareNames
-from src.adjustment.adjustment_sets_utils import writeNodeNames, nodeNamesToString, TestSep
+from src.adjustment.adjustment_sets_utils import nodeNamesToString, TestSep
 from src.path_analysis.d_separation import DSeparation
 from src.projection.projection_utils import ProjectionUtils as pu
 

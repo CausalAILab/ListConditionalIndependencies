@@ -1,14 +1,13 @@
-# import sys
 import random
 from datetime import datetime
 
 from src.graph.classes.graph import Graph
-from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidirectedEdgeType
+from src.graph.classes.graph_defs import latentNodeType
 from src.inference.utils.set_utils import SetUtils as su
 from src.inference.utils.graph_utils import GraphUtils as gu
 from src.projection.projection_utils import ProjectionUtils as pu
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
-from src.adjustment.adjustment_sets_utils import writeNodeNames
+
 
 def testRandomGraphs(numGraphs, n, m, latentFraction=None):
     CIs = []
@@ -47,13 +46,6 @@ def testRandomGraphs(numGraphs, n, m, latentFraction=None):
         G.edges = edges
         G = pu.projectOver(G,Obs)
 
-        # numNodes = len(G.nodes)
-        # numEdges = len(G.edges)
-        # bidirectedEdges = list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges))
-        # numBidir = len(bidirectedEdges)
-        # line = str(numNodes) + ' ' + str(numEdges) + ' ' + str(numBidir)
-        # print(line)
-
         start = datetime.now()
         CI = ConditionalIndependencies.ListCI(G, G.nodes)
         end = datetime.now()
@@ -75,6 +67,7 @@ def testRandomGraphs(numGraphs, n, m, latentFraction=None):
 
         line = str(s) + ' ' + str(len(CI)) + ' ' + str(end - start)
         print(line)
+
 
 if __name__ == '__main__':
     numGraphs = 10

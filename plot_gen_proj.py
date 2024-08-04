@@ -1,22 +1,12 @@
 import sys
 import csv
-import datetime
-import time
 
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 
-def durationStringToSeconds(runtime):
-    # convert durating string '00:00:00' to seconds
-    x = time.strptime(runtime,'%H:%M:%S')
-    seconds = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,seconds=x.tm_sec).total_seconds()
+from src.testable_implications.ci_utils import ConditionalIndependenceUtils as cu
 
-    # round up to avoid undefined value in log-log plot
-    if seconds == 0.0:
-        seconds = seconds + 1
-
-    return seconds
 
 def parseGraphSizeData(lines):
     nCollection = []
@@ -80,7 +70,7 @@ def parseData(lines):
             CIsizeCollection.extend(CIsizes)
         # runtime
         elif i % 3 == 2:
-            runtimes = list(map(lambda t: durationStringToSeconds(t), line))
+            runtimes = list(map(lambda t: cu.durationStringToSeconds(t), line))
             runtimeCollection.extend(runtimes)
 
     data = {
@@ -114,11 +104,12 @@ def drawPlot(data, gsData):
     # ['tab:blue', 'tab:orange', 'tab:green', 'tab:red', 'tab:purple', 'tab:brown', 'tab:pink', 'tab:gray', 'tab:olive', 'tab:cyan']
     colors = list(mcolors.TABLEAU_COLORS)
 
-    selectPlot = 's_CI'
+    # selectPlot = 's_CI'
     # selectPlot = 's_runtime'
     # selectPlot = 'CI_runtime'
     # selectPlot = 'proj_CI'
     # selectPlot = 'proj_runtime'
+    selectPlot = 'proj_s'
 
     xData = []
     yData = []
@@ -131,7 +122,7 @@ def drawPlot(data, gsData):
         if plotAveragedSamples:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
                 sSamples = ss[startIndex : endIndex]
                 averageS = int(sum(sSamples) / numSamples)
                 xData.append(averageS)
@@ -142,7 +133,7 @@ def drawPlot(data, gsData):
 
                 # print edges info
                 gsStartIndex = i * gsNumSamples
-                gsEndIndex = ((i+1) * gsNumSamples)-1
+                gsEndIndex = ((i+1) * gsNumSamples)
 
                 n = ns[gsStartIndex]
                 mdSamples = mds[gsStartIndex : gsEndIndex]
@@ -168,10 +159,10 @@ def drawPlot(data, gsData):
 
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
 
                 gsStartIndex = i * gsNumSamples
-                gsEndIndex = ((i+1) * gsNumSamples)-1
+                gsEndIndex = ((i+1) * gsNumSamples)
 
                 n = ns[gsStartIndex]
                 mdSamples = mds[gsStartIndex : gsEndIndex]
@@ -209,7 +200,7 @@ def drawPlot(data, gsData):
         else:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
 
                 yLabel = 'Projected (' + str(i+1) + '0%)'
                 plt.scatter(CIsizes[startIndex : endIndex], runtimes[startIndex : endIndex], color=colors[i], label=yLabel)
@@ -226,22 +217,22 @@ def drawPlot(data, gsData):
         if plotAveragedSamples:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
                 xData.append(i * 10)
 
                 CIsize = CIsizes[startIndex : endIndex]
                 averageCIsize = round(sum(CIsize) / numSamples, 3)
                 yData.append(averageCIsize)
 
-            plt.scatter(xData, yData, color=blueColor)
-            # plt.plot(xData, yData, linestyle='--', marker='o', color=blueColor)
+            # plt.scatter(xData, yData, color=blueColor)
+            plt.plot(xData, yData, linestyle='--', marker='o', color=blueColor)
             # plt.errorbar(xData, yData, yerr=[yLower,yUpper], capsize=5, linestyle='--', marker='o', color=blueColor)
 
             yLabel = 'Average number of CIs'
         else:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
 
                 label = 'Projected (' + str(i+1) + '0%)'
                 plt.scatter([i * 10] * numSamples, CIsizes[startIndex : endIndex], color=colors[i], label=label)
@@ -258,7 +249,7 @@ def drawPlot(data, gsData):
         if plotAveragedSamples:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
                 xData.append(i * 10)
 
                 runtime = runtimes[startIndex : endIndex]
@@ -273,12 +264,44 @@ def drawPlot(data, gsData):
         else:
             for i in range(numDivisions):
                 startIndex = i * numSamples
-                endIndex = ((i+1) * numSamples)-1
+                endIndex = ((i+1) * numSamples)
 
                 label = 'Projected (' + str(i+1) + '0%)'
                 plt.scatter([i * 10] * numSamples, runtimes[startIndex : endIndex], color=colors[i], label=label)
             
             yLabel = 'Runtime in seconds'
+
+        xLabel = 'Projected observed nodes (%)'
+        # xLabel = 'Ratio of bidirected edges (%)'
+        # xLabel = '% of bidirected edges in a clique'
+
+        plt.xlabel(xLabel, fontsize=labelFontsize)
+        plt.ylabel(yLabel, fontsize=labelFontsize)
+    elif selectPlot == 'proj_s':
+        if plotAveragedSamples:
+            for i in range(numDivisions):
+                startIndex = i * numSamples
+                endIndex = ((i+1) * numSamples)
+                xData.append(i * 10)
+
+                sSamples = ss[startIndex : endIndex]
+                averageS = round(sum(sSamples) / numSamples, 3)
+                yData.append(averageS)
+
+            # plt.scatter(xData, yData, color=blueColor)
+            plt.plot(xData, yData, linestyle='--', marker='o', color=blueColor)
+            # plt.errorbar(xData, yData, yerr=[yLower,yUpper], capsize=5, linestyle='--', marker='o', color=blueColor)
+
+            yLabel = 's'
+        else:
+            for i in range(numDivisions):
+                startIndex = i * numSamples
+                endIndex = ((i+1) * numSamples)
+
+                label = 'Projected (' + str(i+1) + '0%)'
+                plt.scatter([i * 10] * numSamples, ss[startIndex : endIndex], color=colors[i], label=label)
+
+            yLabel = 's'
 
         xLabel = 'Projected observed nodes (%)'
         # xLabel = 'Ratio of bidirected edges (%)'

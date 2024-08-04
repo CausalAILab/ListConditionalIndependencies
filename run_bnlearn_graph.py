@@ -1,7 +1,9 @@
 import sys
 import random
+import multiprocessing as mp
 from datetime import datetime
 
+from src.testable_implications.ci_defs import algMap, algListGMP, algListCIBF, algListCI
 from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidirectedEdgeType
 from src.inference.utils.set_utils import SetUtils as su
 from src.inference.utils.graph_utils import GraphUtils as gu
@@ -12,7 +14,9 @@ from src.editor.classes.bidirected_options_parser import BidirectedOptionsParser
 from src.editor.classes.latent_options_parser import LatentOptionsParser
 from src.editor.input_parser import InputParser
 from src.testable_implications.conditional_independencies import ConditionalIndependencies
-from src.adjustment.adjustment_sets_utils import writeNodeNames
+
+
+defaultTimeout = 60
 
 
 def parseGraph(fileContent):
@@ -79,26 +83,67 @@ def applyProjection(G, latentFraction=0.3):
     return Gp
 
 
-def measureParams(alg, G):
+def runAlgorithm(queue, G, alg):
+    CI = queue.get()
+    measuredParams = queue.get()
+
+    if alg == algListGMP.id_:
+        CIs = ConditionalIndependencies.ListGMP(G, G.nodes)
+    elif alg == algListCIBF.id_:
+        CIs = ConditionalIndependencies.ListCIBF(G, G.nodes, True, None, measuredParams)
+    elif alg == algListCI.id_:
+        CIs = ConditionalIndependencies.ListCI(G, G.nodes)
+
+    CI.extend(CIs)
+
+    queue.put(CI)
+    queue.put(measuredParams)
+
+
+def measureParams(G, alg, timeout=defaultTimeout):
+    CI = []
     measuredParams = {}
-    s = 1
+
+    # use queue to pass values between processes
+    queue = mp.Queue()
+    queue.put(CI)
+    queue.put(measuredParams)
+    p = mp.Process(target=runAlgorithm, args=(queue, G, alg))
 
     start = datetime.now()
+    p.start()
+    p.join(timeout=timeout)
 
-    if alg == 'gmp':
-        CI = ConditionalIndependencies.ListGMP(G, G.nodes)
-        end = datetime.now()
-    elif alg == 'lmp':
-        CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, None, measuredParams)
-        end = datetime.now()
+    if p.is_alive():
+        p.terminate()
+        p.join()
 
+        currentAlg = algMap[alg]
+        paramNames = currentAlg.params
+        params = ['-'] * len(paramNames)
+
+        return params
+    
+    end = datetime.now()
+
+    CI = queue.get()
+    measuredParams = queue.get()
+
+    # get parameters
+    n = len(G.nodes)
+    m = len(G.edges)
+    md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
+    mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
+    CIsize = len(CI)
+    runtime = end - start
+
+    s = 1
+
+    if alg == algListCIBF.id_:
         Snum = measuredParams['Snum']
         Splusnum = measuredParams['Splusnum']
         s = measuredParams['s']
-    elif alg == 'listci':
-        CI = ConditionalIndependencies.ListCI(G, G.nodes)
-        end = datetime.now()
-
+    elif alg == algListCI.id_:
         V = su.intersection(gu.topoSort(G), G.nodes, 'name')
         ACsizes = []
 
@@ -112,52 +157,46 @@ def measureParams(alg, G):
         if len(ACsizes) > 0:
             s = max(ACsizes)
 
-    # get parameters
-    n = len(G.nodes)
-    m = len(G.edges)
-    md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
-    mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
-    CIsize = len(CI)
-    runtime = end - start
-
     params = []
 
-    if alg == 'gmp':
+    if alg == algListGMP.id_:
         params = [n, m, md, mb, CIsize, runtime]
-    elif alg == 'lmp':
+    elif alg == algListCIBF.id_:
         params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
-    elif alg == 'listci':
+    elif alg == algListCI.id_:
         params = [n, m, md, mb, CIsize, runtime, s]
 
     return params
 
 
-def testProjectedGraphs(alg, G, numGraphs, latentFraction=0.3):
+def testProjectedGraphs(G, alg, numGraphs, latentFraction=0.3, timeout=defaultTimeout):
     paramsCollection = []
 
     for i in range(numGraphs):
         paramsCollection.append([])
 
         Gp = applyProjection(G, latentFraction)
-        params = measureParams(alg, Gp)
+        params = measureParams(Gp, alg, timeout)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
     for line in paramsCollection:
         print(' '.join(line))
 
-def testProjectedGraphsBatch(alg, G, numGraphs):
+
+def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
     paramsCollection = []
 
     numDivisions = 10
+    offset = 0
 
     for i in range(numGraphs):
         paramsCollection.append([])
 
         for j in range(numDivisions):
-            latentFraction = j * 0.1
+            latentFraction = j * 0.1 + offset
             Gp = applyProjection(G, latentFraction)
-            params = measureParams(alg, Gp)
+            params = measureParams(Gp, alg, timeout)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
@@ -168,17 +207,20 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 2:
-        print('Please specify input file path (e.g., graphs/bif/sm/cancer.txt).')
+        print('Please specify input file path correctly (e.g., graphs/bif/sm/cancer.txt).')
 
         sys.exit()
 
     filePath = sys.argv[1]
 
-    # algorithm = 'gmp'
-    # algorithm = 'lmp'
-    algorithm = 'listci'
+    # algorithm = algListGMP.id_
+    # algorithm = algListCIBF.id_
+    algorithm = algListCI.id_
 
     numGraphs = 10
+
+    # 2 hours
+    timeout = 2 * 60 * 60
 
     try:
         with open(filePath, 'r') as f:
@@ -186,8 +228,8 @@ if __name__ == '__main__':
             G = parseGraph(fileContent)
 
             if G is not None:
-                testProjectedGraphsBatch(algorithm, G, numGraphs)
-                # testProjectedGraphs(algorithm, G, numGraphs, 0.4)
+                testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
+                # testProjectedGraphs(G, algorithm, numGraphs, 0.2, timeout)
 
             f.close()
     except IOError:
