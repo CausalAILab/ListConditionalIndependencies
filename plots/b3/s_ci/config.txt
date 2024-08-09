@@ -1,0 +1,9 @@
+x: s
+y: CI
+numDivisions: 8 (n30ex15), 7 (n30ex20, n40ex15), 6 (n40ex20)
+plotStyle: scatter
+averageSamples: False
+showmdmb: True
+
+x_range: range(0,45,5)
+y_range: (1, 1e7) => log
