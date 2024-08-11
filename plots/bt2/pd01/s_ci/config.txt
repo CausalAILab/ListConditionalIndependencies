@@ -1,0 +1,8 @@
+x: s
+y: CI
+numDivisions: 9
+plotStyle: scatter
+averageSamples: False
+
+x_range: range(0,55,5)
+y_range: (1, 1e7) => log

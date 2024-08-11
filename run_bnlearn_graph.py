@@ -1,5 +1,4 @@
 import sys
-import random
 import multiprocessing as mp
 from datetime import datetime
 
@@ -7,17 +6,16 @@ from src.testable_implications.ci_defs import algMap, algListGMP, algListCIBF, a
 from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidirectedEdgeType
 from src.inference.utils.set_utils import SetUtils as su
 from src.inference.utils.graph_utils import GraphUtils as gu
-from src.projection.projection_utils import ProjectionUtils as pu
 from src.editor.sections.edges_section import EdgesSection
 from src.editor.sections.nodes_section import NodesSection
 from src.editor.classes.bidirected_options_parser import BidirectedOptionsParser
 from src.editor.classes.latent_options_parser import LatentOptionsParser
 from src.editor.input_parser import InputParser
-from src.testable_implications.conditional_independencies import ConditionalIndependencies
+from src.testable_implications.conditional_independencies import ConditionalIndependencies as cu
+from src.experiment.experiment_utils import ExperimentUtils as eu
 
 
 defaultTimeout = 60
-
 
 def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
@@ -51,48 +49,16 @@ def getEdgesSection():
     return EdgesSection(edgeTypeParsers)
 
 
-def applyProjection(G, latentFraction=0.3):
-    if latentFraction == 0:
-        return G
-    
-    nodes = G.nodes
-    edges = G.edges
-
-    # sample x% of nodes and turn those to latent
-    k = int(len(nodes) * latentFraction)
-    indices = random.sample(range(len(nodes)), k)
-
-    V = []
-    Obs = []
-
-    for i in range(len(nodes)):
-        node = nodes[i]
-
-        if i in indices:
-            node['type_'] = latentNodeType.id_
-        else:
-            Obs.append(node)
-
-        V.append(node)
-    
-    Gp = G.copy()
-    Gp.nodes = V
-    Gp.edges = edges
-    Gp = pu.projectOver(Gp,Obs)
-
-    return Gp
-
-
 def runAlgorithm(queue, G, alg):
     CI = queue.get()
     measuredParams = queue.get()
 
     if alg == algListGMP.id_:
-        CIs = ConditionalIndependencies.ListGMP(G, G.nodes)
+        CIs = cu.ListGMP(G, G.nodes)
     elif alg == algListCIBF.id_:
-        CIs = ConditionalIndependencies.ListCIBF(G, G.nodes, True, None, measuredParams)
+        CIs = cu.ListCIBF(G, G.nodes, True, None, measuredParams)
     elif alg == algListCI.id_:
-        CIs = ConditionalIndependencies.ListCI(G, G.nodes)
+        CIs = cu.ListCI(G, G.nodes)
 
     CI.extend(CIs)
 
@@ -151,7 +117,7 @@ def measureParams(G, alg, timeout=defaultTimeout):
             VleqX = V[:V.index(X)+1]
             GVleqX = gu.subgraph(G, VleqX)
             
-            R = ConditionalIndependencies.C(GVleqX,X)
+            R = cu.C(GVleqX,X)
             ACsizes.append(len(R))
 
         if len(ACsizes) > 0:
@@ -175,11 +141,12 @@ def testProjectedGraphs(G, alg, numGraphs, latentFraction=0.3, timeout=defaultTi
     for i in range(numGraphs):
         paramsCollection.append([])
 
-        Gp = applyProjection(G, latentFraction)
+        Gp = eu.applyProjection(G, latentFraction)
         params = measureParams(Gp, alg, timeout)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
+    # output to file
     for line in paramsCollection:
         print(' '.join(line))
 
@@ -194,12 +161,15 @@ def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
         paramsCollection.append([])
 
         for j in range(numDivisions):
+            # print per division
+
             latentFraction = j * 0.1 + offset
-            Gp = applyProjection(G, latentFraction)
+            Gp = eu.applyProjection(G, latentFraction)
             params = measureParams(Gp, alg, timeout)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
+    # output to file
     for line in paramsCollection:
         print(' '.join(line))
 
@@ -221,6 +191,7 @@ if __name__ == '__main__':
 
     # 2 hours
     timeout = 2 * 60 * 60
+    # timeout = None
 
     try:
         with open(filePath, 'r') as f:
@@ -229,7 +200,7 @@ if __name__ == '__main__':
 
             if G is not None:
                 testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
-                # testProjectedGraphs(G, algorithm, numGraphs, 0.2, timeout)
+                # testProjectedGraphs(G, algorithm, numGraphs, 0.8, timeout)
 
             f.close()
     except IOError:

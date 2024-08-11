@@ -92,28 +92,128 @@ class Graph():
 
         # change all edge types
 
-    # def toErdosRenyiGraph(self, n, p):
-    #     self.nx = nx.erdos_renyi_graph(n, p)
 
-    #     # convert names (numbers) to strings
-    #     nodes = self.nodes
-    #     newNodes = []
+    def addRandomNodes(self, n, nodeType=basicNodeType.id_):
+        nodes = []
 
-    #     for node in nodes:
-    #         node['name'] = str(node['name'])
-    #         node['label'] = str(node['label'])
-    #         newNodes.append(node)
-
-    #     edges = self.edges
-    #     newEdges = []
+        for i in range(n):
+            node = {'name': str(i),'label': str(i),'type_': nodeType,'metadata': {}}
+            nodes.append(node)
         
-    #     for edge in edges:
-    #         edge['from_'] = str(edge['from_'])
-    #         edge['to_'] = str(edge['to_'])
-    #         newEdges.append(edge)
+        self.addNodes(nodes)
 
-    #     self.nodes = newNodes
-    #     self.edges = newEdges
+        return nodes
+
+    # possible improvements
+    # adding directed edges: 1) pick a topological order, 2) add X -> Y where X < Y.
+    # adding bidirected edges: 1) pick permutation, 2) add X -- Y (be careful not to overwrite X -> Y)
+    def addRandomEdges(self, m, edgeType=directedEdgeType.id_):
+        # reject if total number of edges would exceed maximum capacity
+        n = len(self.nodes)
+        numEdges = len(self.edges)
+        mMax = n * (n-1) / 2
+
+        if numEdges + m > mMax:
+            return []
+
+        edges = []
+        edgeCount = 0
+
+        if edgeType == directedEdgeType.id_:
+            while (edgeCount < m):
+                x = int(random.random() * n)
+                y = int(random.random() * n)
+
+                if x == y:
+                    continue
+
+                edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
+
+                if not self.nx.has_edge(edge['from_'], edge['to_']):
+                    self.__addEdge(edge)
+
+                    try:
+                        cycle = nx.find_cycle(self.nx)
+                        self.__deleteEdge(edge)
+                    except nx.exception.NetworkXNoCycle:
+                        edgeCount = edgeCount + 1
+                        edges.append(edge)
+                        continue
+
+                if not self.nx.has_edge(edge['to_'], edge['from_']):
+                    edge = {'from_': str(y), 'to_': str(x), 'label': None, 'type_': directedEdgeType.id_, 'metadata': {}}
+                    self.__addEdge(edge)
+
+                    try:
+                        cycle = nx.find_cycle(self.nx)
+                        self.__deleteEdge(edge)
+                    except nx.exception.NetworkXNoCycle:
+                        edgeCount = edgeCount + 1
+                        edges.append(edge)
+                        continue
+        elif edgeType == bidirectedEdgeType.id_:
+            while (edgeCount < m):
+                x = int(random.random() * n)
+                y = int(random.random() * n)
+
+                if x == y:
+                    continue
+                
+                edge = {'from_': str(x), 'to_': str(y), 'label': None, 'type_': bidirectedEdgeType.id_, 'metadata': {}}
+
+                # if X -- Y or X -> Y exists
+                #   check if X -- Y
+                #    if true, skip
+                #   else (X -> Y)
+                #     check if bidirected edge Y -- X exists
+                #       if true, skip
+                #       else, add Y -- X
+                # else
+                #   check if Y -- X exists
+                #     if yes, skip
+                #     else (Y <- X), add X -- Y
+                #   else (no edge exists)
+                #     add X -- Y
+                if self.nx.has_edge(edge['from_'], edge['to_']):
+                    existingEdge = None
+
+                    for e in self.edges:
+                        if e['from_'] == edge['from_'] and e['to_'] == edge['to_']:
+                            existingEdge = e
+                            break
+
+                    if existingEdge['type_'] == bidirectedEdgeType.id_:
+                        continue
+                    else:
+                        if self.nx.has_edge(edge['to_'], edge['from_']):
+                            continue
+                        else:
+                            edge = {'from_': str(y), 'to_': str(x), 'label': None, 'type_': bidirectedEdgeType.id_, 'metadata': {}}
+
+                            self.__addEdge(edge)
+                            edgeCount = edgeCount + 1
+                            edges.append(edge)
+                else:
+                    if self.nx.has_edge(edge['to_'], edge['from_']):
+                        existingEdge = None
+
+                        for e in self.edges:
+                            if e['from_'] == edge['to_'] and e['to_'] == edge['from_']:
+                                existingEdge = e
+                                break
+
+                        if existingEdge['type_'] == bidirectedEdgeType.id_:
+                            continue
+                        else:
+                            self.__addEdge(edge)
+                            edgeCount = edgeCount + 1
+                            edges.append(edge)
+                    else:
+                        self.__addEdge(edge)
+                        edgeCount = edgeCount + 1
+                        edges.append(edge)
+
+        return edges
 
     def toRandomGraph(self, n, m, edgeType=directedEdgeType.id_):
         nodes = []
