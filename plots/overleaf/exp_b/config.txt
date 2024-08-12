@@ -1,0 +1,53 @@
+For all plots:
+y: CI
+y_range: (1, 1e6) => log
+plotStyle: line
+averageSamples: True
+numDivisions: 10 (exception will be specified)
+
+for x: pb
+x_range: range(0,100,10) / 100.0
+
+
+* plot 1a
+x: pb
+numDivisions: 20
+
+* plot 1as
+x: s
+x_range: range(0,22,2)
+numDivisions: 20
+
+
+* plot 1b
+x: mb
+x_range: range(0,45,5)
+
+* plot 1bs
+x: s
+x_range: range(0,35,5)
+
+
+* plot 2a
+x: pb
+
+* plot 2as
+x: s
+x_range: range(0,35,5)
+
+
+* plot 2b
+x: mb
+x_range: range(0,55,5)
+
+* plot 2bs
+x: s
+x_range: range(0,45,5)
+
+
+* plot 3a
+x: pb
+
+* plot 3as
+x: s
+x_range: range(0,55,5)

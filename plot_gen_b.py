@@ -1,86 +1,88 @@
 import sys
 import csv
 
+from os import listdir
+from os.path import isfile, join
+
 import numpy as np
 import matplotlib.pyplot as plt
-# import matplotlib.colors as mcolors
 from scipy.interpolate import make_interp_spline
 
-from src.testable_implications.ci_defs import algMap, algListGMP, algListCIBF, algListCI
+from src.testable_implications.ci_defs import algListCI
 from src.experiment.plot_utils import PlotUtils as pu
 
 
-def getDataPoints(algId, datas, specs, divisionsToRead=range(0,10)):
+numNodes = []
+
+def getDataPoints(data, specs):
     numDivisions = specs['numDivisions']
     averageSamples = specs['averageSamples']
     sort = specs['sort']
     xParam = specs['x']
     yParam = specs['y']
+    axes = [xParam, yParam]
 
     dataPoints = [[], []]
+    numSamples = data['numSamples']
 
-    for i in range(len(datas)):
-        data = datas[i]
+    # collect n, assumes n is the same for all samples in one file
+    nDataPoints = data['n']
+    n = int(nDataPoints[0])
 
-        numSamples = data['numSamples']
+    if not np.isnan(n):
+        numNodes.append(n)
 
-        axes = [xParam, yParam]
+    for k in range(len(axes)):
+        paramAxisName = axes[k]
 
-        exceptionParams = ['S', 'Splus']
+        # handle pd, pb
+        if paramAxisName == 'pd' or paramAxisName == 'pb':
+            if paramAxisName == 'pd':
+                mDataPoints = data['md']
+            elif paramAxisName == 'pb':
+                mDataPoints = data['mb']
 
-        if xParam in exceptionParams or yParam in exceptionParams:
-            if algId != algListCIBF.id_:
-                continue
-        
-        for k in range(len(axes)):
-            paramAxisName = axes[k]
+            for j in range(numDivisions):
+                startIndex = j * numSamples
+                endIndex = ((j+1) * numSamples)
 
-            # handle pd, pb
+                # skip division with nan entries
+                n = nDataPoints[startIndex]
 
-            if paramAxisName == 'pd' or paramAxisName == 'pb':
-                if paramAxisName == 'pd':
-                    mDataPoints = data['md']
-                elif paramAxisName == 'pb':
-                    mDataPoints = data['mb']
+                if np.isnan(n):
+                    continue
 
-                nDataPoints = data['n']
+                n = int(n)
+                mMax = int(n * (n-1) / 2)
 
-                # how to read n, to compute pd?
+                mSamples = mDataPoints[startIndex : endIndex]
+                pSamples = list(map(lambda m: round(m / mMax, 3), mSamples))
 
-                for j in range(numDivisions):
-                    if j not in divisionsToRead:
-                        continue
+                if averageSamples:
+                    average = round(sum(pSamples) / numSamples, 3)
+                    dataPoints[k].append(average)
+                else:
+                    dataPoints[k].extend(pSamples.tolist())
+        else:
+            axisDataPoints = data[paramAxisName]
 
-                    startIndex = j * numSamples
-                    endIndex = ((j+1) * numSamples)
+            for j in range(numDivisions):
+                startIndex = j * numSamples
+                endIndex = ((j+1) * numSamples)
 
-                    n = nDataPoints[startIndex]
-                    mMax = int(n * (n-1) / 2)
+                # skip division with nan entries
+                n = nDataPoints[startIndex]
 
-                    mSamples = mDataPoints[startIndex : endIndex]
-                    pSamples = list(map(lambda m: round(m / mMax, 3), mSamples))
+                if np.isnan(n):
+                    continue
 
-                    if averageSamples:
-                        average = round(sum(pSamples) / numSamples, 3)
-                        dataPoints[k].append(average)
-                    else:
-                        dataPoints[k].extend(pSamples.tolist())
-            else:
-                axisDataPoints = data[paramAxisName]
+                samples = axisDataPoints[startIndex : endIndex]
 
-                for j in range(numDivisions):
-                    if j not in divisionsToRead:
-                        continue
-
-                    startIndex = j * numSamples
-                    endIndex = ((j+1) * numSamples)
-                    samples = axisDataPoints[startIndex : endIndex]
-
-                    if averageSamples:
-                        average = round(sum(samples) / numSamples, 3)
-                        dataPoints[k].append(average)
-                    else:
-                      dataPoints[k].extend(samples.tolist())
+                if averageSamples:
+                    average = round(sum(samples) / numSamples, 3)
+                    dataPoints[k].append(average)
+                else:
+                    dataPoints[k].extend(samples.tolist())
 
     if sort:
         tuples = []
@@ -99,161 +101,198 @@ def getDataPoints(algId, datas, specs, divisionsToRead=range(0,10)):
     return dataPoints
 
 
-def drawPlot(algId, dataPoints, specs):
+def drawPlot(plotType, datas, specs):
     labelFontsize = specs['labelFontsize']
     averageSamples = specs['averageSamples']
     smoothCurve = specs['smoothCurve']
     plotStyle = specs['plotStyle']
-    regression = specs['regression']
+    # regression = specs['regression']
+    numColorDivisions = specs['numColorDivisions']
     xParam = specs['x']
     yParam = specs['y']
 
-    redColor = '#f00'
-    blueColor = '#2D7BB1'
-    greenColor = '#5CB769'
+    # redColor = '#f00'
+    # blueColor = '#2D7BB1'
+    # greenColor = '#5CB769'
 
-    currentAlg = algMap[algId]
+    colors = pu.getColorPalette(numColorDivisions)
 
-    if algId == algListGMP.id_:
-        plotColor = redColor
-    elif algId == algListCIBF.id_:
-        plotColor = greenColor
-    elif algId == algListCI.id_:
-        plotColor = blueColor
+    for i in range(len(datas)):
+        dataPoints = datas[i]
     
-    xData = dataPoints[0]
-    yData = dataPoints[1]
-    
-    if smoothCurve:
-        # in case of 'S', reverse the list
-        if xParam == 'S':
-            xData.reverse()
-        if yParam == 'S':
-            yData.reverse()
-        splineModel = make_interp_spline(xData, yData)
-        xSplines = np.linspace(min(xData), max(xData), 500)
-        ySplines = splineModel(xSplines)
-        xData = xSplines
-        yData = ySplines
-    
-    if plotStyle == 'scatter':
-        plt.scatter(xData, yData, color=plotColor, label=currentAlg.name)
-    elif plotStyle == 'line':
-        plt.plot(xData, yData, linestyle='--', color=plotColor, label=currentAlg.name)
-    elif plotStyle == 'line_scatter':
-        plt.plot(xData, yData, linestyle='--', marker='o', color=plotColor, label=currentAlg.name)
+        xData = dataPoints[0]
+        yData = dataPoints[1]
+        
+        if smoothCurve:
+            # filter valid data points
+            xArray = np.array(xData)
+            yArray = np.array(yData)
+
+            mask = ~np.isnan(xArray) & ~np.isnan(yArray)
+
+            validX = xArray[mask]
+            validY = yArray[mask]
+
+            splineModel = make_interp_spline(validX, validY)
+            xSplines = np.linspace(min(validX), max(validX), 500)
+            ySplines = splineModel(xSplines)
+
+            xData = xSplines
+            yData = ySplines
+
+        color = colors[i % len(colors)]
+
+        # custom label: n = x
+        n = numNodes[i]
+        label = 'n = ' + str(n)
+        
+        if plotStyle == 'scatter':
+            plt.scatter(xData, yData, color=color, label=label)
+        elif plotStyle == 'line':
+            plt.plot(xData, yData, linestyle='solid', color=color, label=label)
+        elif plotStyle == 'line_scatter':
+            plt.plot(xData, yData, linestyle='solid', marker='o', color=color, label=label)
 
     xLabel = pu.paramNameToAxisLabel(xParam, averageSamples)
     yLabel = pu.paramNameToAxisLabel(yParam, averageSamples)
 
     plt.xlabel(xLabel, fontsize=labelFontsize)
     plt.ylabel(yLabel, fontsize=labelFontsize)
-        
-    setAxisBoundaries(xParam, yParam)
+            
+    setAxisBoundaries(plotType, xParam, yParam)
 
 
-def setAxisBoundaries(xParam, yParam):
-    if xParam == 'n':
-        plt.xticks(range(0,110,10))
-    if xParam == 'proj':
-        plt.xticks(range(0,100,10))
-    if xParam == 'u_clique':
-        ranges = range(0,100,10)
-        plt.xticks(list(map(lambda x: x/100.0, ranges)))
-    if xParam == 's':
-        plt.xticks(range(0,55,5))
+def savePlotToFile(plotType, imageFormat='png'):
+    fileName = 'plot_' + plotType + '.' + imageFormat
 
-    if yParam == 's':
-        plt.yticks(range(0,45,5))
-    # runtime (timeout = 1h)
+    if imageFormat == 'png' or imageFormat == 'pdf':
+        plt.savefig(fileName)
+
+
+def setAxisBoundaries(plotType, xParam, yParam):
     if yParam == 'runtime':
         plt.ylim(1,3600)
-        # plt.yscale('log')
+        plt.yscale('log')
     if yParam == 'CI':
-        plt.ylim(1,1e7)
+        plt.ylim(1,1e6)
         plt.yscale('log')
 
-    return
+    if 's' not in plotType:
+        # pb: 1a, 2a, 3a, 4a
+        if 'a' in plotType:
+            ranges = range(0,100,10)
+            plt.xticks(list(map(lambda x: x/100.0, ranges)))
+        # mb: 1b, 2b
+        elif 'b' in plotType:
+            if plotType == '1b':
+                plt.xticks(range(0,45,5))
+            if plotType == '2b':
+                plt.xticks(range(0,55,5))
+    else:
+        # s: xxs
+        if plotType == '1as':
+            plt.xticks(range(0,22,2))
+        elif plotType == '1bs' or plotType == '2as':
+            plt.xticks(range(0,35,5))
+        elif plotType == '2bs':
+            plt.xticks(range(0,55,5))
+        elif plotType == '3as':
+            plt.xticks(range(0,55,5))
+        elif plotType == '4as':
+            plt.xticks(range(0,65,5))
 
 
-def savePlotToFile(imageFormat='png'):
-    if imageFormat == 'png':
-        plt.savefig('a.png')
-    elif imageFormat == 'pdf':
-        plt.savefig('a.pdf')
+def getPlotSpecs(plotType):
+    specs = {
+        'x': 'n',
+        'y': 'CI',
+        'numDivisions': 10,
+        'numColorDivisions': 7,
+        'labelFontsize': 16,
+        'plotStyle': 'line',
+        'imageFormat': 'pdf',
+        'averageSamples': True,
+        'smoothCurve': False,
+        'regression': False,
+        'sort': False
+    }
+
+    if 's' not in plotType:
+        if 'a' in plotType:
+            specs['x'] = 'pb'
+            
+            if plotType == '1a':
+                specs['numDivisions'] = 20
+        elif 'b' in plotType:
+            specs['x'] = 'mb'
+    else:
+        specs['x'] = 's'
+
+        if plotType == '1as':
+            specs['numDivisions'] = 20
+
+    if '2a' in plotType:
+        specs['numDivisions'] = 12
+    elif '2b' in plotType:
+        specs['numDivisions'] = 14
+    elif '3a' in plotType:
+        specs['numDivisions'] = 11
+
+    return specs
 
 
 if __name__ == '__main__':
-    # graphNames = {
-    #     'sm': ['asia', 'cancer', 'earthquake', 'sachs', 'survey'],
-    #     'md': ['alarm', 'barley', 'child', 'insurance', 'mildew', 'water'],
-    #     'lg': ['hailfinder', 'win95pts']
-    # }
+    if len(sys.argv) != 2:
+        print('Please specify input file paths correctly.')
 
-    # graphSizes = ['sm', 'md', 'lg']
-    # prefixes = ['_ci', '_bf', '_gmp']
-    basePath = 'experiments/a_bnlearn'
-    extension = '.csv'
+        sys.exit()
 
-    parsedData = dict()
-    # parsedData[algListGMP.id_] = []
-    # parsedData[algListCIBF.id_] = []
-    # parsedData[algListCI.id_] = []
+    plotType = sys.argv[1]
+    supportedPlotTypes = ['1a', '1as', '1b', '1bs', '2a', '2as', '2b', '2bs', '3a', '3as', '4a', '4as']
 
-    specs = {
-        'x': 's',
-        'y': 'CI',
-        'numDivisions': 10,
-        'labelFontsize': 16,
-        'plotStyle': 'scatter',
-        'imageFormat': 'png',
-        'averageSamples': True,
-        'smoothCurve': False
-    }
+    if plotType not in supportedPlotTypes:
+        print('Please specify a correct plot type (e.g., 1a).')
 
-    # for size in graphNames:
-    #     names = graphNames[size]
+    specs = getPlotSpecs(plotType)
+    
+    basePath = 'experiments/overleaf/plot'
+    # remove string 's' for reading data
+    directoryPath = basePath + plotType.replace('s', '') + '/'
+    fileNames = [f for f in listdir(directoryPath) if isfile(join(directoryPath, f))]
+    fileNames.sort()
 
-    #     if size == 'sm':
-    #         prefixesToCheck = prefixes
-    #     elif size == 'md':
-    #         prefixesToCheck = prefixes[0:2]
-    #     elif size == 'lg':
-    #         prefixesToCheck = [prefixes[0]]
+    parsedData = []
 
-    #     for name in names:
-    #         for prefix in prefixesToCheck:
-    #             filePath = basePath + '/' + size + '/' + name + prefix + extension
+    for fileName in fileNames:
+        if fileName.startswith('.'):
+            continue
 
-    #             try:
-    #                 with open(filePath, 'r') as f:
-    #                     r = csv.reader(f)
-    #                     lines = list(r)
+        filePath = directoryPath + fileName
+        
+        try:
+            with open(filePath, 'r') as f:
+                r = csv.reader(f)
+                lines = list(r)
+                
+                data = pu.parseData(algListCI.id_, lines)
+                parsedData.append(data)
 
-    #                     if prefix == '_ci':
-    #                         algId = algListCI.id_
-    #                     elif prefix == '_bf':
-    #                         algId = algListCIBF.id_
-    #                     elif prefix == '_gmp':
-    #                         algId = algListGMP.id_
-                        
-    #                     data = pu.parseData(algId, lines)
-    #                     parsedData[algId].append(data)
-
-    #                     f.close()
-    #             except:
-    #                 line = 'Please specify the input file correctly.'
-    #                 print(filePath)
+                f.close()
+        except:
+            line = 'Please specify the input file correctly.'
+            print(filePath)
 
     plt.figure(dpi=300)
 
-    for algId in parsedData:
-        datas = parsedData[algId]
-        
-        dataPoints = getDataPoints(algId, datas, specs)
-        drawPlot(algId, dataPoints, specs)
+    processedData = []
+
+    for data in parsedData:
+        dataPoints = getDataPoints(data, specs)
+        processedData.append(dataPoints)
+    
+    drawPlot(plotType, processedData, specs)
 
     plt.legend()
     # plt.show()
 
-    savePlotToFile(specs['imageFormat'])
+    savePlotToFile(plotType, specs['imageFormat'])

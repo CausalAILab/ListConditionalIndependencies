@@ -66,9 +66,7 @@ class ExperimentUtils():
             params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
         elif alg == algListCI.id_:
             params = [n, m, md, mb, CIsize, runtime, s]
-
-        # params = [s, CIsize, runtime]
-
+        
         return params
     
     @staticmethod

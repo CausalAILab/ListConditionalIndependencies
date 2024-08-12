@@ -42,9 +42,10 @@ def testBT1Batch(numGraphs, n, numDivisions=10):
 
 
 if __name__ == '__main__':
-    numGraphs = 5
+    timeout = 1 * 60 * 60
+    numGraphs = 10
     numDivisions = 10
-    n = 20
+    n = 10
     m = int(n * 1.5)
 
     testBT1Batch(numGraphs, n, numDivisions)

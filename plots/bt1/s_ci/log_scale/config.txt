@@ -5,4 +5,4 @@ plotStyle: scatter
 averageSamples: True
 
 x_range: range(0,22,2)
-y_range: (1, 1000000) => log
+y_range: (1, 1e7) => log
