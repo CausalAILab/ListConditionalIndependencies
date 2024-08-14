@@ -1,6 +1,6 @@
 x: s
 y: CI
-numDivisions: 9
+numDivisions: 10
 plotStyle: scatter
 averageSamples: False
 

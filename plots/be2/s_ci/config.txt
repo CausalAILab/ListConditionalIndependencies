@@ -1,6 +1,6 @@
 x: s
 y: CI
-numDivisions: 10, 5 (n10ex30) - note that U = 0 is dropped from dataset
+numDivisions: 11
 plotStyle: scatter
 averageSamples: False
 showmdmb: True

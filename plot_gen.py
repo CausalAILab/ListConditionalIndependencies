@@ -74,14 +74,16 @@ def drawPlot(algs, datas, specs):
                     else:
                         dataPoints[k].extend([j * 10] * numSamples)
             elif paramAxisName == 'u_clique':
+                fraction = 1.0 / numDivisions
+
                 for j in range(numDivisions):
                     startIndex = j * numSamples
                     endIndex = ((j+1) * numSamples)
 
                     if averageSamples:
-                        dataPoints[k].append(j * 0.1)
+                        dataPoints[k].append(j * fraction)
                     else:
-                        dataPoints[k].extend([j * 0.1] * numSamples)
+                        dataPoints[k].extend([j * fraction] * numSamples)
             else:
                 axisDataPoints = data[paramAxisName]
 
@@ -97,16 +99,31 @@ def drawPlot(algs, datas, specs):
         
         xData = dataPoints[0]
         yData = dataPoints[1]
-        
+
         if smoothCurve:
             # in case of 'S', reverse the list
             if xParam == 'S':
                 xData.reverse()
             if yParam == 'S':
                 yData.reverse()
-            splineModel = make_interp_spline(xData, yData)
-            xSplines = np.linspace(min(xData), max(xData), 500)
+
+            # filter valid data points
+            xArray = np.array(xData)
+            yArray = np.array(yData)
+
+            mask = ~np.isnan(xArray) & ~np.isnan(yArray)
+
+            validX = xArray[mask]
+            validY = yArray[mask]
+
+            splineModel = make_interp_spline(validX, validY)
+            xSplines = np.linspace(min(validX), max(validX), 500)
             ySplines = splineModel(xSplines)
+
+            # splineModel = make_interp_spline(xData, yData)
+            # xSplines = np.linspace(min(xData), max(xData), 500)
+            # ySplines = splineModel(xSplines)
+
             xData = xSplines
             yData = ySplines
 
@@ -201,13 +218,16 @@ def setAxisBoundaries(xParam, yParam):
         plt.xticks(list(map(lambda x: x/100.0, ranges)))
     if xParam == 's':
         plt.xticks(range(0,55,5))
+        # plt.xticks(range(0,22,2))
+    if xParam == 'mb':
+        plt.xticks(range(0,55,5))
 
     if yParam == 's':
         plt.yticks(range(0,45,5))
     # runtime (timeout = 1h)
     if yParam == 'runtime':
-        plt.ylim(0,3600)
-        # plt.yscale('log')
+        plt.ylim(1,3600)
+        plt.yscale('log')
     if yParam == 'CI':
         plt.ylim(1,1e7)
         plt.yscale('log')
@@ -241,11 +261,12 @@ if __name__ == '__main__':
         'x': 's',
         'y': 'CI',
         'numDivisions': 10,
+        'numColorDivisions': 7,
         'labelFontsize': 16,
         'plotStyle': 'scatter',
-        'imageFormat': 'png',
+        'imageFormat': 'pdf',
         'averageSamples': False,
-        'showmdmb': True,
+        'showmdmb': False,
         'smoothCurve': False
     }
 

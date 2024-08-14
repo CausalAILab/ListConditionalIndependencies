@@ -1,0 +1,8 @@
+x: mb
+y: CI
+numDivisions: 11
+plotStyle: line
+averageSamples: True
+
+x_range: range(0,55,5)
+y_range: (1, 1e7) => log

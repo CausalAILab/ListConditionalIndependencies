@@ -34,10 +34,12 @@ def testBE1Batch(numGraphs, n, m, numDivisions=10):
 
 
 if __name__ == '__main__':
-    numGraphs = 10
+    timeout = 1 * 60 * 60
+    numGraphs = 1
     numDivisions = 10
     n = 20
     m = int(n * 1.5)
+    u = 1.0
 
-    testBE1Batch(numGraphs, n, m)
-    # testBE1(numGraphs, n, int(m * 0.2))
+    # testBE1Batch(numGraphs, n, m)
+    testBE1(numGraphs, n, int(m * u))

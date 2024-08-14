@@ -17,6 +17,14 @@ def funcExp(x, a, b, c):
 def funcLog(x, a, b):
     return a + b * np.log(x)
 
+# def adjustRuntimeByLog(t):
+#     if t <= 1.0:
+#         return 1.2
+#     elif t <= 2.0:
+#         return t + 0.2
+#     else:
+#         return t
+
 def getDataPoints(algId, datas, specs, uIndices=range(0,10)):
     numDivisions = specs['numDivisions']
     averageSamples = specs['averageSamples']
@@ -76,6 +84,10 @@ def getDataPoints(algId, datas, specs, uIndices=range(0,10)):
                     startIndex = j * numSamples
                     endIndex = ((j+1) * numSamples)
                     samples = axisDataPoints[startIndex : endIndex]
+
+                    # in case for log plots, add 1 to runtime
+                    if paramAxisName == 'runtime':
+                        samples = np.array(list(map(lambda t: 1.2 if t <= 1.0 else t, samples)))
 
                     if averageSamples:
                         average = round(sum(samples) / numSamples, 3)
@@ -232,7 +244,7 @@ if __name__ == '__main__':
         'numDivisions': 10,
         'labelFontsize': 16,
         'plotStyle': 'scatter',
-        'imageFormat': 'png',
+        'imageFormat': 'pdf',
         'averageSamples': False,
         'smoothCurve': False,
         'sort': True,
@@ -240,7 +252,7 @@ if __name__ == '__main__':
     }
 
     # 1 means U = 0.1, min = 0, max = 9
-    uIndices = [2]
+    uIndices = [3]
     # uIndices = range(0,10)
 
     for size in graphNames:
