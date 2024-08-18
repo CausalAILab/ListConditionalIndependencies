@@ -19,7 +19,65 @@ def parseGraph(fileContent):
 
     return parsedData['graph']
 
-def outputCIs(G, alg):
+
+def parseInput(fileContent):
+    parser = InputParser()
+    parser.sections = [getNodesSection(), getEdgesSection()]
+
+    parsedData = parser.parse(fileContent)
+
+    return parsedData
+
+
+def getNodesSection():
+    nodeTypeParsers = {}
+    nodeTypeParsers[latentNodeType.id_] = LatentOptionsParser()
+
+    return NodesSection(nodeTypeParsers)
+
+
+def getEdgesSection():
+    edgeTypeParsers = {}
+    edgeTypeParsers[bidirectedEdgeType.id_] = BidirectedOptionsParser()
+
+    return EdgesSection(edgeTypeParsers)
+
+
+def printCI(CI, alg):
+    if CI is None or len(CI) == 0:
+        print('No conditional independence is implied.')
+    else:
+        for ci in CI:
+            if alg == 'gmp':
+                X = ci['X']
+                Y = ci['Y']
+                Z = ci['Z']
+            elif alg == 'lmp' or alg == 'lmpp' or alg == 'listci':
+                X = [ci['X']]
+                Y = ci['W']
+                Z = ci['Z']
+
+            Xnames = sorted(list(map(lambda n: n['name'], X)))
+            Ynames = sorted(list(map(lambda n: n['name'], Y)))
+            Znames = sorted(list(map(lambda n: n['name'], Z)))
+
+            print(writeNodeNames(Xnames) + ' \indep ' + writeNodeNames(Ynames) + ' | ' + writeNodeNames(Znames))
+
+        line = 'CIs'
+
+        if alg == 'gmp':
+            line = line + ' (GMP):'
+        elif alg == 'lmp':
+            line = line + ' (ListCIBF):'
+        elif alg == 'listci':
+            line = line + ' (ListCI):'
+
+        line = line + ' '+ str(len(CI)) + ' in total.'
+
+        print(line)
+
+
+def runAlgorithm(G, alg):
     CI = []
 
     Vordered = None
@@ -61,73 +119,28 @@ def outputCIs(G, alg):
 
     printCI(CI, alg)
 
-def printCI(CI, alg):
-    if CI is None or len(CI) == 0:
-        print('No conditional independence is implied.')
-    else:
-        for ci in CI:
-            if alg == 'gmp':
-                X = ci['X']
-                Y = ci['Y']
-                Z = ci['Z']
-            elif alg == 'lmp' or alg == 'lmpp' or alg == 'listci':
-                X = [ci['X']]
-                Y = ci['W']
-                Z = ci['Z']
-
-            Xnames = sorted(list(map(lambda n: n['name'], X)))
-            Ynames = sorted(list(map(lambda n: n['name'], Y)))
-            Znames = sorted(list(map(lambda n: n['name'], Z)))
-
-            print(writeNodeNames(Xnames) + ' \indep ' + writeNodeNames(Ynames) + ' | ' + writeNodeNames(Znames))
-
-        print('Conditional independencies (' + str(len(CI)) + ') in total.')
-
-
-def parseInput(fileContent):
-    parser = InputParser()
-    parser.sections = [getNodesSection(), getEdgesSection()]
-
-    parsedData = parser.parse(fileContent)
-
-    return parsedData
-
-
-def getNodesSection():
-    nodeTypeParsers = {}
-    nodeTypeParsers[latentNodeType.id_] = LatentOptionsParser()
-
-    return NodesSection(nodeTypeParsers)
-
-
-def getEdgesSection():
-    edgeTypeParsers = {}
-    edgeTypeParsers[bidirectedEdgeType.id_] = BidirectedOptionsParser()
-
-    return EdgesSection(edgeTypeParsers)
-
 
 if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 3:
-        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', \'lmpp\', or \'listci\'), and 2) input file path (e.g., graphs/paper/fig5a.txt).')
+        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', or \'listci\'), and 2) input file path (e.g., graphs/paper/fig5a.txt).')
 
         sys.exit()
 
-    task = sys.argv[1]
+    algorithm = sys.argv[1]
     filePath = sys.argv[2]
 
     validTasks = ['gmp', 'lmp', 'listci']
 
-    if task not in validTasks:
-        print('Please specify a valid task to run (\'gmp\', \'lmp\', \'lmpp\', or \'listci\').')
+    if algorithm not in validTasks:
+        print('Please specify a valid task to run (\'gmp\', \'lmp\', or \'listci\').')
     else:
         try:
             with open(filePath, 'r') as f:
                 fileContent = f.read()
                 G = parseGraph(fileContent)
-                outputCIs(G, task)
+                runAlgorithm(G, algorithm)
 
                 f.close()
         except IOError:
