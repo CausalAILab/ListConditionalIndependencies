@@ -1,11 +1,11 @@
 from src.experiment.experiment_utils import ExperimentUtils as eu
 
 
-def testBT2(numGraphs, n, bidirectedEdgesFraction=0):
+def testBT2(numGraphs, n, md, bidirectedEdgesFraction=0):
     paramsCollection = []
 
     mMax = int(n * (n-1) * 0.5)
-    md = int(n * 3.0)
+    # md = int(n * 1.0)
     # md = int(mMax * 0.1)
     mb = int(mMax * bidirectedEdgesFraction)
     
@@ -13,7 +13,7 @@ def testBT2(numGraphs, n, bidirectedEdgesFraction=0):
         paramsCollection.append([])
 
         G = eu.constructMixedGraph(n, md, mb)
-        params = eu.measureParams(G)
+        params = eu.runAlgorithmAndMeasureParams(G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -21,11 +21,11 @@ def testBT2(numGraphs, n, bidirectedEdgesFraction=0):
         print(' '.join(line))
 
 
-def testBT2Batch(numGraphs, n, numDivisions=10):
+def testBT2Batch(numGraphs, n, md, numDivisions=10):
     paramsCollection = []
 
     mMax = int(n * (n-1) * 0.5)
-    md = int(n * 3.0)
+    # md = int(n * 1.0)
     # md = int(mMax * 0.1)
 
     for i in range(numGraphs):
@@ -36,7 +36,7 @@ def testBT2Batch(numGraphs, n, numDivisions=10):
             mb = int(mMax * bidirectedEdgesFraction)
 
             G = eu.constructMixedGraph(n, md, mb)
-            params = eu.measureParams(G)
+            params = eu.runAlgorithmAndMeasureParams(G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
@@ -47,8 +47,9 @@ if __name__ == '__main__':
     timeout = 1 * 60 * 60
     numGraphs = 10
     numDivisions = 10
-    n = 70
-    U = 0.05
+    n = 30
+    md = int(n * 2.0)
+    U = 0.9
 
-    testBT2Batch(numGraphs, n, numDivisions)
-    # testBT2(numGraphs, n, U)
+    # testBT2Batch(numGraphs, n, md, numDivisions)
+    testBT2(numGraphs, n, md, U)

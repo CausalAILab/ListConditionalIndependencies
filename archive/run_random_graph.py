@@ -8,7 +8,7 @@ def testB3(numGraphs, n, m, bidirectedEdgesFraction=0):
         paramsCollection.append([])
 
         G = eu.constructBidirConvGraph(n, m, int(m * bidirectedEdgesFraction))
-        params = eu.measureParams(G)
+        params = eu.runAlgorithmAndMeasureParams(G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -25,7 +25,7 @@ def testB3Batch(numGraphs, n, m, numDivisions=10):
         for j in range(numDivisions):
             bidirectedEdgesFraction = j * 0.1
             G = eu.constructBidirConvGraph(n, m, int(m * bidirectedEdgesFraction))
-            params = eu.measureParams(G)
+            params = eu.runAlgorithmAndMeasureParams(G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
@@ -40,7 +40,7 @@ def testDirGraphs(algorithm, numGraphs, n, m):
         paramsCollection.append([])
 
         G = eu.constructDirGraph(n, m)
-        params = eu.measureParams(G, algorithm)
+        params = eu.runAlgorithmAndMeasureParams(G, algorithm)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -57,7 +57,7 @@ def testDirGraphBatch(algorithm, numGraphs, n, m, numDivisions=11):
         for j in range(numDivisions):
             directedEdgesFraction = j * 0.1
             G = eu.constructDirGraph(n, int(m * directedEdgesFraction))
-            params = eu.measureParams(G, algorithm)
+            params = eu.runAlgorithmAndMeasureParams(G, algorithm)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 

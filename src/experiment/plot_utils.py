@@ -4,6 +4,9 @@ import matplotlib.colors as mcolors
 from src.testable_implications.ci_defs import algMap, algListGMP, algListCIBF, algListCI
 from src.testable_implications.ci_utils import ConditionalIndependenceUtils as cu
 
+# redColor = '#f00'
+# blueColor = '#2D7BB1'
+# greenColor = '#5CB769'
 
 class PlotUtils():
 
@@ -53,6 +56,8 @@ class PlotUtils():
             return 'pd: Probability for adding directed edges'
         elif paramName == 'pb':
             return 'pb: Probability for adding bidirected edges'
+        elif paramName == 'ivCI':
+            return 'Number of invalid CIs'
         elif paramName == 'n':
             # if averageSamples:
             #     return 'Average number of nodes'
@@ -72,7 +77,7 @@ class PlotUtils():
             # if averageSamples:
             #     return 'Average number of bidirected edges'
             # else:
-            return 'mb: Number of bidirected edges'
+            return 'mu: Number of bidirected edges'
         elif paramName == 's':
             # if averageSamples:
             #     return 'Average s'
@@ -87,7 +92,7 @@ class PlotUtils():
             # if averageSamples:
             #     return 'Average number of CIs'
             # else:
-            return 'Number of CIs'
+            return 'Number of valid CIs'
         elif paramName == 'S':
             # if averageSamples:
             #     return 'Average number of ancestral sets'

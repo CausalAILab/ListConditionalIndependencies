@@ -89,8 +89,10 @@ def testModel(G, Pv, pValue, outputCIs = False):
         if p >= pValue:
             violatedCIs.append(CI)
         
+        roundedPvalue = round(p, 6)
+
         printCI(CI)
-        print(p)
+        print('p-value: ' + str(roundedPvalue))
 
     line = 'CIs total: ' + str(len(CIs))
     print(line)

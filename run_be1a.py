@@ -1,17 +1,17 @@
 from src.experiment.experiment_utils import ExperimentUtils as eu
 
 
-def testMixedGraphs(numGraphs, n, m, bidirectedEdgesFraction=0):
+def testBE1a(numGraphs, n, bidirectedEdgesFraction):
     paramsCollection = []
 
-    md = m
-    mb = int(md * bidirectedEdgesFraction)
-
+    mMax = int(0.5 * n * (n-1))
+    
     for i in range(numGraphs):
         paramsCollection.append([])
 
-        # G = constructMixedGraph(n, m, int(m * bidirectedEdgesFraction))
-        G = eu.constructMixedGraph(n, md, mb)
+        mb = int(mMax * (1.0 - bidirectedEdgesFraction))
+        print(mb)
+        G = eu.constructBidirGraph(n, mb)
         params = eu.runAlgorithmAndMeasureParams(G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
@@ -20,21 +20,19 @@ def testMixedGraphs(numGraphs, n, m, bidirectedEdgesFraction=0):
         print(' '.join(line))
 
 
-def testMixedGraphsBatch(numGraphs, n, m, numDivisions=11):
+def testBE1aBatch(numGraphs, n, numDivisions=10):
     paramsCollection = []
 
-    md = m
+    mMax = int(0.5 * n * (n-1))
 
     for i in range(numGraphs):
         paramsCollection.append([])
 
         for j in range(numDivisions):
             bidirectedEdgesFraction = j * 0.1
-            
-            mb = int(md * bidirectedEdgesFraction)
-
-            # G = constructMixedGraph(n, m, int(m * bidirectedEdgesFraction))
-            G = eu.constructMixedGraph(n, md, mb)
+            mb = int(mMax * (1.0 - bidirectedEdgesFraction))
+            print(mb)
+            G = eu.constructBidirGraph(n, mb)
             params = eu.runAlgorithmAndMeasureParams(G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
@@ -47,9 +45,8 @@ if __name__ == '__main__':
     timeout = 1 * 60 * 60
     numGraphs = 10
     numDivisions = 10
-    n = 30
-    m = int(n * 1)
-    U = 0.2
+    n = 25
+    U = 0.9
 
-    # testMixedGraphsBatch(numGraphs, n, m, numDivisions)
-    testMixedGraphs(numGraphs, n, m, U)
+    # testBE1aBatch(numGraphs, n, numDivisions)
+    testBE1a(numGraphs, n, U)

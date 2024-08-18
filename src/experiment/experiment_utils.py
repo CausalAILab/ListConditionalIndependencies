@@ -13,7 +13,7 @@ from src.projection.projection_utils import ProjectionUtils as pu
 class ExperimentUtils():
 
     @staticmethod
-    def measureParams(G, alg=algListCI.id_):
+    def runAlgorithmAndMeasureParams(G, alg=algListCI.id_):
         if G is None:
             return []
 
@@ -86,10 +86,10 @@ class ExperimentUtils():
 
     @staticmethod
     def constructMixedGraph(n, md, mb):
-        mMax = n * (n-1) / 2.0
+        # mMax = n * (n-1) / 2.0
 
-        if md + mb > mMax:
-            return None
+        # if md + mb > mMax:
+        #     return None
         
         G = Graph()
         G.addRandomNodes(n)

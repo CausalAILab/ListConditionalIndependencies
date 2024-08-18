@@ -110,11 +110,11 @@ class Graph():
     def addRandomEdges(self, m, edgeType=directedEdgeType.id_):
         # reject if total number of edges would exceed maximum capacity
         n = len(self.nodes)
-        numEdges = len(self.edges)
-        mMax = n * (n-1) / 2
+        # numEdges = len(self.edges)
+        # mMax = n * (n-1) / 2
 
-        if numEdges + m > mMax:
-            return []
+        # if numEdges + m > mMax:
+        #     return []
 
         edges = []
         edgeCount = 0

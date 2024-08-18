@@ -8,9 +8,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import make_interp_spline
 
-from src.testable_implications.ci_defs import algListCI
+from src.testable_implications.ci_defs import algListCI, algListCIBF
 from src.experiment.plot_utils import PlotUtils as pu
 
+defaultRounding = 3
 
 numNodes = []
 
@@ -56,13 +57,37 @@ def getDataPoints(data, specs):
                 mMax = int(n * (n-1) / 2)
 
                 mSamples = mDataPoints[startIndex : endIndex]
-                pSamples = list(map(lambda m: round(m / mMax, 3), mSamples))
+                pSamples = list(map(lambda m: round(m / mMax, defaultRounding), mSamples))
 
                 if averageSamples:
-                    average = round(sum(pSamples) / numSamples, 3)
+                    average = round(sum(pSamples) / numSamples, defaultRounding)
                     dataPoints[k].append(average)
                 else:
                     dataPoints[k].extend(pSamples.tolist())
+        # assumes data comes from listCIBF
+        elif paramAxisName == 'ivCI':
+            for j in range(numDivisions):
+                startIndex = j * numSamples
+                endIndex = ((j+1) * numSamples)
+
+                masSamples = data['Splus'][startIndex : endIndex]
+                ciSamples = data['CI'][startIndex : endIndex]
+
+                if averageSamples:
+                    masAverage = round(sum(masSamples) / numSamples, defaultRounding)
+                    ciAverage = round(sum(ciSamples) / numSamples, defaultRounding)
+
+                    dataPoints[k].append(masAverage - ciAverage)
+                else:
+                    invalidCIs = []
+
+                    for i in range(len(ciSamples)):
+                        mas = masSamples[i]
+                        ci = ciSamples[i]
+
+                        invalidCIs.append(mas - ci)
+
+                    dataPoints[k].extend(invalidCIs)
         else:
             axisDataPoints = data[paramAxisName]
 
@@ -79,7 +104,7 @@ def getDataPoints(data, specs):
                 samples = axisDataPoints[startIndex : endIndex]
 
                 if averageSamples:
-                    average = round(sum(samples) / numSamples, 3)
+                    average = round(sum(samples) / numSamples, defaultRounding)
                     dataPoints[k].append(average)
                 else:
                     dataPoints[k].extend(samples.tolist())
@@ -97,7 +122,7 @@ def getDataPoints(data, specs):
 
         dataPoints[0] = list(map(lambda tup: tup[0], tuples))
         dataPoints[1] = list(map(lambda tup: tup[1], tuples))
-
+    
     return dataPoints
 
 
@@ -110,10 +135,6 @@ def drawPlot(plotType, datas, specs):
     numColorDivisions = specs['numColorDivisions']
     xParam = specs['x']
     yParam = specs['y']
-
-    # redColor = '#f00'
-    # blueColor = '#2D7BB1'
-    # greenColor = '#5CB769'
 
     colors = pu.getColorPalette(numColorDivisions)
 
@@ -145,11 +166,16 @@ def drawPlot(plotType, datas, specs):
         # custom label: n = x
         n = numNodes[i]
         label = 'n = ' + str(n)
+
+        # if yParam == 'ivCI':
+        #     label = 'n = ' + str(n) + ' (invalid CIs)'
         
         if plotStyle == 'scatter':
             plt.scatter(xData, yData, color=color, label=label)
-        elif plotStyle == 'line':
+        elif plotStyle == 'line_solid':
             plt.plot(xData, yData, linestyle='solid', color=color, label=label)
+        elif plotStyle == 'line_dotted':
+            plt.plot(xData, yData, linestyle='dotted', color=color, label=label)
         elif plotStyle == 'line_scatter':
             plt.plot(xData, yData, linestyle='solid', marker='o', color=color, label=label)
 
@@ -171,16 +197,19 @@ def savePlotToFile(plotType, imageFormat='png'):
 
 def setAxisBoundaries(plotType, xParam, yParam):
     if yParam == 'runtime':
-        plt.ylim(1,3600)
+        plt.ylim(1,1e5)
         plt.yscale('log')
-    if yParam == 'CI':
+    if yParam == 'CI' or yParam == 'ivCI':
         plt.ylim(1,1e6)
         plt.yscale('log')
 
     if 's' not in plotType:
-        # pb: 1a, 2a, 3a, 4a
-        if 'a' in plotType:
+        # pb: 1a, 2a, 3a, 4a, 1v, 1r
+        if 'a' in plotType or 'v' in plotType:
             ranges = range(0,100,10)
+            plt.xticks(list(map(lambda x: x/100.0, ranges)))
+        if 'r' in plotType:
+            ranges = range(0,110,10)
             plt.xticks(list(map(lambda x: x/100.0, ranges)))
         # mb: 1b, 2b
         elif 'b' in plotType:
@@ -200,7 +229,9 @@ def setAxisBoundaries(plotType, xParam, yParam):
             plt.xticks(range(0,55,5))
         elif plotType == '4as':
             plt.xticks(range(0,65,5))
-
+    # CI vs. runtime
+    # plt.xlim(1e1,1e5)
+    # plt.xscale('log')
 
 def getPlotSpecs(plotType):
     specs = {
@@ -209,7 +240,7 @@ def getPlotSpecs(plotType):
         'numDivisions': 10,
         'numColorDivisions': 7,
         'labelFontsize': 16,
-        'plotStyle': 'line',
+        'plotStyle': 'line_solid',
         'imageFormat': 'pdf',
         'averageSamples': True,
         'smoothCurve': False,
@@ -218,7 +249,7 @@ def getPlotSpecs(plotType):
     }
 
     if 's' not in plotType:
-        if 'a' in plotType:
+        if 'a' in plotType or 'r' in plotType:
             specs['x'] = 'pb'
             
             if plotType == '1a':
@@ -238,6 +269,11 @@ def getPlotSpecs(plotType):
     elif '3a' in plotType:
         specs['numDivisions'] = 11
 
+    if 'v' in plotType:
+        specs['x'] = 'pb'
+    # CI vs. runtime
+    # specs['x'] = 'CI'
+    # specs['y'] = 'runtime'
     return specs
 
 
@@ -248,7 +284,7 @@ if __name__ == '__main__':
         sys.exit()
 
     plotType = sys.argv[1]
-    supportedPlotTypes = ['1a', '1as', '1b', '1bs', '2a', '2as', '2b', '2bs', '3a', '3as', '4a', '4as']
+    supportedPlotTypes = ['1a', '1as', '1b', '1bs', '1v', '1r', '2a', '2as', '2b', '2bs', '3a', '3as', '4a', '4as']
 
     if plotType not in supportedPlotTypes:
         print('Please specify a correct plot type (e.g., 1a).')
@@ -262,7 +298,7 @@ if __name__ == '__main__':
     fileNames.sort()
 
     parsedData = []
-
+    
     for fileName in fileNames:
         if fileName.startswith('.'):
             continue
@@ -273,25 +309,46 @@ if __name__ == '__main__':
             with open(filePath, 'r') as f:
                 r = csv.reader(f)
                 lines = list(r)
-                
-                data = pu.parseData(algListCI.id_, lines)
+
+                if 'v' in plotType:
+                    data = pu.parseData(algListCIBF.id_, lines)
+                else:
+                    data = pu.parseData(algListCI.id_, lines)
                 parsedData.append(data)
 
                 f.close()
-        except:
-            line = 'Please specify the input file correctly.'
+        except Exception as e:
+            # line = 'Please specify the input file correctly.'
             print(filePath)
 
     plt.figure(dpi=300)
 
-    processedData = []
+    if 'v' in plotType:
+        # yParams = ['CI', 'ivCI']
+        yParams = ['ivCI']
 
-    for data in parsedData:
-        dataPoints = getDataPoints(data, specs)
-        processedData.append(dataPoints)
+        for y in yParams:
+            specs['y'] = y
+
+            processedData = []
+
+            for data in parsedData:
+                dataPoints = getDataPoints(data, specs)
+                processedData.append(dataPoints)
+
+            # if y == 'ivCI':
+            #     specs['plotStyle'] = 'line_dotted'
+
+            drawPlot(plotType, processedData, specs)
+    else:
+        processedData = []
+
+        for data in parsedData:
+            dataPoints = getDataPoints(data, specs)
+            processedData.append(dataPoints)
+
+        drawPlot(plotType, processedData, specs)
     
-    drawPlot(plotType, processedData, specs)
-
     plt.legend()
     # plt.show()
 

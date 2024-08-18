@@ -8,7 +8,7 @@ def testBE1(numGraphs, n, m):
         paramsCollection.append([])
 
         G = eu.constructBidirGraph(n,m)
-        params = eu.measureParams(G)
+        params = eu.runAlgorithmAndMeasureParams(G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
@@ -25,7 +25,7 @@ def testBE1Batch(numGraphs, n, m, numDivisions=10):
         for j in range(numDivisions):
             bidirectedEdgesFraction = j * 0.1
             G = eu.constructBidirGraph(n, int(m * bidirectedEdgesFraction))
-            params = eu.measureParams(G)
+            params = eu.runAlgorithmAndMeasureParams(G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 

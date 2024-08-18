@@ -256,7 +256,7 @@ if __name__ == '__main__':
     # algorithm = algListCIBF.id_
     algorithm = algListCI.id_
     numGraphs = 10
-    UsToTest = [0, 0.2, 0.4, 0.6, 0.8]
+    # UsToTest = [0.1]
 
     timeout = 1 * 60 * 60
     # timeout = None
@@ -267,13 +267,13 @@ if __name__ == '__main__':
             G = parseGraph(fileContent)
 
             if G is not None:
-                # testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
+                testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
                 # testProjectedGraphs(G, algorithm, numGraphs, 0.4, timeout)
 
-                if not tryTestProjectedGraphs(G, algorithm, numGraphs, UsToTest, timeout):
-                    currentAlg = algMap[algorithm]
-                    line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
-                    print(line)
+                # if not tryTestProjectedGraphs(G, algorithm, numGraphs, UsToTest, timeout):
+                #     currentAlg = algMap[algorithm]
+                #     line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
+                #     print(line)
 
             f.close()
     except IOError:
