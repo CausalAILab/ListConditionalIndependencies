@@ -1,8 +1,0 @@
-x: u_clique
-y: CI
-numDivisions: 20
-plotStyle: line
-averageSamples: True
-
-x_range: range(0,100,10) / 100.0
-y_range: (1, 1e7) => log
