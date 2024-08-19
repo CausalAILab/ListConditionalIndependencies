@@ -206,7 +206,7 @@ def setAxisBoundaries(plotType, xParam, yParam):
     if 's' not in plotType:
         # pb: 1a, 2a, 3a, 4a, 1v, 1r
         if 'a' in plotType or 'v' in plotType:
-            ranges = range(0,100,10)
+            ranges = range(0,110,10)
             plt.xticks(list(map(lambda x: x/100.0, ranges)))
         if 'r' in plotType:
             ranges = range(0,110,10)

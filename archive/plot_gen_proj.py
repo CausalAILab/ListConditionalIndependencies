@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
 
-from src.testable_implications.ci_utils import ConditionalIndependenceUtils as cu
+from src.experiment.experiment_utils import ExperimentUtils as eu
 
 
 def parseGraphSizeData(lines):
@@ -70,7 +70,7 @@ def parseData(lines):
             CIsizeCollection.extend(CIsizes)
         # runtime
         elif i % 3 == 2:
-            runtimes = list(map(lambda t: cu.durationStringToSeconds(t), line))
+            runtimes = list(map(lambda t: eu.durationStringToSeconds(t), line))
             runtimeCollection.extend(runtimes)
 
     data = {

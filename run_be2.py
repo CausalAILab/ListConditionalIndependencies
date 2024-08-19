@@ -10,14 +10,15 @@ def testMixedGraphs(numGraphs, n, m, bidirectedEdgesFraction=0):
     for i in range(numGraphs):
         paramsCollection.append([])
 
-        # G = constructMixedGraph(n, m, int(m * bidirectedEdgesFraction))
         G = eu.constructMixedGraph(n, md, mb)
         params = eu.runAlgorithmAndMeasureParams(G)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollection[i].extend(paramsToStr)
 
-    for line in paramsCollection:
-        print(' '.join(line))
+    # for line in paramsCollection:
+    #     print(' '.join(line))
+
+    eu.printParams(paramsCollection)
 
 
 def testMixedGraphsBatch(numGraphs, n, m, numDivisions=11):
@@ -33,21 +34,22 @@ def testMixedGraphsBatch(numGraphs, n, m, numDivisions=11):
             
             mb = int(md * bidirectedEdgesFraction)
 
-            # G = constructMixedGraph(n, m, int(m * bidirectedEdgesFraction))
             G = eu.constructMixedGraph(n, md, mb)
             params = eu.runAlgorithmAndMeasureParams(G)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollection[i].extend(paramsToStr)
 
-    for line in paramsCollection:
-        print(' '.join(line))
+    # for line in paramsCollection:
+    #     print(' '.join(line))
+
+    eu.printParams(paramsCollection)
 
 
 if __name__ == '__main__':
     timeout = 1 * 60 * 60
     numGraphs = 10
     numDivisions = 10
-    n = 30
+    n = 10
     m = int(n * 1)
     U = 0.2
 

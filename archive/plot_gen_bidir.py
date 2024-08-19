@@ -1,21 +1,11 @@
 import sys
 import csv
-import datetime
-import time
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-def durationStringToSeconds(runtime):
-    # convert durating string '00:00:00' to seconds
-    x = time.strptime(runtime,'%H:%M:%S')
-    seconds = datetime.timedelta(hours=x.tm_hour,minutes=x.tm_min,seconds=x.tm_sec).total_seconds()
+from src.experiment.experiment_utils import ExperimentUtils as eu
 
-    # round up to avoid undefined value in log-log plot
-    if seconds == 0.0:
-        seconds = seconds + 1
-
-    return seconds
 
 def parseData(lines):
     u30_s = []
@@ -36,9 +26,9 @@ def parseData(lines):
         CIsize = line[4]
         u50_CIs.append(int(CIsize))
 
-        runtime = durationStringToSeconds(line[2])
+        runtime = eu.durationStringToSeconds(line[2])
         u30_runtime.append(runtime)
-        runtime = durationStringToSeconds(line[5])
+        runtime = eu.durationStringToSeconds(line[5])
         u50_runtime.append(runtime)
 
     data = {

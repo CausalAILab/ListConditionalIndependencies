@@ -6,8 +6,6 @@ Implementation of the algorithm for listing all conditional independencies impli
 Please run the following commands to install the package:
 
 ```
-git clone https://github.com/CausalAILab/ListConditionalIndependencies.git
-cd ListConditionalIndependencies
 pip install -r requirements.txt
 pip install -e .
 ```
@@ -17,15 +15,15 @@ pip install -e .
 To run some examples, try running the following command:
 
 ```
-python3 main.py listci graphs/paper/fig1b.txt
+python3 main.py clmp graphs/paper/fig5a.txt
 ```
 
 ## Arguments
 
-1. First argument: `gmp`, `lmp`, or `listci`.
-- `gmp`: The global Markov property
-- `lmp`: The ordered local Markov property
-- `listci`: The augmented ordered local Markov property (poly-delay)
+1. First argument: `gmp`, `lmp`, or `clmp`.
+- `gmp`: The global Markov property (runs the algorithm ListGMP)
+- `lmp`: The ordered local Markov property (runs the algorithm ListCIBF)
+- `clmp`: The c-component local Markov property (runs the algorithm ListCI)
 
 2. Second argument: `graphs/paper/fig1b.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
 
@@ -48,7 +46,6 @@ Each line describes an edge. Two types of edges are supported:
 
 There are two scripts to run experiments:
 - `experiment_graph.py`: Parses a text file containing graph information, constructs a graph, and run experiments.
-- `experiment_bif.py`: Parses a BIF file (BIF stands for Bayesian Interchange Format), constructs a graph, and run experiments.
 
 To run some examples, try running the following command:
 
@@ -56,18 +53,8 @@ To run some examples, try running the following command:
 python3 experiment_graph.py graphs/paper/fig1b.txt
 ```
 
-or
-
-```
-python3 experiment_bif.py bif/sm/asia.bif
-```
-
 ## Arguments
 
-1. First argument: `graphs/paper/fig1b.txt` or `bif/sm/asia.bif`. The path to a text or BIF file.
+1. First argument: `graphs/paper/fig1b.txt`. The path to a text or BIF file.
 
-The supported algorithms are: [`gmp`, `lmp`, `listci`]. By default, two algorithms [`lmp`, `listci`] will run, but you may modify the `algorithms` variable in `experiment_graph.py` or `experiment_bif.py` to change the sets of algorithms to run.
-
-## BIF format details
-
-https://www.cs.washington.edu/dm/vfml/appendixes/bif.htm
+The supported algorithms are: [`gmp`, `lmp`, `clmp`]. By default, two algorithms [`lmp`, `clmp`] will run, but you may modify the `algorithms` variable in `experiment_graph.py` to change the sets of algorithms to run.

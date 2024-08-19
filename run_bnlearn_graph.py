@@ -22,6 +22,8 @@ defaultLatentFranctionsToTest = list(map(lambda x: x/10.0, ranges))
 numSampleOfFailure = 0
 latentFractionOfFailure = 0
 
+fileName = 'bnlearn_projection_report'
+
 def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
 
@@ -171,7 +173,7 @@ def runAlgorithmAndMeasureParams(G, alg, timeout=defaultTimeout):
 
     CI = queue.get()
     listCIBFParams = queue.get()
-    runtime = end - start
+    runtime = eu.roundToNearestSecond(end - start)
 
     params = getFullParams(G, alg, CI, runtime, listCIBFParams)
 
@@ -194,23 +196,34 @@ def testProjectedGraphs(G, alg, numGraphs, latentFraction=0.3, timeout=defaultTi
 
 
 def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
+    paramsCollectionText = []
     paramsCollection = []
 
     numDivisions = 10
     offset = 0
 
     for i in range(numGraphs):
-        paramsCollection.append([])
+        paramsCollectionText.append([])
+        paramsCollectionPerSample = []
+
+        line = 'Running a batch of samples [' + str(i * 10 + 1) + ', ' + str((i+1) * 10) + ']'
+        print(line)
 
         for j in range(numDivisions):
             latentFraction = j * 0.1 + offset
             Gp = eu.applyProjection(G, latentFraction)
             params = runAlgorithmAndMeasureParams(Gp, alg, timeout)
             paramsToStr = list(map(lambda n: str(n), params))
-            paramsCollection[i].extend(paramsToStr)
+            paramsCollectionText[i].extend(paramsToStr)
 
-    for line in paramsCollection:
-        print(' '.join(line))
+            paramsCollectionPerSample.append(params)
+
+        paramsCollection.append(paramsCollectionPerSample)
+
+    # for line in paramsCollectionText:
+    #     print(' '.join(line))
+
+    eu.writeParamsToCsv(fileName, paramsCollection)
 
 
 def tryTestProjectedGraphs(G, alg, numGraphs, latentFractionsToTest=defaultLatentFranctionsToTest, timeout=defaultTimeout):
@@ -245,39 +258,49 @@ def tryTestProjectedGraphs(G, alg, numGraphs, latentFractionsToTest=defaultLaten
 if __name__ == '__main__':
 
     # read arguments
-    if len(sys.argv) != 2:
-        print('Please specify input file path correctly (e.g., graphs/bif/sm/cancer.txt).')
+    if len(sys.argv) != 3:
+        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', or \'clmp\'), and 2) input file path (e.g., graphs/bif/sm/cancer.txt).')
 
         sys.exit()
 
-    filePath = sys.argv[1]
+    task = sys.argv[1]
+    filePath = sys.argv[2]
 
-    # algorithm = algListGMP.id_
-    # algorithm = algListCIBF.id_
-    algorithm = algListCI.id_
     numGraphs = 10
     # UsToTest = [0.1]
 
     timeout = 1 * 60 * 60
     # timeout = None
-    
-    try:
-        with open(filePath, 'r') as f:
-            fileContent = f.read()
-            G = parseGraph(fileContent)
 
-            if G is not None:
-                testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
-                # testProjectedGraphs(G, algorithm, numGraphs, 0.4, timeout)
+    validTasks = ['gmp', 'lmp', 'clmp']
 
-                # if not tryTestProjectedGraphs(G, algorithm, numGraphs, UsToTest, timeout):
-                #     currentAlg = algMap[algorithm]
-                #     line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
-                #     print(line)
+    if task not in validTasks:
+        print('Please specify a valid task to run (\'gmp\', \'lmp\', or \'clmp\').')
+    else:
+        if task == 'gmp':
+            algorithm = algListGMP.id_
+        elif task == 'lmp':
+            algorithm = algListCIBF.id_
+        elif task == 'clmp':
+            algorithm = algListCI.id_
 
-            f.close()
-    except IOError:
-        line = 'Please specify the input file correctly.'
+        try:
+            with open(filePath, 'r') as f:
+                fileContent = f.read()
+                G = parseGraph(fileContent)
 
-        print(line)
+                if G is not None:
+                    testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
+                    # testProjectedGraphs(G, algorithm, numGraphs, 0.4, timeout)
+
+                    # if not tryTestProjectedGraphs(G, algorithm, numGraphs, UsToTest, timeout):
+                    #     currentAlg = algMap[algorithm]
+                    #     line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
+                    #     print(line)
+
+                f.close()
+        except IOError:
+            line = 'Please specify the input file correctly.'
+
+            print(line)
     

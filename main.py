@@ -52,7 +52,7 @@ def printCI(CI, alg):
                 X = ci['X']
                 Y = ci['Y']
                 Z = ci['Z']
-            elif alg == 'lmp' or alg == 'lmpp' or alg == 'listci':
+            elif alg == 'lmp' or alg == 'lmpp' or alg == 'clmp':
                 X = [ci['X']]
                 Y = ci['W']
                 Z = ci['Z']
@@ -68,9 +68,9 @@ def printCI(CI, alg):
         if alg == 'gmp':
             line = line + ' (GMP):'
         elif alg == 'lmp':
-            line = line + ' (ListCIBF):'
-        elif alg == 'listci':
-            line = line + ' (ListCI):'
+            line = line + ' (LMP):'
+        elif alg == 'clmp':
+            line = line + ' (C-LMP):'
 
         line = line + ' '+ str(len(CI)) + ' in total.'
 
@@ -114,7 +114,7 @@ def runAlgorithm(G, alg):
         CI = ConditionalIndependencies.ListGMP(G, G.nodes)
     elif alg == 'lmp':
         CI = ConditionalIndependencies.ListCIBF(G, G.nodes, True, Vordered)
-    elif alg == 'listci':
+    elif alg == 'clmp':
         CI = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
     printCI(CI, alg)
@@ -124,17 +124,17 @@ if __name__ == '__main__':
 
     # read arguments
     if len(sys.argv) != 3:
-        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', or \'listci\'), and 2) input file path (e.g., graphs/paper/fig5a.txt).')
+        print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', or \'clmp\'), and 2) input file path (e.g., graphs/paper/fig5a.txt).')
 
         sys.exit()
 
     algorithm = sys.argv[1]
     filePath = sys.argv[2]
 
-    validTasks = ['gmp', 'lmp', 'listci']
+    validTasks = ['gmp', 'lmp', 'clmp']
 
     if algorithm not in validTasks:
-        print('Please specify a valid task to run (\'gmp\', \'lmp\', or \'listci\').')
+        print('Please specify a valid task to run (\'gmp\', \'lmp\', or \'clmp\').')
     else:
         try:
             with open(filePath, 'r') as f:

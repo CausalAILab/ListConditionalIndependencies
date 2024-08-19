@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.colors as mcolors
 
 from src.testable_implications.ci_defs import algMap, algListGMP, algListCIBF, algListCI
-from src.testable_implications.ci_utils import ConditionalIndependenceUtils as cu
+from src.experiment.experiment_utils import ExperimentUtils as eu
 
 # redColor = '#f00'
 # blueColor = '#2D7BB1'
@@ -135,7 +135,7 @@ class PlotUtils():
             measurements = []
 
             if paramNames[collectionIndex] == 'runtime':
-                measurements = list(map(lambda t: np.nan if t.strip() == '-' else cu.durationStringToSeconds(t), line))
+                measurements = list(map(lambda t: np.nan if t.strip() == '-' else eu.durationStringToSeconds(t), line))
             else:
                 measurements = list(map(lambda x: np.nan if x.strip() == '-' else int(x), line))
 

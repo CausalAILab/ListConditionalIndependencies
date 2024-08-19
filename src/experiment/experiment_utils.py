@@ -1,5 +1,7 @@
 import random
-from datetime import datetime
+import csv
+import time
+from datetime import datetime, timedelta
 
 from src.graph.classes.graph import Graph
 from src.graph.classes.graph_defs import latentNodeType, directedEdgeType, bidirectedEdgeType
@@ -56,7 +58,7 @@ class ExperimentUtils():
         md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
         mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
         CIsize = len(CI)
-        runtime = end - start
+        runtime = ExperimentUtils.roundToNearestSecond(end - start)
 
         params = []
 
@@ -69,6 +71,103 @@ class ExperimentUtils():
         
         return params
     
+
+    @staticmethod
+    def printParams(paramsCollection=[], algId=algListCI.id_):
+        numGraphs = len(paramsCollection)
+        numDivisions = len(paramsCollection[0])
+
+        # print header row
+        headerTextBlocks = []
+        
+        for j in range(numDivisions):
+            sampleLine = ''
+
+            if algId == algListGMP.id_:
+                sampleLine = 'n\tm\tmd\tmu\t# CI\truntime'
+            elif algId == algListCIBF.id_:
+                sampleLine = 'n\tm\tmd\tmu\t# CI\truntime\ts\t# S\t# S+'
+            elif algId == algListCI.id_:
+                sampleLine = 'n\tm\tmd\tmu\t# CI\truntime\ts'
+
+            headerTextBlocks.append(sampleLine)
+
+        print('\t'.join(headerTextBlocks))
+
+        for i in range(numGraphs):
+            paramsRow = paramsCollection[i]
+            textBlocks = []
+
+            for j in range(numDivisions):
+                sampleParam = paramsRow[j]
+                paramToStr= list(map(lambda n: str(n), sampleParam))
+
+                sampleLine = '\t'.join(paramToStr)
+
+                textBlocks.append(sampleLine)
+
+            print('\t'.join(textBlocks))
+        
+
+    @staticmethod
+    def writeParamsToCsv(fileName, paramsCollection=[], algId=algListCI.id_):
+        numGraphs = len(paramsCollection)
+        numDivisions = len(paramsCollection[0])
+
+        headers = []
+
+        for j in range(numDivisions):
+            header = []
+
+            if algId == algListGMP.id_:
+                header = ['n', 'm', 'md', 'mu', '# CI', 'runtime']
+            elif algId == algListCIBF.id_:
+                header = ['n', 'm', 'md', 'mu', '# CI', 'runtime', 's', '# S', '# S+']
+            elif algId == algListCI.id_:
+                header = ['n', 'm', 'md', 'mu', '# CI', 'runtime', 's']
+
+            headers.extend(header)
+
+        data = []
+
+        for i in range(numGraphs):
+            paramsRow = paramsCollection[i]
+            textBlocks = []
+
+            for j in range(numDivisions):
+                sampleParam = paramsRow[j]
+                paramToStr = list(map(lambda n: str(n), sampleParam))
+
+                textBlocks.extend(paramToStr)
+
+            data.append(textBlocks)
+
+        with open(fileName + '.csv', 'w') as f:
+            writer = csv.writer(f, delimiter=',')
+
+            writer.writerow(headers)
+            writer.writerows(data)
+
+            print('Results written to ' + fileName + '.csv.')
+    
+
+    @staticmethod
+    def durationStringToSeconds(runtime):
+        x = time.strptime(runtime, '%H:%M:%S')
+        seconds = timedelta(hours=x.tm_hour,minutes=x.tm_min,seconds=x.tm_sec).total_seconds()
+        
+        # round up to avoid undefined value in log-log plot
+        # if seconds == 0.0:
+        #     seconds = seconds + 1
+
+        return seconds
+    
+
+    @staticmethod
+    def roundToNearestSecond(td):
+        return timedelta(seconds=int(td.total_seconds()))
+
+
     @staticmethod
     def constructDirGraph(n, m):
         G = Graph()
