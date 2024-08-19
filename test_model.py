@@ -94,10 +94,10 @@ def testModel(G, Pv, pValue, outputCIs = False):
         printCI(CI)
         print('p-value: ' + str(roundedPvalue))
 
-    line = 'CIs total: ' + str(len(CIs))
+    line = 'CIs in total: ' + str(len(CIs))
     print(line)
 
-    line = 'CIs violated: ' + str(len(violatedCIs))
+    line = 'CIs violated (p-value >= ' + str(pValue) + '): ' + str(len(violatedCIs))
     print(line)
 
     if outputCIs:

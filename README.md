@@ -1,16 +1,16 @@
 # ListConditionalIndependencies
-Implementation of the algorithm for listing all conditional independencies implied by a causal model.
+Implementation of the algorithms for listing all conditional independencies implied by a causal model.
 
 ## How to install
 
 Please run the following commands to install the package:
 
 ```
-pip install -r requirements.txt
-pip install -e .
+pip3 install -r requirements.txt
+pip3 install -e .
 ```
 
-## How to run
+## How to run a listing algorithm
 
 To run some examples, try running the following command:
 
@@ -18,7 +18,7 @@ To run some examples, try running the following command:
 python3 main.py clmp graphs/paper/fig5a.txt
 ```
 
-## Arguments
+### Arguments
 
 1. First argument: `gmp`, `lmp`, or `clmp`.
 - `gmp`: The global Markov property (runs the algorithm ListGMP)
@@ -27,7 +27,7 @@ python3 main.py clmp graphs/paper/fig5a.txt
 
 2. Second argument: `graphs/paper/fig1b.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
 
-## Format of the graph file
+### Format of the graph file
 
 Consider `graphs/paper/fig1b.txt` as an example.
 
@@ -42,19 +42,61 @@ Each line describes an edge. Two types of edges are supported:
 1. Directed edge: `A -> E` represents a directed edge from `A` to `E`.
 2. Bidirected edge: `E -- F` means there exists some unmeasured confounder (i.e., latent variable) between `E` and `F`.
 
+
+## How to test a model against observational data
+
+As an example, try running the following command:
+
+```
+python3 test_model.py graphs/sachs/graph_gt.txt datasets/sachs/dataset.csv
+```
+
+The example tests a ground-truth graph provided by experts (11 nodes and 17 edges) against a real-world protein signaling dataset (853 samples) by (Sachs et al. 2005).
+
+### Arguments
+
+1. First argument: `graphs/sachs/graph_gt.txt`. The path to a graph file.
+2. Second argument: `datasets/sachs/dataset.csv`. The path to a dataset file.
+
 ## How to run experiments
 
-There are two scripts to run experiments:
-- `experiment_graph.py`: Parses a text file containing graph information, constructs a graph, and run experiments.
+The following scripts are used to run experiments shown in Appendix E.
 
-To run some examples, try running the following command:
+1. Appendix E.1: Comparison of ListCI and two other algorithms - ListGMP and ListCIBF.
+    - Running bnlearn instances (with varying projection levels) over three algorithms.
 
-```
-python3 experiment_graph.py graphs/paper/fig1b.txt
-```
+    Try running the following command:
 
-## Arguments
+    ```
+    python3 run_bnlearn_graph.py clmp graphs/bnlearn/sm/asia.txt
+    ```
 
-1. First argument: `graphs/paper/fig1b.txt`. The path to a text or BIF file.
+    When the experiment finishes, a report file named `bnlearn_report_asia_clmp.csv` will be generated.
 
-The supported algorithms are: [`gmp`, `lmp`, `clmp`]. By default, two algorithms [`lmp`, `clmp`] will run, but you may modify the `algorithms` variable in `experiment_graph.py` to change the sets of algorithms to run.
+    ### Arguments
+
+    1. First argument: `gmp`, `lmp`, or `clmp`. An algorithm to run.
+    2. Second argument: `graphs/bnlearn/sm/asia.txt`. The path to a bnlearn graph file.
+
+2. Appendix E.2: Analysis of C-LMP
+    - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
+
+    The following provides the list of scripts. The scripts take no argument. A report file will be generated once the experiment finishes.
+        - run_case1.py
+        - run_case1_mu.py
+        - run_case1_invalid.py
+        - run_case2.py
+        - run_case2_mu.py
+        - run_case3.py
+    
+    As an example, try running the following command:
+
+    ```
+    python3 run_case1.py
+    ```
+
+    Then, a report file named `case1_report.csv` will be generated.
+
+## References
+
+- Sachs, K.; Perez, O.; Pe’er, D.; Lauffenburger, D. A.; and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.

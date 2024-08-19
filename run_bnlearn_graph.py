@@ -1,4 +1,5 @@
 import sys
+import os
 import multiprocessing as mp
 from datetime import datetime
 
@@ -22,7 +23,8 @@ defaultLatentFranctionsToTest = list(map(lambda x: x/10.0, ranges))
 numSampleOfFailure = 0
 latentFractionOfFailure = 0
 
-fileName = 'bnlearn_projection_report'
+reportFileName = 'bnlearn_report'
+fileName = ''
 
 def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
@@ -223,7 +225,20 @@ def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
     # for line in paramsCollectionText:
     #     print(' '.join(line))
 
-    eu.writeParamsToCsv(fileName, paramsCollection)
+    global fileName
+
+    suffix = ''
+
+    if alg == algListGMP.id_:
+        suffix = 'gmp'
+    elif alg == algListCIBF.id_:
+        suffix = 'lmp'
+    elif alg == algListCI.id_:
+        suffix = 'clmp'
+
+    fullFileName = reportFileName + '_' + fileName.replace('.txt', '') + '_' + suffix
+
+    eu.writeParamsToCsv(fullFileName, paramsCollection)
 
 
 def tryTestProjectedGraphs(G, alg, numGraphs, latentFractionsToTest=defaultLatentFranctionsToTest, timeout=defaultTimeout):
@@ -285,6 +300,11 @@ if __name__ == '__main__':
             algorithm = algListCI.id_
 
         try:
+            filePath = os.path.normpath(filePath)
+            path, file = os.path.split(filePath)
+
+            fileName = file
+
             with open(filePath, 'r') as f:
                 fileContent = f.read()
                 G = parseGraph(fileContent)
