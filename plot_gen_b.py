@@ -167,17 +167,40 @@ def drawPlot(plotType, datas, specs):
         n = numNodes[i]
         label = 'n = ' + str(n)
 
+        # n20r, n25r, n30r
+        # if i == 3 or i == 5 or i == 7:
+        #     label = None
+
+        # if i == 2 or i == 3:
+        #     color = colors[2]
+        # if i == 4 or i == 5:
+        #     color = colors[3]
+        # if i == 6 or i == 7:
+        #     color = colors[4]
+
         # if yParam == 'ivCI':
         #     label = 'n = ' + str(n) + ' (invalid CIs)'
         
         if plotStyle == 'scatter':
-            plt.scatter(xData, yData, color=color, label=label)
+            if label is not None:
+                plt.scatter(xData, yData, color=color, label=label)
+            else:
+                plt.scatter(xData, yData, color=color)
         elif plotStyle == 'line_solid':
-            plt.plot(xData, yData, linestyle='solid', color=color, label=label)
+            if label is not None:
+                plt.plot(xData, yData, linestyle='solid', color=color, label=label)
+            else:
+                plt.plot(xData, yData, linestyle='solid', color=color)
         elif plotStyle == 'line_dotted':
-            plt.plot(xData, yData, linestyle='dotted', color=color, label=label)
+            if label is not None:
+                plt.plot(xData, yData, linestyle='dotted', color=color, label=label)
+            else:
+                plt.plot(xData, yData, linestyle='dotted', color=color)
         elif plotStyle == 'line_scatter':
-            plt.plot(xData, yData, linestyle='solid', marker='o', color=color, label=label)
+            if label is not None:
+                plt.plot(xData, yData, linestyle='solid', marker='o', color=color, label=label)
+            else:
+                plt.plot(xData, yData, linestyle='solid', marker='o', color=color)
 
     xLabel = pu.paramNameToAxisLabel(xParam, averageSamples)
     yLabel = pu.paramNameToAxisLabel(yParam, averageSamples)
@@ -296,7 +319,7 @@ if __name__ == '__main__':
     directoryPath = basePath + plotType.replace('s', '') + '/'
     fileNames = [f for f in listdir(directoryPath) if isfile(join(directoryPath, f))]
     fileNames.sort()
-
+    
     parsedData = []
     
     for fileName in fileNames:
