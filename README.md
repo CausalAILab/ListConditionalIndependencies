@@ -25,7 +25,7 @@ python3 main.py clmp graphs/paper/fig5a.txt
 - `lmp`: The ordered local Markov property (runs the algorithm ListCIBF)
 - `clmp`: The c-component local Markov property (runs the algorithm ListCI)
 
-2. Second argument: `graphs/paper/fig1b.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
+2. Second argument: `graphs/paper/fig5a.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
 
 ### Format of the graph file
 
@@ -82,12 +82,12 @@ The following scripts are used to run experiments shown in Appendix E.
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
 
     The following provides the list of scripts. The scripts take no argument. A report file will be generated once the experiment finishes.
-        - run_case1.py
-        - run_case1_mu.py
-        - run_case1_invalid.py
-        - run_case2.py
-        - run_case2_mu.py
-        - run_case3.py
+    * run_case1.py
+    * run_case1_mu.py
+    * run_case1_invalid.py
+    * run_case2.py
+    * run_case2_mu.py
+    * run_case3.py
     
     As an example, try running the following command:
 
