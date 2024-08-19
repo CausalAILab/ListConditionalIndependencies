@@ -45,7 +45,7 @@ Each line describes an edge. Two types of edges are supported:
 
 ## How to test a model against observational data
 
-As an example, try running the following command:
+Try running the following command:
 
 ```
 python3 test_model.py graphs/sachs/graph_gt.txt datasets/sachs/dataset.csv
@@ -63,7 +63,7 @@ The example tests a ground-truth graph provided by experts (11 nodes and 17 edge
 The following scripts are used to run experiments shown in Appendix E.
 
 1. Appendix E.1: Comparison of ListCI and two other algorithms - ListGMP and ListCIBF.
-    - Running bnlearn instances (with varying projection levels) over three algorithms.
+    - Running bnlearn instances (with varying projection levels) over three algorithms. The original bnlearn instances are available [here](https://www.bnlearn.com/bnrepository/).
 
     Try running the following command:
 
@@ -78,6 +78,22 @@ The following scripts are used to run experiments shown in Appendix E.
     1. First argument: `gmp`, `lmp`, or `clmp`. An algorithm to run.
     2. Second argument: `graphs/bnlearn/sm/asia.txt`. The path to a bnlearn graph file.
 
+    ### Graphs
+
+    All bnlearn graphs are placed in the directory `graphs/bnlearn`. There are three types of graphs, classified based on `n`: number of nodes.
+
+    * Small graphs, `n`: [1,20)
+
+        Placed in `graphs/bnlearn/sm` subdirectory.
+
+    * Medium graphs, `n`: [21,50)
+
+        Placed in `graphs/bnlearn/md` subdirectory.
+
+    * Large graphs, `n`: [51,100)
+
+        Placed in `graphs/bnlearn/lg` subdirectory.
+
 2. Appendix E.2: Analysis of C-LMP
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
 
@@ -89,15 +105,13 @@ The following scripts are used to run experiments shown in Appendix E.
     * run_case2_mu.py
     * run_case3.py
     
-    As an example, try running the following command:
+    The list of commands goes as follows:
 
     ```
     python3 run_case1.py
     ```
 
-    Then, a report file named `case1_report.csv` will be generated.
-
-    The rest of the commands are as follows:
+    A report file named `case1_report.csv` will be generated.
 
     ```
     python3 run_case1_mu.py
@@ -131,16 +145,17 @@ The following scripts are used to run experiments shown in Appendix E.
 
     ### Parameters of a report file
 
-    * n: number of nodes.
-    * m: number of edges.
-    * md: number of directed edges.
-    * mu: number of bidirected edges.
-    * \# CI: number of CIs invoked by a Markov property.
-    * runtime: running time of an algorithm in seconds (rounded to the nearest second).
-    * s: size of the largest c-component.
-    * \# S: number of ancestral sets.
-    * \# S+: number of maximal ancestral sets (MASs).
+    * `n`: number of nodes.
+    * `m`: number of edges.
+    * `md`: number of directed edges.
+    * `mu`: number of bidirected edges.
+    * `# CI`: number of CIs invoked by a Markov property.
+    * `runtime:` running time of an algorithm in seconds (rounded to the nearest second).
+    * `s`: size of the largest c-component.
+    * `# S`: number of ancestral sets.
+    * `# S+`: number of maximal ancestral sets (MASs).
 
 ## References
 
+- Scutari, M. 2010. Learning Bayesian Networks with the bnlearn R Package. Journal of Statistical Software, 35(3): 1–22.
 - Sachs, K.; Perez, O.; Pe’er, D.; Lauffenburger, D. A.; and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.
