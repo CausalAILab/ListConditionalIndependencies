@@ -97,6 +97,24 @@ The following scripts are used to run experiments shown in Appendix E.
 
     Then, a report file named `case1_report.csv` will be generated.
 
+    The rest of the commands are as follows:
+
+    ```
+    python3 run_case1_mu.py
+    ```
+    ```
+    python3 run_case1_invalid.py
+    ```
+    ```
+    python3 run_case2.py
+    ```
+    ```
+    python3 run_case2_mu.py
+    ```
+    ```
+    python3 run_case3.py
+    ```
+
 ## References
 
 - Sachs, K.; Perez, O.; Pe’er, D.; Lauffenburger, D. A.; and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.
