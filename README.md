@@ -15,7 +15,7 @@ pip3 install -e .
 To run some examples, try running the following command:
 
 ```
-python3 main.py clmp graphs/paper/fig5a.txt
+python3 main.py clmp graphs/paper/fig4b.txt
 ```
 
 ### Arguments
@@ -25,22 +25,22 @@ python3 main.py clmp graphs/paper/fig5a.txt
 - `lmp`: The ordered local Markov property (runs the algorithm ListCIBF)
 - `clmp`: The c-component local Markov property (runs the algorithm ListCI)
 
-2. Second argument: `graphs/paper/fig5a.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
+2. Second argument: `graphs/paper/fig4b.txt`. The path to a text file that contains graph information, such as nodes and edges of a graph. Please check the formatting for details.
 
 ### Format of the graph file
 
-Consider `graphs/paper/fig1b.txt` as an example.
+Consider `graphs/paper/fig4b.txt` as an example.
 
 *&#60;NODES&#62;*
 
-Each line represents the name of a variable/node (e.g., `A` and `E`).
+Each line represents the name of a variable/node (e.g., `A` and `B`).
 
 *&#60;EDGES&#62;*
 
 Each line describes an edge. Two types of edges are supported:
 
-1. Directed edge: `A -> E` represents a directed edge from `A` to `E`.
-2. Bidirected edge: `E -- F` means there exists some unmeasured confounder (i.e., latent variable) between `E` and `F`.
+1. Directed edge: `A -> B` represents a directed edge from `A` to `B`.
+2. Bidirected edge: `A -- F` means there exists some unmeasured confounder (i.e., latent variable) between `A` and `F`.
 
 
 ## How to test a model against observational data
@@ -96,15 +96,20 @@ We consider experiments shown in Appendix E.
 
     ### Parameters of a report file
 
+    Measured parameters for all three algorithms.
     * `n`: number of nodes.
     * `m`: number of edges.
     * `md`: number of directed edges.
     * `mu`: number of bidirected edges.
     * `# CI`: number of CIs invoked by a Markov property.
     * `runtime:` running time of an algorithm in seconds (rounded to the nearest second).
-    * `s`: size of the largest c-component.
+
+    Two additional paramters are measured for ListCIBF.
     * `# S`: number of ancestral sets.
     * `# S+`: number of maximal ancestral sets (MASs).
+
+    One additional paramter is measured for both ListCIBF and ListCI.
+    * `s`: size of the largest c-component.
 
 2. Appendix E.2: Analysis of C-LMP
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
