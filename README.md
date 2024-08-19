@@ -102,18 +102,32 @@ The following scripts are used to run experiments shown in Appendix E.
     ```
     python3 run_case1_mu.py
     ```
+
+    A report file named `case1_mu_report.csv` will be generated.
+
     ```
     python3 run_case1_invalid.py
     ```
+
+    A report file named `case1_invalid_CIs_report.csv` will be generated.
+
     ```
     python3 run_case2.py
     ```
+
+    A report file named `case2_report.csv` will be generated.
+
     ```
     python3 run_case2_mu.py
     ```
+
+    A report file named `case2_mu_report.csv` will be generated.
+
     ```
     python3 run_case3.py
     ```
+
+    A report file named `case3_report.csv` will be generated.
 
 ## References
 
