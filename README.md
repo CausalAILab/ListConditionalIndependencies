@@ -129,6 +129,18 @@ The following scripts are used to run experiments shown in Appendix E.
 
     A report file named `case3_report.csv` will be generated.
 
+    ### Parameters of a report file
+
+    * n: number of nodes.
+    * m: number of edges.
+    * md: number of directed edges.
+    * mu: number of bidirected edges.
+    * \# CI: number of CIs invoked by a Markov property.
+    * runtime: running time of an algorithm in seconds (rounded to the nearest second).
+    * s: size of the largest c-component.
+    * \# S: number of ancestral sets.
+    * \# S+: number of maximal ancestral sets (MASs).
+
 ## References
 
 - Sachs, K.; Perez, O.; Pe’er, D.; Lauffenburger, D. A.; and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.
