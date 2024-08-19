@@ -1,5 +1,5 @@
 # ListConditionalIndependencies
-Implementation of the algorithms for listing all conditional independencies implied by a causal model.
+Implementation of the algorithms for listing all conditional independence relations (CIs) implied by a causal model.
 
 ## How to install
 
@@ -20,7 +20,7 @@ python3 main.py clmp graphs/paper/fig5a.txt
 
 ### Arguments
 
-1. First argument: `gmp`, `lmp`, or `clmp`.
+1. First argument: `gmp`, `lmp`, or `clmp`. Specifies a listing algorithm that outputs all CIs invoked by the following property.
 - `gmp`: The global Markov property (runs the algorithm ListGMP)
 - `lmp`: The ordered local Markov property (runs the algorithm ListCIBF)
 - `clmp`: The c-component local Markov property (runs the algorithm ListCI)
@@ -60,7 +60,7 @@ The example tests a ground-truth graph provided by experts (11 nodes and 17 edge
 
 ## How to run experiments
 
-The following scripts are used to run experiments shown in Appendix E.
+We consider experiments shown in Appendix E.
 
 1. Appendix E.1: Comparison of ListCI and two other algorithms - ListGMP and ListCIBF.
     - Running bnlearn instances (with varying projection levels) over three algorithms. The original bnlearn instances are available [here](https://www.bnlearn.com/bnrepository/).
@@ -71,7 +71,7 @@ The following scripts are used to run experiments shown in Appendix E.
     python3 run_bnlearn_graph.py clmp graphs/bnlearn/sm/asia.txt
     ```
 
-    When the experiment finishes, a report file named `bnlearn_report_asia_clmp.csv` will be generated.
+    When the experiment finishes, a report file named `bnlearn_report_asia_clmp.csv` will be generated. Please check the heading **Parameters of a report file** for more details.
 
     ### Arguments
 
@@ -93,6 +93,18 @@ The following scripts are used to run experiments shown in Appendix E.
     * Large graphs, `n`: [51,100)
 
         Placed in `graphs/bnlearn/lg` subdirectory.
+
+    ### Parameters of a report file
+
+    * `n`: number of nodes.
+    * `m`: number of edges.
+    * `md`: number of directed edges.
+    * `mu`: number of bidirected edges.
+    * `# CI`: number of CIs invoked by a Markov property.
+    * `runtime:` running time of an algorithm in seconds (rounded to the nearest second).
+    * `s`: size of the largest c-component.
+    * `# S`: number of ancestral sets.
+    * `# S+`: number of maximal ancestral sets (MASs).
 
 2. Appendix E.2: Analysis of C-LMP
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
@@ -142,18 +154,6 @@ The following scripts are used to run experiments shown in Appendix E.
     ```
 
     A report file named `case3_report.csv` will be generated.
-
-    ### Parameters of a report file
-
-    * `n`: number of nodes.
-    * `m`: number of edges.
-    * `md`: number of directed edges.
-    * `mu`: number of bidirected edges.
-    * `# CI`: number of CIs invoked by a Markov property.
-    * `runtime:` running time of an algorithm in seconds (rounded to the nearest second).
-    * `s`: size of the largest c-component.
-    * `# S`: number of ancestral sets.
-    * `# S+`: number of maximal ancestral sets (MASs).
 
 ## References
 
