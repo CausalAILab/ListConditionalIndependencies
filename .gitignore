@@ -6,6 +6,12 @@
 # test output files
 output/
 
+# bnlearn bif files
+# bif/
+
+# experiment files
+experiments/
+
 # Node artifact files
 node_modules/
 

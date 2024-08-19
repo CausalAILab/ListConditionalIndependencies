@@ -1,8 +1,0 @@
-<NODES>
-Earthquake
-Alarm
-JohnCalls
-
-<EDGES>
-Earthquake -> Alarm
-Alarm -> JohnCalls

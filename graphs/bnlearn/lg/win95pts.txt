@@ -1,0 +1,191 @@
+<NODES>
+AppOK
+DataFile
+AppData
+DskLocal
+PrtSpool
+PrtOn
+PrtPaper
+NetPrint
+PrtDriver
+PrtThread
+EMFOK
+GDIIN
+DrvSet
+DrvOK
+GDIOUT
+PrtSel
+PrtDataOut
+PrtPath
+NtwrkCnfg
+PTROFFLINE
+NetOK
+PrtCbl
+PrtPort
+CblPrtHrdwrOK
+LclOK
+DSApplctn
+PrtMpTPth
+DS_NTOK
+DS_LCLOK
+PC2PRT
+PrtMem
+PrtTimeOut
+FllCrrptdBffr
+TnrSpply
+PrtData
+Problem1
+AppDtGnTm
+PrntPrcssTm
+DeskPrntSpd
+PgOrnttnOK
+PrntngArOK
+ScrnFntNtPrntrFnt
+CmpltPgPrntd
+GrphcsRltdDrvrSttngs
+EPSGrphc
+NnPSGrphc
+PrtPScript
+PSGRAPHIC
+Problem4
+TrTypFnts
+FntInstlltn
+PrntrAccptsTrtyp
+TTOK
+NnTTOK
+Problem5
+LclGrbld
+NtGrbld
+GrbldOtpt
+HrglssDrtnAftrPrnt
+REPEAT
+AvlblVrtlMmry
+PSERRMEM
+TstpsTxt
+GrbldPS
+IncmpltPS
+PrtFile
+PrtIcon
+Problem6
+Problem3
+PrtQueue
+NtSpd
+Problem2
+PrtStatPaper
+PrtStatToner
+PrtStatMem
+PrtStatOff
+
+<EDGES>
+AppOK -> AppData
+DataFile -> AppData
+AppData -> EMFOK
+AppData -> GDIIN
+AppData -> DS_NTOK
+AppData -> DS_LCLOK
+AppData -> LclGrbld
+AppData -> NtGrbld
+DskLocal -> EMFOK
+PrtSpool -> GDIIN
+PrtSpool -> AppDtGnTm
+PrtSpool -> PrntPrcssTm
+PrtOn -> PrtData
+PrtOn -> PrtStatOff
+PrtPaper -> PrtData
+PrtPaper -> PrtStatPaper
+NetPrint -> PC2PRT
+NetPrint -> GrbldOtpt
+NetPrint -> Problem2
+PrtDriver -> GDIOUT
+PrtDriver -> LclGrbld
+PrtDriver -> NtGrbld
+PrtThread -> EMFOK
+EMFOK -> GDIIN
+GDIIN -> GDIOUT
+DrvSet -> GDIOUT
+DrvOK -> GDIOUT
+GDIOUT -> PrtDataOut
+PrtSel -> PrtDataOut
+PrtDataOut -> PC2PRT
+PrtDataOut -> PrtFile
+PrtPath -> NetOK
+PrtPath -> DS_NTOK
+NtwrkCnfg -> NetOK
+NtwrkCnfg -> DS_NTOK
+NtwrkCnfg -> NtGrbld
+NtwrkCnfg -> REPEAT
+NtwrkCnfg -> PrtIcon
+NtwrkCnfg -> NtSpd
+PTROFFLINE -> NetOK
+PTROFFLINE -> DS_NTOK
+PTROFFLINE -> PrtIcon
+NetOK -> PC2PRT
+PrtCbl -> LclOK
+PrtCbl -> DS_LCLOK
+PrtPort -> LclOK
+PrtPort -> DS_LCLOK
+CblPrtHrdwrOK -> LclOK
+CblPrtHrdwrOK -> DS_LCLOK
+CblPrtHrdwrOK -> LclGrbld
+CblPrtHrdwrOK -> REPEAT
+LclOK -> PC2PRT
+DSApplctn -> PC2PRT
+PrtMpTPth -> DS_NTOK
+DS_NTOK -> PC2PRT
+DS_LCLOK -> PC2PRT
+PC2PRT -> PrtData
+PrtMem -> PrtData
+PrtMem -> DeskPrntSpd
+PrtMem -> CmpltPgPrntd
+PrtMem -> NnPSGrphc
+PrtMem -> PSGRAPHIC
+PrtMem -> TTOK
+PrtMem -> NnTTOK
+PrtMem -> LclGrbld
+PrtMem -> NtGrbld
+PrtMem -> PrtStatMem
+PrtTimeOut -> PrtData
+FllCrrptdBffr -> PrtData
+TnrSpply -> PrtData
+TnrSpply -> PrtStatToner
+PrtData -> Problem1
+AppDtGnTm -> DeskPrntSpd
+AppDtGnTm -> HrglssDrtnAftrPrnt
+PrntPrcssTm -> DeskPrntSpd
+DeskPrntSpd -> NtSpd
+DeskPrntSpd -> Problem2
+PgOrnttnOK -> CmpltPgPrntd
+PrntngArOK -> CmpltPgPrntd
+ScrnFntNtPrntrFnt -> NnTTOK
+CmpltPgPrntd -> IncmpltPS
+CmpltPgPrntd -> Problem3
+GrphcsRltdDrvrSttngs -> NnPSGrphc
+GrphcsRltdDrvrSttngs -> PSGRAPHIC
+EPSGrphc -> NnPSGrphc
+EPSGrphc -> PSGRAPHIC
+NnPSGrphc -> Problem4
+PrtPScript -> Problem4
+PrtPScript -> AvlblVrtlMmry
+PrtPScript -> PSERRMEM
+PrtPScript -> TstpsTxt
+PrtPScript -> Problem6
+PrtPScript -> Problem3
+PSGRAPHIC -> Problem4
+TrTypFnts -> Problem5
+FntInstlltn -> TTOK
+FntInstlltn -> NnTTOK
+PrntrAccptsTrtyp -> TTOK
+TTOK -> Problem5
+NnTTOK -> Problem5
+LclGrbld -> GrbldOtpt
+NtGrbld -> GrbldOtpt
+GrbldOtpt -> GrbldPS
+GrbldOtpt -> Problem6
+AvlblVrtlMmry -> PSERRMEM
+AvlblVrtlMmry -> TstpsTxt
+AvlblVrtlMmry -> GrbldPS
+AvlblVrtlMmry -> IncmpltPS
+GrbldPS -> Problem6
+IncmpltPS -> Problem3
+PrtQueue -> NtSpd
+NtSpd -> Problem2

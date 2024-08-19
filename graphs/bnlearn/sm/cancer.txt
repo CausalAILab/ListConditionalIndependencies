@@ -1,0 +1,12 @@
+<NODES>
+Pollution  -75,-150
+Smoker  75,-150
+Cancer  0,0
+Xray  -75,150
+Dyspnoea  75,150
+
+<EDGES>
+Pollution -> Cancer
+Smoker -> Cancer
+Cancer -> Xray
+Cancer -> Dyspnoea
