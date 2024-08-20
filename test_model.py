@@ -61,8 +61,6 @@ def testModel(G, Pv, pValue, outputCIs = False):
     CIs = ConditionalIndependencies.ListCI(G, G.nodes)
 
     # tests: 'fisherz', 'kci'
-    # https://github.com/py-why/causal-learn/blob/main/causallearn/utils/cit.py
-    # https://causal-learn.readthedocs.io/en/latest/independence_tests_index/kci.html
     # CITestMethod = 'fisherz'
     CITestMethod = 'kci'
     CITester = CIT(Pv['dataset'], CITestMethod)
