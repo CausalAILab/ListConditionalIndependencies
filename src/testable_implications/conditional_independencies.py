@@ -17,6 +17,22 @@ class ConditionalIndependencies():
 
     @staticmethod
     def ListGMP(G,V):
+        """
+        Enumerates all conditional independence relations (CIs) invoked by the global Markov property (GMP).
+        Reference: Figure D.0.1 in Appendix
+
+        Parameters
+        ----------
+        G : Graph
+            A causal graph.
+        V : Node[]
+            A set of variables.
+
+        Returns
+        -------
+        Dict
+            A list of objects where each object represents one CI invoked by GMP.
+        """
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
         
@@ -65,7 +81,29 @@ class ConditionalIndependencies():
         return CI
 
     @staticmethod
-    def ListCIBF(G, V, onlyMaximalAns = True, Vordered = None, measuredParams=None):
+    def ListCIBF(G, V, onlyMaximalAns=True, Vordered=None, measuredParams=None):
+        """
+        Enumerates all conditional independence relations (CIs) invoked by the ordered local Markov property (LMP).
+        Reference: Algorithm 1
+
+        Parameters
+        ----------
+        G : Graph
+            A causal graph.
+        V : Node[]
+            A set of variables.
+        onlyMaximalAns: boolean
+            Default is True. If set to true, ListCIBF considers only maximal ancestral sets to genereate CIs invoked by LMP.
+        Vordered: Node[]
+            Default is None. If specified, ListCIBF uses the given fixed consisent ordering of variables.
+        measuredParams: Dict
+            Default is None. If specified, ListCIBF records the following measured parameters (s: size of the largest c-component, Snum: total number of ancestral sets, Splusnum: total number of maximal ancestral sets) to measuredParams after ListCIBF terminates.
+
+        Returns
+        -------
+        Dict
+            A list of objects where each object represents one CI invoked by LMP.
+        """
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
 
@@ -153,9 +191,27 @@ class ConditionalIndependencies():
 
         return CI
     
-    
+
     @staticmethod
-    def ListCI(G,V,Vordered = None):
+    def ListCI(G, V, Vordered = None):
+        """
+        Enumerates all conditional independence relations (CIs) invoked by the c-component local Markov property (C-LMP).
+        Reference: Algorithm 2
+
+        Parameters
+        ----------
+        G : Graph
+            A causal graph.
+        V : Node[]
+            A set of variables.
+        Vordered: Node[]
+            Default is None. If specified, ListCI uses the given fixed consisent ordering of variables.
+
+        Returns
+        -------
+        Dict
+            A list of objects where each object represents one CI invoked by C-LMP.
+        """
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return None
         
@@ -186,7 +242,26 @@ class ConditionalIndependencies():
     
 
     @staticmethod
-    def ListCIX(GVleqX,X,VleqX,I,R,CI):
+    def ListCIX(GVleqX, X, VleqX, I, R, CI):
+        """
+        Enumerates all conditional independence relations (CIs) invoked by the c-component local Markov property (C-LMP) for a fixed variable X.
+        Reference: Algorithm 2
+
+        Parameters
+        ----------
+        GVleqX : Graph
+            A causal graph. Assumed to be a subgraph of the original graph G consisting of nodes VleqX: all variables up to X in a consistent ordering.
+        X : Node
+            A variable.
+        VleqX : Node[]
+            A set of variables up to X in a consistent ordering.
+        I: Node[]
+            An ancestral c-component (AC) relative to X. Enforces the constraint that every node in I must be included in any admissible ancestral c-component (AAC).
+        R: Node[]
+            An AC relative to X. Enforces the constraint that any node in R could be included in any AAC.
+        CI: Dict
+            A collection of all CIs invoked by C-LMP that are generated up to the current point of execution.
+        """
         if ConditionalIndependencies.FindAAC(GVleqX,X,VleqX,I,R) is not None:
             if su.equals(I, R, 'name'):
                 C = I
@@ -221,7 +296,29 @@ class ConditionalIndependencies():
     
 
     @staticmethod
-    def FindAAC(GVleqX,X,VleqX,I,R):
+    def FindAAC(GVleqX, X, VleqX, I, R):
+        """
+        Outputs an admissible ancestral c-component (AAC) C relative to a variable X under the constraint I <= C <= R, if such C exists. Outputs None otherwise.
+        Reference: Figure 7
+
+        Parameters
+        ----------
+        GVleqX : Graph
+            A causal graph. Assumed to be a subgraph of the original graph G consisting of nodes VleqX: all variables up to X in a consistent ordering.
+        X : Node
+            A variable.
+        VleqX : Node[]
+            A set of variables up to X in a consistent ordering.
+        I: Node[]
+            An ancestral c-component (AC) relative to X. Enforces the constraint that every node in I must be included in C.
+        R: Node[]
+            An AC relative to X. Enforces the constraint that any node in R could be included in C.
+
+        Returns
+        ----------
+        Node[]
+            An AAC C under the constraint I <= C <= R, if such C exists. None otherwise.
+        """
         if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,I):
             return I
         else:
@@ -244,7 +341,27 @@ class ConditionalIndependencies():
     
 
     @staticmethod
-    def IsAdmissible(GVleqX,X,VleqX,C):
+    def IsAdmissible(GVleqX, X, VleqX, C):
+        """
+        Verifies whether a given ancestral c-component (AC) relative to X is admissible or not.
+        Reference: Figure B.2.1 in Appendix
+
+        Parameters
+        ----------
+        GVleqX : Graph
+            A causal graph. Assumed to be a subgraph of the original graph G consisting of nodes VleqX: all variables up to X in a consistent ordering.
+        X : Node
+            A variable.
+        VleqX : Node[]
+            A set of variables up to X in a consistent ordering.
+        C: Node[]
+            An ancestral c-component (AC) relative to X.
+
+        Returns
+        ----------
+        Boolean
+            True if C is an AAC relative to X. False otherwise.
+        """
         Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
         Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
         W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
@@ -254,6 +371,28 @@ class ConditionalIndependencies():
 
     @staticmethod
     def FindSeparator(G, X, Y, I, R):
+        """
+        Generates a set of variables Z that d-separates X and Y in G under the constraint I \ (X \cup Y) <= Z <= R \ (X \cup Y) if such Z exists. Outputs None otherwise.
+        Reference: Figure B.2.2 in Appendix
+
+        Parameters
+        ----------
+        G : Graph
+            A causal graph.
+        X : Node[]
+            A set of variables.
+        Y : Node[]
+            A set of variables.
+        I: Node[]
+            A set of variables.
+        R: Node[]
+            A set of variables.
+
+        Returns
+        ----------
+        Node[]
+            A set of variables Z if and only if there exists Z (under the constraint I \ (X \cup Y) <= Z <= R \ (X \cup Y)) that d-separates X and Y. None otherwise.
+        """
         X = ou.makeArray(X)
         Y = ou.makeArray(Y)
         I = ou.makeArray(I)
