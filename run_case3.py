@@ -2,7 +2,7 @@ from src.experiment.experiment_utils import ExperimentUtils as eu
 
 fileName = 'case3_report'
 
-def testCase3(numGraphs, n, bidirectedEdgesFraction=0.2):
+def testCase3(numBatches, n, bidirectedEdgesFraction=0.2):
     paramsCollectionText = []
     paramsCollection = []
 
@@ -10,7 +10,7 @@ def testCase3(numGraphs, n, bidirectedEdgesFraction=0.2):
     md = 2 * n
     mb = int(mMax * bidirectedEdgesFraction)
     
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -28,14 +28,14 @@ def testCase3(numGraphs, n, bidirectedEdgesFraction=0.2):
     eu.writeParamsToCsv(fileName, paramsCollection)
 
 
-def testCase3Batch(numGraphs, n, numDivisions=10):
+def testCase3Batch(numBatches, n, numDivisions=10):
     paramsCollectionText = []
     paramsCollection = []
 
     mMax = int(n * (n-1) * 0.5)
     md = 2 * n
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -62,11 +62,10 @@ def testCase3Batch(numGraphs, n, numDivisions=10):
 
 
 if __name__ == '__main__':
-    # timeout = 1 * 60 * 60
-    numGraphs = 10
+    numBatches = 10
     numDivisions = 10
     n = 10
     U = 0.2
 
-    testCase3Batch(numGraphs, n, numDivisions)
-    # testCase3(numGraphs, n, U)
+    testCase3Batch(numBatches, n, numDivisions)
+    # testCase3(numBatches, n, U)

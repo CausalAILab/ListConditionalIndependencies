@@ -3,14 +3,14 @@ from src.testable_implications.ci_defs import algListCIBF
 
 fileName = 'case1_invalid_CIs_report'
 
-def testCase1Invalid(numGraphs, n, bidirectedEdgesFraction=0):
+def testCase1Invalid(numBatches, n, bidirectedEdgesFraction=0):
     paramsCollectionText = []
     paramsCollection = []
 
     mMax = int(0.5 * n * (n-1))
     mb = int(mMax * bidirectedEdgesFraction)
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
         
@@ -28,13 +28,13 @@ def testCase1Invalid(numGraphs, n, bidirectedEdgesFraction=0):
     eu.writeParamsToCsv(fileName, paramsCollection, algListCIBF.id_)
 
 
-def testCase1InvalidBatch(numGraphs, n, numDivisions=10):
+def testCase1InvalidBatch(numBatches, n, numDivisions=10):
     paramsCollectionText = []
     paramsCollection = []
 
     mMax = int(0.5 * n * (n-1))
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -60,11 +60,10 @@ def testCase1InvalidBatch(numGraphs, n, numDivisions=10):
 
 
 if __name__ == '__main__':
-    # timeout = 1 * 60 * 60
-    numGraphs = 10
+    numBatches = 10
     numDivisions = 10
     n = 10
     U = 0.2
 
-    testCase1InvalidBatch(numGraphs, n, numDivisions)
-    # testCase1Invalid(numGraphs, n, U)
+    testCase1InvalidBatch(numBatches, n, numDivisions)
+    # testCase1Invalid(numBatches, n, U)

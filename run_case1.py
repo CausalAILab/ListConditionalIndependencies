@@ -2,13 +2,13 @@ from src.experiment.experiment_utils import ExperimentUtils as eu
 
 fileName = 'case1_report'
 
-def testCase1(numGraphs, n, bidirectedEdgesFraction=0):
+def testCase1(numBatches, n, bidirectedEdgesFraction=0):
     paramsCollectionText = []
     paramsCollection = []
 
     mMax = int(0.5 * n * (n-1))
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -26,13 +26,13 @@ def testCase1(numGraphs, n, bidirectedEdgesFraction=0):
     eu.writeParamsToCsv(fileName, paramsCollection)
 
 
-def testCase1Batch(numGraphs, n, numDivisions=10):
+def testCase1Batch(numBatches, n, numDivisions=10):
     paramsCollectionText = []
     paramsCollection = []
 
     mMax = int(0.5 * n * (n-1))
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -57,11 +57,10 @@ def testCase1Batch(numGraphs, n, numDivisions=10):
 
 
 if __name__ == '__main__':
-    # timeout = 1 * 60 * 60
-    numGraphs = 10
+    numBatches = 10
     numDivisions = 10
     n = 10
     U = 0.2
 
-    testCase1Batch(numGraphs, n, numDivisions)
-    # testCase1(numGraphs, n, U)
+    testCase1Batch(numBatches, n, numDivisions)
+    # testCase1(numBatches, n, U)

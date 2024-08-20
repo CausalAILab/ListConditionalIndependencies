@@ -2,13 +2,13 @@ from src.experiment.experiment_utils import ExperimentUtils as eu
 
 fileName = 'case2_mu_report'
 
-def testCase2Mu(numGraphs, n, md, bidirectedEdgesFraction=0.2):
+def testCase2Mu(numBatches, n, md, bidirectedEdgesFraction=0.2):
     paramsCollectionText = []
     paramsCollection = []
 
     mb = int(md * bidirectedEdgesFraction)
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -26,11 +26,11 @@ def testCase2Mu(numGraphs, n, md, bidirectedEdgesFraction=0.2):
     eu.writeParamsToCsv(fileName, paramsCollection)
 
 
-def testCase2MuBatch(numGraphs, n, md, numDivisions=10):
+def testCase2MuBatch(numBatches, n, md, numDivisions=10):
     paramsCollectionText = []
     paramsCollection = []
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -58,11 +58,10 @@ def testCase2MuBatch(numGraphs, n, md, numDivisions=10):
 
 
 if __name__ == '__main__':
-    # timeout = 1 * 60 * 60
-    numGraphs = 10
+    numBatches = 10
     numDivisions = 10
     n = 10
     U = 0.2
 
-    testCase2MuBatch(numGraphs, n, n, numDivisions)
-    # testCase2Mu(numGraphs, n, n, U)
+    testCase2MuBatch(numBatches, n, n, numDivisions)
+    # testCase2Mu(numBatches, n, n, U)

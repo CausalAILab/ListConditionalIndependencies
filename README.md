@@ -111,6 +111,12 @@ We consider experiments shown in Appendix E.
     One additional paramter is measured for both ListCIBF and ListCI.
     * `s`: size of the largest c-component.
 
+    ### Experiment configuration
+
+    The following parameter may be modified in `run_bnlearn_graph.py` to change experiment settings.
+
+    * `numBatches`: number of batches to run for an experiment. For each single batch, 10 random graphs are generated in total: one graph for each projection level `U` (for `U = 0, 10, ..., 90`). Default is set to `10`, totalling 100 sample graphs. Located at line 284 of `run_bnlearn_graph.py`.
+
 2. Appendix E.2: Analysis of C-LMP
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
 
@@ -159,6 +165,13 @@ We consider experiments shown in Appendix E.
     ```
 
     A report file named `case3_report.csv` will be generated.
+
+    ### Experiment configuration
+
+    For all six scripts `run_case*.py`, the following parameters may be modified to change experiment settings. For all scripts, the mentioned variables are defined below the line: `if __name__ == '__main__':`.
+
+    * `n`: number of nodes.
+    * `numBatches`: number of batches to run for an experiment. For each single batch, 10 random graphs are generated. Default is set to `10`, totalling 100 sample graphs.
 
 ## References
 
