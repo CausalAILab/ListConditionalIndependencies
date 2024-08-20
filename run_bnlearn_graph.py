@@ -182,10 +182,10 @@ def runAlgorithmAndMeasureParams(G, alg, timeout=defaultTimeout):
     return params
 
 
-def testProjectedGraphs(G, alg, numGraphs, latentFraction=0.3, timeout=defaultTimeout):
+def testProjectedGraphs(G, alg, numBatches, latentFraction=0.3, timeout=defaultTimeout):
     paramsCollection = []
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollection.append([])
 
         Gp = eu.applyProjection(G, latentFraction)
@@ -197,14 +197,14 @@ def testProjectedGraphs(G, alg, numGraphs, latentFraction=0.3, timeout=defaultTi
         print(' '.join(line))
 
 
-def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
+def testProjectedGraphsBatch(G, alg, numBatches, timeout=defaultTimeout):
     paramsCollectionText = []
     paramsCollection = []
 
     numDivisions = 10
     offset = 0
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
 
@@ -241,13 +241,13 @@ def testProjectedGraphsBatch(G, alg, numGraphs, timeout=defaultTimeout):
     eu.writeParamsToCsv(fullFileName, paramsCollection)
 
 
-def tryTestProjectedGraphs(G, alg, numGraphs, latentFractionsToTest=defaultLatentFranctionsToTest, timeout=defaultTimeout):
+def tryTestProjectedGraphs(G, alg, numBatches, latentFractionsToTest=defaultLatentFranctionsToTest, timeout=defaultTimeout):
     paramsCollection = []
 
     global numSampleOfFailure
     numSampleOfFailure = 1
 
-    for i in range(numGraphs):
+    for i in range(numBatches):
         paramsCollection.append([])
 
         for U in latentFractionsToTest:
@@ -281,7 +281,7 @@ if __name__ == '__main__':
     task = sys.argv[1]
     filePath = sys.argv[2]
 
-    numGraphs = 10
+    numBatches = 10
     # UsToTest = [0.1]
 
     timeout = 1 * 60 * 60
@@ -310,10 +310,10 @@ if __name__ == '__main__':
                 G = parseGraph(fileContent)
 
                 if G is not None:
-                    testProjectedGraphsBatch(G, algorithm, numGraphs, timeout)
-                    # testProjectedGraphs(G, algorithm, numGraphs, 0.4, timeout)
+                    testProjectedGraphsBatch(G, algorithm, numBatches, timeout)
+                    # testProjectedGraphs(G, algorithm, numBatches, 0.4, timeout)
 
-                    # if not tryTestProjectedGraphs(G, algorithm, numGraphs, UsToTest, timeout):
+                    # if not tryTestProjectedGraphs(G, algorithm, numBatches, UsToTest, timeout):
                     #     currentAlg = algMap[algorithm]
                     #     line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
                     #     print(line)

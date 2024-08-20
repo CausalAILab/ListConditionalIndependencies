@@ -373,6 +373,8 @@ if __name__ == '__main__':
         drawPlot(plotType, processedData, specs)
     
     plt.legend()
+    # used for plot 1v
+    # plt.legend(loc='upper right')
     # plt.show()
 
     savePlotToFile(plotType, specs['imageFormat'])
