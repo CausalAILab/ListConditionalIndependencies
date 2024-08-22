@@ -6,9 +6,6 @@
 # test output files
 output/
 
-# bnlearn graph files
-graphs/bnlearn/vl/
-
 # experiment files
 experiments/
 

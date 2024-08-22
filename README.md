@@ -6,6 +6,8 @@ Implementation of the algorithms for listing all conditional independence relati
 Please run the following commands to install the package:
 
 ```
+git clone https://github.com/CausalAILab/ListConditionalIndependencies.git
+cd ListConditionalIndependencies
 pip3 install -r requirements.txt
 pip3 install -e .
 ```
