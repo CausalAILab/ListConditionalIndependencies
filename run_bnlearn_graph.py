@@ -21,10 +21,11 @@ ranges = range(0,10,1)
 defaultLatentFranctionsToTest = list(map(lambda x: x/10.0, ranges))
 
 numSampleOfFailure = 0
-latentFractionOfFailure = 0
+UOfFailure = 0
 
 reportFileName = 'bnlearn_report'
 fileName = ''
+
 
 def parseGraph(fileContent):
     parsedData = parseInput(fileContent)
@@ -59,60 +60,67 @@ def getEdgesSection():
 
 
 # an internal function to organize and finalize measured parameters
-def getFullParams(G, alg, CI, runtime, listCIBFParams):
-    n = len(G.nodes)
-    m = len(G.edges)
-    md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
-    mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
-    CIsize = len(CI)
+# def getFullParams(G, alg, CI, runtime, listCIBFParams):
+#     n = len(G.nodes)
+#     m = len(G.edges)
+#     md = len(list(filter(lambda e: e['type_'] == directedEdgeType.id_, G.edges)))
+#     mb = len(list(filter(lambda e: e['type_'] == bidirectedEdgeType.id_, G.edges)))
+#     CIsize = len(CI)
 
-    s = 1
+#     s = 1
 
-    if alg == algListCIBF.id_:
-        Snum = listCIBFParams['Snum']
-        Splusnum = listCIBFParams['Splusnum']
-        s = listCIBFParams['s']
-    elif alg == algListCI.id_:
-        V = su.intersection(gu.topoSort(G), G.nodes, 'name')
-        ACsizes = []
+#     if alg == algListCIBF.id_:
+#         Snum = listCIBFParams['Snum']
+#         Splusnum = listCIBFParams['Splusnum']
+#         s = listCIBFParams['s']
+#     elif alg == algListCI.id_:
+#         V = su.intersection(gu.topoSort(G), G.nodes, 'name')
+#         ACsizes = []
 
-        for X in V:
-            VleqX = V[:V.index(X)+1]
-            GVleqX = gu.subgraph(G, VleqX)
+#         for X in V:
+#             VleqX = V[:V.index(X)+1]
+#             GVleqX = gu.subgraph(G, VleqX)
             
-            R = cu.C(GVleqX,X)
-            ACsizes.append(len(R))
+#             R = cu.C(GVleqX,X)
+#             ACsizes.append(len(R))
 
-        if len(ACsizes) > 0:
-            s = max(ACsizes)
+#         if len(ACsizes) > 0:
+#             s = max(ACsizes)
 
-    params = []
+#     params = []
 
-    if alg == algListGMP.id_:
-        params = [n, m, md, mb, CIsize, runtime]
-    elif alg == algListCIBF.id_:
-        params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
-    elif alg == algListCI.id_:
-        params = [n, m, md, mb, CIsize, runtime, s]
+#     if alg == algListGMP.id_:
+#         params = [n, m, md, mb, CIsize, runtime]
+#     elif alg == algListCIBF.id_:
+#         params = [n, m, md, mb, CIsize, runtime, s, Snum, Splusnum]
+#     elif alg == algListCI.id_:
+#         params = [n, m, md, mb, CIsize, runtime, s]
 
-    return params
+#     return params
 
 
-def runAlgorithm(queue, G, alg):
-    CI = queue.get()
-    listCIBFParams = queue.get()
+# def runAlgorithm(queue, G, alg, specs):
+#     orgVordered = specs['Vordered']
 
-    if alg == algListGMP.id_:
-        CIs = cu.ListGMP(G, G.nodes)
-    elif alg == algListCIBF.id_:
-        CIs = cu.ListCIBF(G, G.nodes, True, None, listCIBFParams)
-    elif alg == algListCI.id_:
-        CIs = cu.ListCI(G, G.nodes)
+#     if orgVordered is not None:
+#         Vordered = su.intersection(orgVordered, G.nodes, 'name')
+#     else:
+#         Vordered = None
 
-    CI.extend(CIs)
+#     CI = queue.get()
+#     listCIBFParams = queue.get()
 
-    queue.put(CI)
-    queue.put(listCIBFParams)
+#     if alg == algListGMP.id_:
+#         CIs = cu.ListGMP(G, G.nodes)
+#     elif alg == algListCIBF.id_:
+#         CIs = cu.ListCIBF(G, G.nodes, True, Vordered, listCIBFParams)
+#     elif alg == algListCI.id_:
+#         CIs = cu.ListCI(G, G.nodes, Vordered)
+
+#     CI.extend(CIs)
+
+#     queue.put(CI)
+#     queue.put(listCIBFParams)
 
 
 # returns a pair: (status of sucessful run, measured params)
@@ -124,7 +132,7 @@ def tryRunAlgorithm(G, alg, timeout=defaultTimeout):
     queue = mp.Queue()
     queue.put(CI)
     queue.put(listCIBFParams)
-    p = mp.Process(target=runAlgorithm, args=(queue, G, alg))
+    p = mp.Process(target=eu.runAlgorithm, args=(queue, G, alg, specs))
 
     start = datetime.now()
     p.start()
@@ -142,88 +150,109 @@ def tryRunAlgorithm(G, alg, timeout=defaultTimeout):
     listCIBFParams = queue.get()
     runtime = end - start
 
-    params = getFullParams(G, alg, CI, runtime, listCIBFParams)
+    params = eu.getFullParams(G, alg, CI, runtime, listCIBFParams)
 
     return (True, params)
 
 
-def runAlgorithmAndMeasureParams(G, alg, timeout=defaultTimeout):
-    CI = []
-    listCIBFParams = {}
+# def runAlgorithmAndMeasureParams(G, alg, specs):
+#     timeout = specs['timeout']
 
-    # use queue to pass values between processes
-    queue = mp.Queue()
-    queue.put(CI)
-    queue.put(listCIBFParams)
-    p = mp.Process(target=runAlgorithm, args=(queue, G, alg))
+#     CI = []
+#     listCIBFParams = {}
 
-    start = datetime.now()
-    p.start()
-    p.join(timeout=timeout)
+#     # use queue to pass values between processes
+#     queue = mp.Queue()
+#     queue.put(CI)
+#     queue.put(listCIBFParams)
+#     p = mp.Process(target=runAlgorithm, args=(queue, G, alg, specs))
 
-    if p.is_alive():
-        p.terminate()
-        p.join()
+#     start = datetime.now()
+#     p.start()
+#     p.join(timeout=timeout)
 
-        currentAlg = algMap[alg]
-        paramNames = currentAlg.params
-        params = ['-'] * len(paramNames)
+#     if p.is_alive():
+#         p.terminate()
+#         p.join()
 
-        return params
+#         currentAlg = algMap[alg]
+#         paramNames = currentAlg.params
+#         params = ['-'] * len(paramNames)
+
+#         return params
     
-    end = datetime.now()
+#     end = datetime.now()
 
-    CI = queue.get()
-    listCIBFParams = queue.get()
-    runtime = eu.roundToNearestSecond(end - start)
+#     CI = queue.get()
+#     listCIBFParams = queue.get()
+#     runtime = eu.roundToNearestSecond(end - start)
 
-    params = getFullParams(G, alg, CI, runtime, listCIBFParams)
+#     params = getFullParams(G, alg, CI, runtime, listCIBFParams)
 
-    return params
+#     return params
 
 
-def testProjectedGraphs(G, alg, numBatches, latentFraction=0.3, timeout=defaultTimeout):
-    paramsCollection = []
+def testProjectedGraphs(G, alg, specs):
+    U = specs['U']
+    numBatches = specs['numBatches']
+
+    paramsCollectionText = []
 
     for i in range(numBatches):
-        paramsCollection.append([])
+        paramsBatchText = []
 
-        Gp = eu.applyProjection(G, latentFraction)
-        params = runAlgorithmAndMeasureParams(Gp, alg, timeout)
+        Gp = eu.applyProjection(G, U)
+
+        params = eu.runAlgorithmAndMeasureParams(Gp, alg, specs)
         paramsToStr = list(map(lambda n: str(n), params))
-        paramsCollection[i].extend(paramsToStr)
 
-    for line in paramsCollection:
-        print(' '.join(line))
+        paramsBatchText.extend(paramsToStr)
+        paramsCollectionText.append(paramsBatchText)
+
+    for paramsBatchTextBlocks in paramsCollectionText:
+        print(' '.join(paramsBatchTextBlocks))
 
 
-def testProjectedGraphsBatch(G, alg, numBatches, timeout=defaultTimeout):
+def testProjectedGraphsBatch(G, alg, specs):
+    numBatches = specs['numBatches']
+    numDivisions = specs['numDivisions']
+    randomSeed = specs['randomSeed']
+    fixOrdering = specs['fixOrdering']
+
+    if fixOrdering:
+        Vordered = su.intersection(gu.topoSort(G), G.nodes, 'name')
+        specs['Vordered'] = Vordered
+    else:
+        specs['Vordered'] = None
+
     paramsCollectionText = []
     paramsCollection = []
 
-    numDivisions = 10
     offset = 0
 
     for i in range(numBatches):
-        paramsCollectionText.append([])
-        paramsCollectionPerSample = []
+        paramsBatchText = []
+        paramsBatch = []
 
-        line = 'Running a batch of samples [' + str(i * 10 + 1) + ', ' + str((i+1) * 10) + ']'
+        line = 'Running a batch of samples [' + str(i * numDivisions + 1) + ', ' + str((i+1) * numDivisions) + ']'
         print(line)
 
         for j in range(numDivisions):
-            latentFraction = j * 0.1 + offset
-            Gp = eu.applyProjection(G, latentFraction)
-            params = runAlgorithmAndMeasureParams(Gp, alg, timeout)
+            U = j * 0.1 + offset
+            Gp = eu.applyProjection(G, U, randomSeed)
+
+            params = eu.runAlgorithmAndMeasureParams(Gp, alg, specs)
             paramsToStr = list(map(lambda n: str(n), params))
-            paramsCollectionText[i].extend(paramsToStr)
 
-            paramsCollectionPerSample.append(params)
+            paramsBatchText.extend(paramsToStr)
+            paramsBatch.append(params)
 
-        paramsCollection.append(paramsCollectionPerSample)
+        paramsCollectionText.append(paramsBatchText)
+        paramsCollection.append(paramsBatch)
 
-    # for line in paramsCollectionText:
-    #     print(' '.join(line))
+    for paramsBatchTextBlocks in paramsCollectionText:
+        print(' '.join(paramsBatchTextBlocks))
+
 
     global fileName
 
@@ -255,8 +284,8 @@ def tryTestProjectedGraphs(G, alg, numBatches, latentFractionsToTest=defaultLate
             (successfullyRun, params) = tryRunAlgorithm(Gp, alg, timeout)
 
             if not successfullyRun:
-                global latentFractionOfFailure
-                latentFractionOfFailure = U
+                global UOfFailure
+                UOfFailure = U
 
                 return False
 
@@ -270,9 +299,8 @@ def tryTestProjectedGraphs(G, alg, numBatches, latentFractionsToTest=defaultLate
 
     return True
 
-if __name__ == '__main__':
 
-    # read arguments
+if __name__ == '__main__':
     if len(sys.argv) != 3:
         print('Please specify 2 arguments: 1) the name of the task (\'gmp\', \'lmp\', or \'clmp\'), and 2) input file path (e.g., graphs/bif/sm/cancer.txt).')
 
@@ -281,46 +309,53 @@ if __name__ == '__main__':
     task = sys.argv[1]
     filePath = sys.argv[2]
 
-    numBatches = 10
-    # UsToTest = [0.1]
+    supportedTasks = ['gmp', 'lmp', 'clmp']
 
-    timeout = 1 * 60 * 60
-    # timeout = None
-
-    validTasks = ['gmp', 'lmp', 'clmp']
-
-    if task not in validTasks:
+    if task not in supportedTasks:
         print('Please specify a valid task to run (\'gmp\', \'lmp\', or \'clmp\').')
-    else:
-        if task == 'gmp':
-            algorithm = algListGMP.id_
-        elif task == 'lmp':
-            algorithm = algListCIBF.id_
-        elif task == 'clmp':
-            algorithm = algListCI.id_
 
-        try:
-            filePath = os.path.normpath(filePath)
-            path, file = os.path.split(filePath)
+        sys.exit()
 
-            fileName = file
-
-            with open(filePath, 'r') as f:
-                fileContent = f.read()
-                G = parseGraph(fileContent)
-
-                if G is not None:
-                    testProjectedGraphsBatch(G, algorithm, numBatches, timeout)
-                    # testProjectedGraphs(G, algorithm, numBatches, 0.4, timeout)
-
-                    # if not tryTestProjectedGraphs(G, algorithm, numBatches, UsToTest, timeout):
-                    #     currentAlg = algMap[algorithm]
-                    #     line = currentAlg.name + ' timed out with U: ' + str(latentFractionOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
-                    #     print(line)
-
-                f.close()
-        except IOError:
-            line = 'Please specify the input file correctly.'
-
-            print(line)
+    if task == 'gmp':
+        algorithm = algListGMP.id_
+    elif task == 'lmp':
+        algorithm = algListCIBF.id_
+    elif task == 'clmp':
+        algorithm = algListCI.id_
     
+    specs = {
+        'U': 0.2,
+        'numBatches': 10,
+        'numDivisions': 10,
+        'randomSeed': 0,
+        'timeout': 1 * 60 * 60,
+        # 'timeout': None,
+        'fixOrdering': True
+    }
+
+    # UsToTest = [0.1]
+    
+    try:
+        filePath = os.path.normpath(filePath)
+        path, file = os.path.split(filePath)
+
+        fileName = file
+
+        with open(filePath, 'r') as f:
+            fileContent = f.read()
+            G = parseGraph(fileContent)
+
+            if G is not None:
+                testProjectedGraphsBatch(G, algorithm, specs)
+                # testProjectedGraphs(G, algorithm, specs)
+
+                # if not tryTestProjectedGraphs(G, algorithm, numBatches, UsToTest, timeout):
+                #     currentAlg = algMap[algorithm]
+                #     line = currentAlg.name + ' timed out with U: ' + str(UOfFailure) + ' on sample ' + str(numSampleOfFailure) + '.'
+                #     print(line)
+
+            f.close()
+    except IOError:
+        line = 'Please specify the input file correctly.'
+
+        print(line)

@@ -1,39 +1,38 @@
 from src.experiment.experiment_utils import ExperimentUtils as eu
+from src.testable_implications.ci_defs import algListCIBF
 
-fileName = 'case2_report'
+fileName = 'case1_invalid_CIs_report'
 
-def testCase2(numBatches, n, bidirectedEdgesFraction=0.2):
+def testCase1Invalid(numBatches, n, bidirectedEdgesFraction=0):
     paramsCollectionText = []
     paramsCollection = []
 
-    mMax = int(n * (n-1) * 0.5)
-    md = n
+    mMax = int(0.5 * n * (n-1))
     mb = int(mMax * bidirectedEdgesFraction)
-    
+
     for i in range(numBatches):
         paramsCollectionText.append([])
         paramsCollectionPerSample = []
-
-        G = eu.constructMixedGraph(n, md, mb)
-        params = eu.runAlgorithmAndMeasureParams(G)
+        
+        G = eu.constructBidirGraph(n, mb)
+        params = eu.runAlgorithmAndMeasureParams(G, algListCIBF.id_)
         paramsToStr = list(map(lambda n: str(n), params))
         paramsCollectionText[i].extend(paramsToStr)
 
         paramsCollectionPerSample.append(params)
         paramsCollection.append(paramsCollectionPerSample)
 
-    # for line in paramsCollectionText:
+    # for line in paramsCollection:
     #     print(' '.join(line))
 
-    eu.writeParamsToCsv(fileName, paramsCollection)
+    eu.writeParamsToCsv(fileName, paramsCollection, algListCIBF.id_)
 
 
-def testCase2Batch(numBatches, n, numDivisions=10):
+def testCase1InvalidBatch(numBatches, n, numDivisions=10):
     paramsCollectionText = []
     paramsCollection = []
 
-    mMax = int(n * (n-1) * 0.5)
-    md = n
+    mMax = int(0.5 * n * (n-1))
 
     for i in range(numBatches):
         paramsCollectionText.append([])
@@ -45,9 +44,9 @@ def testCase2Batch(numBatches, n, numDivisions=10):
         for j in range(numDivisions):
             bidirectedEdgesFraction = j * 0.1
             mb = int(mMax * bidirectedEdgesFraction)
-
-            G = eu.constructMixedGraph(n, md, mb)
-            params = eu.runAlgorithmAndMeasureParams(G)
+            
+            G = eu.constructBidirGraph(n, mb)
+            params = eu.runAlgorithmAndMeasureParams(G, algListCIBF.id_)
             paramsToStr = list(map(lambda n: str(n), params))
             paramsCollectionText[i].extend(paramsToStr)
 
@@ -55,10 +54,10 @@ def testCase2Batch(numBatches, n, numDivisions=10):
 
         paramsCollection.append(paramsCollectionPerSample)
 
-    # for line in paramsCollection:
+    # for line in paramsCollectionText:
     #     print(' '.join(line))
 
-    eu.writeParamsToCsv(fileName, paramsCollection)
+    eu.writeParamsToCsv(fileName, paramsCollection, algListCIBF.id_)
 
 
 if __name__ == '__main__':
@@ -67,5 +66,5 @@ if __name__ == '__main__':
     n = 10
     U = 0.2
 
-    testCase2Batch(numBatches, n, numDivisions)
-    # testCase2(numBatches, n, U)
+    testCase1InvalidBatch(numBatches, n, numDivisions)
+    # testCase1Invalid(numBatches, n, U)

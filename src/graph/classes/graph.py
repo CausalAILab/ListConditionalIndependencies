@@ -107,14 +107,14 @@ class Graph():
     # possible improvements
     # adding directed edges: 1) pick a topological order, 2) add X -> Y where X < Y.
     # adding bidirected edges: 1) pick permutation, 2) add X -- Y (be careful not to overwrite X -> Y)
-    def addRandomEdges(self, m, edgeType=directedEdgeType.id_):
-        # reject if total number of edges would exceed maximum capacity
-        n = len(self.nodes)
-        # numEdges = len(self.edges)
-        # mMax = n * (n-1) / 2
+    def addRandomEdges(self, m, edgeType=directedEdgeType.id_, randomSeed=None):
+        if m == 0:
+            return
 
-        # if numEdges + m > mMax:
-        #     return []
+        if randomSeed is not None:
+            random.seed(randomSeed)
+
+        n = len(self.nodes)
 
         edges = []
         edgeCount = 0
@@ -215,7 +215,7 @@ class Graph():
 
         return edges
 
-    def toRandomGraph(self, n, m, edgeType=directedEdgeType.id_):
+    def toRandomGraph(self, n, m, edgeType=directedEdgeType.id_, randomSeed=None):
         nodes = []
 
         for i in range(n):
@@ -227,10 +227,13 @@ class Graph():
         edges = []
         edgeCount = 0
 
+        if randomSeed is not None:
+            random.seed(randomSeed)
+
         if edgeType == directedEdgeType.id_:
             while (edgeCount < m):
                 x = int(random.random() * n)
-                y = int(random.random() * n)
+                y = int(random.random() * n)                
 
                 if x == y:
                     continue

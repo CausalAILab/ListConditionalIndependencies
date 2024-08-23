@@ -302,8 +302,7 @@ def getPlotSpecs(plotType):
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print('Please specify input file paths correctly.')
-
+        print('Please specify the plot type correctly (i.e., \'1a\').')
         sys.exit()
 
     plotType = sys.argv[1]
@@ -311,6 +310,7 @@ if __name__ == '__main__':
 
     if plotType not in supportedPlotTypes:
         print('Please specify a correct plot type (e.g., 1a).')
+        sys.exit()
 
     specs = getPlotSpecs(plotType)
     

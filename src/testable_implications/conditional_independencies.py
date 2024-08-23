@@ -107,16 +107,15 @@ class ConditionalIndependencies():
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return []
 
-        CI = []
-
-        V = su.intersection(gu.topoSort(G), V, 'name')
-
         if Vordered is not None:
             V = Vordered
+        else:
+            V = su.intersection(gu.topoSort(G), V, 'name')
 
         # print('Variables (topo sorted):')
         # print(nodeNamesToString(V, False))
-
+        
+        CI = []
         Ss = []
         Spluss = []
         AC = []
@@ -215,28 +214,26 @@ class ConditionalIndependencies():
         if G is None or V is None or len(su.difference(V, G.nodes, 'name')) > 0:
             return None
         
-        CI = []
-
-        V = su.intersection(gu.topoSort(G), V, 'name')
-
         if Vordered is not None:
             V = Vordered
+        else:
+            V = su.intersection(gu.topoSort(G), V, 'name')
 
         # print('Variables (topo sorted):')
         # print(nodeNamesToString(V, False))
+
+        CI = []
 
         for X in V:
             VleqX = V[:V.index(X)+1]
             GVleqX = gu.subgraph(G, VleqX)
             
-            # I and R
-            GVleqX = gu.subgraph(G, VleqX)
             AnX = su.union(gu.ancestors(X, GVleqX), [X], 'name')
             GAnX = gu.subgraph(GVleqX, AnX)
-            I = ConditionalIndependencies.C(GAnX,X)
-            R = ConditionalIndependencies.C(GVleqX,X)
+            I = ConditionalIndependencies.C(GAnX, X)
+            R = ConditionalIndependencies.C(GVleqX, X)
 
-            ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,I,R,CI)
+            ConditionalIndependencies.ListCIX(GVleqX, X, VleqX, I, R, CI)
 
         return CI
     
@@ -262,11 +259,11 @@ class ConditionalIndependencies():
         CI: Dict
             A collection of all CIs invoked by C-LMP that are generated up to the current point of execution.
         """
-        if ConditionalIndependencies.FindAAC(GVleqX,X,VleqX,I,R) is not None:
+        if ConditionalIndependencies.FindAAC(GVleqX, X, VleqX, I, R) is not None:
             if su.equals(I, R, 'name'):
                 C = I
-                Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-                Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+                Z = ConditionalIndependencies.mbplus(GVleqX, VleqX, X, C)
+                Splus = ConditionalIndependencies.Splus(GVleqX, VleqX, X, C)
                 W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
 
                 CI.append({
@@ -291,8 +288,8 @@ class ConditionalIndependencies():
                 Gprime = gu.subgraph(GVleqX, AnIs)
                 Iprime = ConditionalIndependencies.C(Gprime, X)
 
-                ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,I,Rprime,CI)
-                ConditionalIndependencies.ListCIX(GVleqX,X,VleqX,Iprime,R,CI)
+                ConditionalIndependencies.ListCIX(GVleqX, X, VleqX, I, Rprime, CI)
+                ConditionalIndependencies.ListCIX(GVleqX, X, VleqX, Iprime, R, CI)
     
 
     @staticmethod
@@ -319,7 +316,7 @@ class ConditionalIndependencies():
         Node[]
             An AAC C under the constraint I <= C <= R, if such C exists. None otherwise.
         """
-        if ConditionalIndependencies.IsAdmissible(GVleqX,X,VleqX,I):
+        if ConditionalIndependencies.IsAdmissible(GVleqX, X, VleqX, I):
             return I
         else:
             PaR = gu.parentsPlus(R, GVleqX)
@@ -362,8 +359,8 @@ class ConditionalIndependencies():
         Boolean
             True if C is an AAC relative to X. False otherwise.
         """
-        Z = ConditionalIndependencies.mbplus(GVleqX,VleqX,X,C)
-        Splus = ConditionalIndependencies.Splus(GVleqX,VleqX,X,C)
+        Z = ConditionalIndependencies.mbplus(GVleqX, VleqX, X, C)
+        Splus = ConditionalIndependencies.Splus(GVleqX, VleqX, X, C)
         W = su.difference(Splus, su.union(Z, [X], 'name'), 'name')
 
         return not su.isEmpty(W)
