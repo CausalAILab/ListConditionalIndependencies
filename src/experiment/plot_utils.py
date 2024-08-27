@@ -57,7 +57,7 @@ class PlotUtils():
         elif paramName == 'pb':
             return 'pb: Probability for adding bidirected edges'
         elif paramName == 'ivCI':
-            return 'Number of invalid CIs'
+            return 'Number of vacuous CIs'
         elif paramName == 'n':
             # if averageSamples:
             #     return 'Average number of nodes'
@@ -92,7 +92,7 @@ class PlotUtils():
             # if averageSamples:
             #     return 'Average number of CIs'
             # else:
-            return 'Number of valid CIs'
+            return 'Number of non-vacuous CIs'
         elif paramName == 'S':
             # if averageSamples:
             #     return 'Average number of ancestral sets'

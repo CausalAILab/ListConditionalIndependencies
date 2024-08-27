@@ -10,6 +10,7 @@ def runCaseX(experimentType, specs):
     U = specs['U']
     numBatches = specs['numBatches']
     randomSeed = specs['randomSeed']
+    writeToCsv = specs['writeToCsv']
 
     paramsCollectionText = []
     paramsCollection = []
@@ -35,17 +36,20 @@ def runCaseX(experimentType, specs):
         paramsBatch.append(params)
         paramsCollection.append(paramsBatch)
 
-    for paramsBatchTextBlocks in paramsCollectionText:
-        print(' '.join(paramsBatchTextBlocks))
-
-    # eu.writeParamsToCsv(fileName, paramsCollection)
+    if writeToCsv:
+        eu.writeParamsToCsv(fileName, paramsCollection)
+    else:
+        for paramsBatchTextBlocks in paramsCollectionText:
+            print(' '.join(paramsBatchTextBlocks))
 
 
 def runCaseXBatch(experimentType, specs):
     n = specs['n']
     numBatches = specs['numBatches']
     numDivisions = specs['numDivisions']
+    interval = specs['interval']
     randomSeed = specs['randomSeed']
+    writeToCsv = specs['writeToCsv']
 
     paramsCollectionText = []
     paramsCollection = []
@@ -58,7 +62,7 @@ def runCaseXBatch(experimentType, specs):
         print(line)
 
         for div in range(numDivisions):
-            U = div * 0.1
+            U = div * interval
 
             (md, mb) = getEdgeSpecs(experimentType, specs, U)
 
@@ -76,11 +80,12 @@ def runCaseXBatch(experimentType, specs):
 
         paramsCollectionText.append(paramsBatchText)
         paramsCollection.append(paramsBatch)
-
-    for paramsBatchTextBlocks in paramsCollectionText:
-        print(' '.join(paramsBatchTextBlocks))
-
-    # eu.writeParamsToCsv(fileName, paramsCollection)
+    
+    if writeToCsv:
+        eu.writeParamsToCsv(fileName, paramsCollection)
+    else:
+        for paramsBatchTextBlocks in paramsCollectionText:
+            print(' '.join(paramsBatchTextBlocks))
 
 
 def getEdgeSpecs(experimentType, specs, U):
@@ -99,7 +104,7 @@ def getEdgeSpecs(experimentType, specs, U):
         mb = int(mMax * (1.0 - U))
     elif experimentType == '1v':
         md = 0
-        mb = int(n * U)
+        mb = int(mMax * U)
     elif experimentType == '2a':
         md = n
         mb = int(mMax * U)
@@ -130,16 +135,22 @@ if __name__ == '__main__':
         sys.exit()
 
     specs = {
-        'n': 10,
-        'U': 0.2,
-        'numBatches': 2,
-        'numDivisions': 5,
+        'n': 40,
+        'U': 0.225,
+        'numBatches': 10,
+        'numDivisions': 11,
+        'interval': 0.1,
         'randomSeed': 0,
-        # 'timeout': 1 * 60 * 60,
+        'timeout': 1 * 60 * 60,
         # 'timeout': 3,
-        'timeout': None,
-        'Vordered': None
+        # 'timeout': None,
+        'Vordered': None,
+        'writeToCsv': False
     }
 
-    runCaseXBatch(experimentType, specs)
-    # runCaseX(experimentType, specs)
+    runAllDivisions = 1
+
+    if runAllDivisions:
+        runCaseXBatch(experimentType, specs)
+    else:
+        runCaseX(experimentType, specs)

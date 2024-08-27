@@ -179,7 +179,7 @@ def drawPlot(plotType, datas, specs):
         #     color = colors[4]
 
         # if yParam == 'ivCI':
-        #     label = 'n = ' + str(n) + ' (invalid CIs)'
+        #     label = 'n = ' + str(n) + ' (vacuous CIs)'
         
         if plotStyle == 'scatter':
             if label is not None:
