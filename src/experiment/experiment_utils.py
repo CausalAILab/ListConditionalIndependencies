@@ -325,7 +325,7 @@ class ExperimentUtils():
         return G
     
     @staticmethod
-    def applyProjection(G, U=0.3, randomSeed=None):
+    def applyProjection(G, U=0.3):
         if U == 0:
             return G
         
@@ -333,12 +333,9 @@ class ExperimentUtils():
         edges = G.edges
 
         # sample x% of nodes and turn those to latent
-        if randomSeed is not None:
-            random.seed(randomSeed)
-
         k = int(len(nodes) * U)
         indices = random.sample(range(len(nodes)), k)
-
+        
         newNodes = []
         V = []
 

@@ -1,3 +1,4 @@
+import random
 import sys
 import os
 import multiprocessing as mp
@@ -230,6 +231,9 @@ def testProjectedGraphsBatch(G, alg, specs):
 
     offset = 0
 
+    if randomSeed is not None:
+        random.seed(randomSeed)
+
     for i in range(numBatches):
         paramsBatchText = []
         paramsBatch = []
@@ -239,7 +243,7 @@ def testProjectedGraphsBatch(G, alg, specs):
 
         for j in range(numDivisions):
             U = j * 0.1 + offset
-            Gp = eu.applyProjection(G, U, randomSeed)
+            Gp = eu.applyProjection(G, U)
 
             params = eu.runAlgorithmAndMeasureParams(Gp, alg, specs)
             paramsToStr = list(map(lambda n: str(n), params))
