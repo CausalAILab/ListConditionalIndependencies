@@ -15,12 +15,10 @@ Plcg  -30,-60
 PKA -> Akt
 PKA -> Erk
 PKA -> Jnk
-PKA -> Mek
 PKA -> P38
 PKA -> Raf
 Mek -> Erk
 PKC -> Jnk
-PKC -> Mek
 PKC -> P38
 PKC -> Raf
 Raf -> Mek

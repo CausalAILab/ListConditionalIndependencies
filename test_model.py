@@ -58,7 +58,19 @@ def parseDataset(G, lines):
     return parsedDataset
 
 def testModel(G, Pv, pValue, outputCIs = False):
-    CIs = ConditionalIndependencies.ListCI(G, G.nodes)
+    # fix ordering for consistent results
+    namesInOrder = ['PKA', 'PIP3', 'Plcg', 'Akt', 'PIP2', 'PKC', 'Raf', 'P38', 'Jnk', 'Mek', 'Erk']
+
+    if namesInOrder is not None:
+        Vordered = []
+
+        for name in namesInOrder:
+            Vs = list(filter(lambda n: n['name'] == name, G.nodes))
+            Vordered.append(Vs[0])
+    else:
+        Vordered = None
+
+    CIs = ConditionalIndependencies.ListCI(G, G.nodes, Vordered)
 
     # tests: 'fisherz', 'kci'
     # CITestMethod = 'fisherz'
