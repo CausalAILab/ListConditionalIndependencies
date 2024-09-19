@@ -1,7 +1,7 @@
 # ListConditionalIndependencies
 
 This repository contains the implementation for the paper ["Testing Causal Models with Hidden Variables in Polynomial Delay via Conditional Independencies"](https://causalai.net/r117.pdf) by Hyunchai Jeong\*, Adiba Ejaz\*, Jin Tian, and Elias Bareinboim. More specifically, the algorithms for listing all conditional independence relations (CIs) implied by a causal model.
-\* These authors contributed equally.
+These authors\* contributed equally.
 
 ## How to install
 
