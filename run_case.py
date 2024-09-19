@@ -3,7 +3,7 @@ import sys
 from src.testable_implications.ci_defs import algListCI, algListCIBF
 from src.experiment.experiment_utils import ExperimentUtils as eu
 
-fileName = 'case1_report'
+fileName = 'report_case_'
 
 def runCaseX(experimentType, specs):
     n = specs['n']
@@ -37,7 +37,7 @@ def runCaseX(experimentType, specs):
         paramsCollection.append(paramsBatch)
 
     if writeToCsv:
-        eu.writeParamsToCsv(fileName, paramsCollection)
+        eu.writeParamsToCsv(fileName + experimentType,paramsCollection)
     else:
         for paramsBatchTextBlocks in paramsCollectionText:
             print(' '.join(paramsBatchTextBlocks))
@@ -82,7 +82,7 @@ def runCaseXBatch(experimentType, specs):
         paramsCollection.append(paramsBatch)
     
     if writeToCsv:
-        eu.writeParamsToCsv(fileName, paramsCollection)
+        eu.writeParamsToCsv(fileName + experimentType, paramsCollection)
     else:
         for paramsBatchTextBlocks in paramsCollectionText:
             print(' '.join(paramsBatchTextBlocks))
@@ -98,7 +98,8 @@ def getEdgeSpecs(experimentType, specs, U):
         mb = int(mMax * U)
     elif experimentType == '1b':
         md = 0
-        mb = int(n * U)
+        # mb = int(n * U)
+        mb = int(50 * U)
     elif experimentType == '1r':
         md = 0
         mb = int(mMax * (1.0 - U))
@@ -110,7 +111,8 @@ def getEdgeSpecs(experimentType, specs, U):
         mb = int(mMax * U)
     elif experimentType == '2b':
         md = n
-        mb = int(n * U)
+        # mb = int(n * U)
+        mb = int(50 * U)
     elif experimentType == '3a':
         md = n * 2
         mb = int(mMax * U)
@@ -135,17 +137,18 @@ if __name__ == '__main__':
         sys.exit()
 
     specs = {
-        'n': 40,
-        'U': 0.225,
+        'n': 10,
+        'U': 0.1,
         'numBatches': 10,
         'numDivisions': 11,
         'interval': 0.1,
-        'randomSeed': 0,
+        # 'randomSeed': 0,
+        'randomSeed': None,
         'timeout': 1 * 60 * 60,
-        # 'timeout': 3,
         # 'timeout': None,
         'Vordered': None,
-        'writeToCsv': False
+        # 'writeToCsv': False
+        'writeToCsv': True
     }
 
     runAllDivisions = 1

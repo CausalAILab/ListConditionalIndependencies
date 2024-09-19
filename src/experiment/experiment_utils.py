@@ -68,6 +68,8 @@ class ExperimentUtils():
         CI = queue.get()
         listCIBFParams = queue.get()
 
+        CIs = []
+
         if alg == algListGMP.id_:
             CIs = ci.ListGMP(G, G.nodes)
         elif alg == algListCIBF.id_:
@@ -246,13 +248,15 @@ class ExperimentUtils():
 
             data.append(textBlocks)
 
-        with open(fileName + '.csv', 'w') as f:
+        csvFileName = fileName + '.csv'
+
+        with open(csvFileName, 'w') as f:
             writer = csv.writer(f, delimiter=',')
 
             writer.writerow(headers)
             writer.writerows(data)
 
-            print('Results written to ' + fileName + '.csv.')
+            print('Results written to ' + csvFileName + '.')
     
 
     @staticmethod

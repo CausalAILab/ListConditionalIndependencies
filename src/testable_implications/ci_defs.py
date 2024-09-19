@@ -12,7 +12,7 @@ class AlgorithmType():
         self.name = name
         self.params = params
 
-algListGMP = AlgorithmType('gmp', 'ListGMP', ['n', 'm', 'md', 'mb', 'CI', 'runtime'])
+algListGMP = AlgorithmType('listgmp', 'ListGMP', ['n', 'm', 'md', 'mb', 'CI', 'runtime'])
 algListCIBF = AlgorithmType('listcibf', 'ListCIBF', ['n', 'm', 'md', 'mb', 'CI', 'runtime', 's', 'S', 'Splus'])
 algListCI = AlgorithmType('listci', 'ListCI', ['n', 'm', 'md', 'mb', 'CI', 'runtime', 's'])
 

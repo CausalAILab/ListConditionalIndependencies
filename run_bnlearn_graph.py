@@ -196,22 +196,44 @@ def tryRunAlgorithm(G, alg, timeout=defaultTimeout):
 def testProjectedGraphs(G, alg, specs):
     U = specs['U']
     numBatches = specs['numBatches']
+    writeToCsv = specs['writeToCsv']
 
     paramsCollectionText = []
+    paramsCollection = []
 
     for i in range(numBatches):
-        paramsBatchText = []
-
         Gp = eu.applyProjection(G, U)
 
         params = eu.runAlgorithmAndMeasureParams(Gp, alg, specs)
         paramsToStr = list(map(lambda n: str(n), params))
 
-        paramsBatchText.extend(paramsToStr)
+        paramsBatchText = [paramsToStr]
         paramsCollectionText.append(paramsBatchText)
+
+        paramsBatch = [params]
+        paramsCollection.append(paramsBatch)
 
     for paramsBatchTextBlocks in paramsCollectionText:
         print(' '.join(paramsBatchTextBlocks))
+
+    global fileName
+
+    suffix = ''
+
+    if alg == algListGMP.id_:
+        suffix = 'gmp'
+    elif alg == algListCIBF.id_:
+        suffix = 'lmp'
+    elif alg == algListCI.id_:
+        suffix = 'clmp'
+
+    if writeToCsv:
+        fullFileName = reportFileName + '_' + fileName.replace('.txt', '') + '_' + suffix
+
+        eu.writeParamsToCsv(fullFileName, paramsCollection)
+    else:
+        for paramsBatchTextBlocks in paramsCollectionText:
+            print(' '.join(paramsBatchTextBlocks))
 
 
 def testProjectedGraphsBatch(G, alg, specs):
@@ -219,6 +241,7 @@ def testProjectedGraphsBatch(G, alg, specs):
     numDivisions = specs['numDivisions']
     randomSeed = specs['randomSeed']
     fixOrdering = specs['fixOrdering']
+    writeToCsv = specs['writeToCsv']
 
     if fixOrdering:
         Vordered = su.intersection(gu.topoSort(G), G.nodes, 'name')
@@ -254,10 +277,6 @@ def testProjectedGraphsBatch(G, alg, specs):
         paramsCollectionText.append(paramsBatchText)
         paramsCollection.append(paramsBatch)
 
-    for paramsBatchTextBlocks in paramsCollectionText:
-        print(' '.join(paramsBatchTextBlocks))
-
-
     global fileName
 
     suffix = ''
@@ -269,9 +288,13 @@ def testProjectedGraphsBatch(G, alg, specs):
     elif alg == algListCI.id_:
         suffix = 'clmp'
 
-    fullFileName = reportFileName + '_' + fileName.replace('.txt', '') + '_' + suffix
+    if writeToCsv:
+        fullFileName = reportFileName + '_' + fileName.replace('.txt', '') + '_' + suffix
 
-    eu.writeParamsToCsv(fullFileName, paramsCollection)
+        eu.writeParamsToCsv(fullFileName, paramsCollection)
+    else:
+        for paramsBatchTextBlocks in paramsCollectionText:
+            print(' '.join(paramsBatchTextBlocks))
 
 
 def tryTestProjectedGraphs(G, alg, numBatches, latentFractionsToTest=defaultLatentFranctionsToTest, timeout=defaultTimeout):
@@ -331,10 +354,13 @@ if __name__ == '__main__':
         'U': 0.2,
         'numBatches': 10,
         'numDivisions': 10,
-        'randomSeed': 0,
+        # 'randomSeed': 0,
+        'randomSeed': None,
         'timeout': 1 * 60 * 60,
         # 'timeout': None,
-        'fixOrdering': True
+        'fixOrdering': True,
+        # 'writeToCsv': False
+        'writeToCsv': True
     }
 
     # UsToTest = [0.1]

@@ -1,5 +1,7 @@
 # ListConditionalIndependencies
-Implementation of the algorithms for listing all conditional independence relations (CIs) implied by a causal model.
+
+This repository contains the implementation for the paper ["Testing Causal Models with Hidden Variables in Polynomial Delay via Conditional Independencies"](https://causalai.net/r117.pdf) by Hyunchai Jeong\*, Adiba Ejaz\*, Jin Tian, and Elias Bareinboim. More specifically, the algorithms for listing all conditional independence relations (CIs) implied by a causal model.
+\* These authors contributed equally.
 
 ## How to install
 
@@ -53,7 +55,7 @@ Try running the following command:
 python3 test_model.py graphs/sachs/graph_gt.txt datasets/sachs/dataset.csv
 ```
 
-The example tests a ground-truth graph provided by experts (11 nodes and 17 edges) against a real-world protein signaling dataset (853 samples) by (Sachs et al. 2005).
+The example tests a ground-truth graph provided by experts (11 nodes and 17 edges) against a real-world protein signaling dataset (853 samples) by (Sachs et al. 2005). The details are provided in Appendix F.2 in the paper.
 
 ### Arguments
 
@@ -62,9 +64,9 @@ The example tests a ground-truth graph provided by experts (11 nodes and 17 edge
 
 ## How to run experiments
 
-We consider experiments shown in Appendix E.
+We consider experiments shown in Appendix F.1 and F.3.
 
-1. Appendix E.1: Comparison of ListCI and two other algorithms - ListGMP and ListCIBF.
+1. Appendix F.1: Comparison of ListCI and two other algorithms - ListGMP and ListCIBF.
     - Running bnlearn instances (with varying projection levels) over three algorithms. The original bnlearn instances are available [here](https://www.bnlearn.com/bnrepository/).
 
     Try running the following command:
@@ -117,63 +119,41 @@ We consider experiments shown in Appendix E.
 
     The following parameter may be modified in `run_bnlearn_graph.py` to change experiment settings.
 
-    * `numBatches`: number of batches to run for an experiment. For each single batch, 10 random graphs are generated in total: one graph for each projection level `U` (for `U = 0, 10, ..., 90`). Default is set to `10`, totalling 100 sample graphs. Located at line 284 of `run_bnlearn_graph.py`.
+    * `numBatches`: number of batches to run for an experiment. For each single batch, 10 random graphs are generated in total: one graph for each projection level `U` (for `U = 0, 10, ..., 90`). Default is set to `10`, totalling 100 sample graphs. Located at line 355 of `run_bnlearn_graph.py`.
+    * `fixOrdering`: If set to `True`, a topological order over variables will be fixed (across all projections) for more consistent results. Default is `True`.
+    * `randomSeed`: A random seed to be provided to `random.random()`. Default is `None`.
 
-2. Appendix E.2: Analysis of C-LMP
+2. Appendix F.3: Analysis of C-LMP
     - Running experiments over random graphs to understand the total number of valid CIs invoked by C-LMP.
 
-    The following provides the list of scripts. The scripts take no argument. A report file will be generated once the experiment finishes.
-    * run_case1.py
-    * run_case1_mu.py
-    * run_case1_invalid.py
-    * run_case2.py
-    * run_case2_mu.py
-    * run_case3.py
+    Try running the following command:
+
+    ```
+    python3 run_case.py 1a
+    ```
+
+    A report file named `report_case_1a.csv` will be generated.
+
+    ### Arguments
+
+    1. First argument: Any one string from the list `['1a', '1b', '1v', '1r', '2a', '2b', '3a']`.
+    - Case 1
+        * `1a`: Experiments corresponding to plots shown in Fig. F.3.1.
+        * `1v`, `1r`: Fig. F.3.2a and Fig. F.3.2b, respectively.
+        * `1b`: Fig. F.3.3.
+    - Case 2
+        * `2a`: Fig. F.3.4.
+        * `2b`: Fig. F.3.5.
+    - Case 3
+        * `3a`: Fig. F.3.6.
     
-    The list of commands goes as follows:
-
-    ```
-    python3 run_case1.py
-    ```
-
-    A report file named `case1_report.csv` will be generated.
-
-    ```
-    python3 run_case1_mu.py
-    ```
-
-    A report file named `case1_mu_report.csv` will be generated.
-
-    ```
-    python3 run_case1_invalid.py
-    ```
-
-    A report file named `case1_invalid_CIs_report.csv` will be generated.
-
-    ```
-    python3 run_case2.py
-    ```
-
-    A report file named `case2_report.csv` will be generated.
-
-    ```
-    python3 run_case2_mu.py
-    ```
-
-    A report file named `case2_mu_report.csv` will be generated.
-
-    ```
-    python3 run_case3.py
-    ```
-
-    A report file named `case3_report.csv` will be generated.
-
     ### Experiment configuration
 
-    For all six scripts `run_case*.py`, the following parameters may be modified to change experiment settings. For all scripts, the mentioned variables are defined below the line: `if __name__ == '__main__':`.
+    The following parameters may be modified to change experiment settings. The mentioned variables are defined below the line: `if __name__ == '__main__':`.
 
     * `n`: number of nodes.
     * `numBatches`: number of batches to run for an experiment. For each single batch, 10 random graphs are generated. Default is set to `10`, totalling 100 sample graphs.
+    * `randomSeed`: A random seed to be provided to `random.random()`. Default is `None`.
 
 ## References
 
