@@ -157,5 +157,6 @@ We consider experiments shown in Appendix F.1 and F.3.
 
 ## References
 
+- Jeong, H., Ejaz, A., Tian, J., and Bareinboim, E. 2024. Testing Causal Models with Hidden Variables in Polynomial Delay via Conditional Independencies. Causal Artificial Intelligence Lab, Columbia University.
 - Scutari, M. 2010. Learning Bayesian Networks with the bnlearn R Package. Journal of Statistical Software, 35(3): 1–22.
-- Sachs, K.; Perez, O.; Pe’er, D.; Lauffenburger, D. A.; and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.
+- Sachs, K., Perez, O., Pe’er, D., Lauffenburger, D. A., and Nolan, G. P. 2005. Causal protein-signaling networks derived from multiparameter single-cell data. Science, 308(5721): 523–529.
